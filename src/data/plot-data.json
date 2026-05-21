@@ -3,11 +3,13 @@
     "meta": {
       "day": 1,
       "character": "Lendro",
+      "stage": 1,
       "visit": 1,
       "requires": null,
       "unlocks": [
         {
-          "character": "Lendro"
+          "character": "Lendro",
+          "stage_progress": "stage_1_active"
         }
       ],
       "next": "Day02_维修师_第1次",
@@ -54,41 +56,6 @@
         ]
       }
     },
-    "affinity": {
-      "character": "Lendro",
-      "start": 0,
-      "max": 5,
-      "changes": [
-        {
-          "id": "ch_01_01_C",
-          "trigger": "ch_01_01 选C（你淋湿了）",
-          "field": "关切",
-          "value": 1,
-          "note": "Day03 更早开口"
-        },
-        {
-          "id": "drink_01_01_correct",
-          "trigger": "调酒正确（白酒）",
-          "field": "信任",
-          "value": 1,
-          "note": null
-        },
-        {
-          "id": "ch_01_05_C",
-          "trigger": "ch_01_05 选C（倒酒不问）",
-          "field": "信任",
-          "value": 1,
-          "note": "Day03 跳过寒暄"
-        },
-        {
-          "id": "ch_01_06_B",
-          "trigger": "ch_01_06 选B（你随时来）",
-          "field": "亲和",
-          "value": 1,
-          "note": null
-        }
-      ]
-    },
     "drink": {
       "id": "drink_01_01",
       "available": [
@@ -98,23 +65,20 @@
         "柠檬水"
       ],
       "correct": "白酒",
-      "hint": "有什么暖的 / 随便来点什么",
-      "correct_effect": {
-        "affinity": "信任+1",
-        "emotion": "放松"
-      },
+      "hint": "有什么能喝的 / 随便来点什么",
+      "correct_effect": {},
       "wrong_effects": {
         "威士忌": {
           "dialogue": "dlg_01_drink_wrong_whisky",
-          "reaction": "嫌太重，要清的"
+          "reaction": "嫌太重，要清的——老麦学到了：这个人不需要重的东西"
         },
         "啤酒": {
           "dialogue": "dlg_01_drink_wrong_beer",
-          "reaction": "不喝，要烈的"
+          "reaction": "不喝，要烈的——老麦学到了：不是啤酒的人"
         },
         "柠檬水": {
           "dialogue": "dlg_01_drink_wrong_lemon",
-          "reaction": "质疑酒架种类"
+          "reaction": "质疑酒架种类——老麦学到了：别给他倒没味道的"
         }
       }
     },
@@ -122,7 +86,7 @@
       "ch_01_01": {
         "A": {
           "goto": "dlg_01_02a",
-          "effect": "亲和+1"
+          "effect": null
         },
         "B": {
           "goto": "dlg_01_02b",
@@ -130,79 +94,45 @@
         },
         "C": {
           "goto": "dlg_01_02c",
-          "effect": "关切+1"
+          "effect": null
         }
       },
       "ch_01_02": {
         "A": {
-          "goto": "dlg_01_04a",
+          "goto": "dlg_01_05a",
           "effect": null
         },
         "B": {
-          "goto": "dlg_01_04b",
+          "goto": "dlg_01_05b",
           "effect": null
         },
         "C": {
-          "goto": "dlg_01_04c",
+          "goto": "dlg_01_05c",
           "effect": null
         }
       },
       "ch_01_03": {
         "A": {
-          "goto": "dlg_01_06a",
+          "goto": "dlg_01_08a",
           "effect": null
         },
         "B": {
-          "goto": "dlg_01_06b",
+          "goto": "dlg_01_08b",
           "effect": null
         },
         "C": {
-          "goto": "dlg_01_06c",
+          "goto": "dlg_01_08c",
           "effect": null
         }
       },
       "ch_01_04": {
-        "A": {
-          "goto": "dlg_01_08a",
-          "effect": null,
-          "pace": "normal"
-        },
-        "B": {
-          "goto": "dlg_01_08b",
-          "effect": null,
-          "pace": "tight"
-        },
-        "C": {
-          "goto": "dlg_01_08c",
-          "effect": null,
-          "pace": "slow"
-        }
-      },
-      "ch_01_05": {
-        "A": {
-          "goto": "dlg_01_eilas_a",
-          "effect": null
-        },
-        "B": {
-          "goto": "dlg_01_eilas_b",
-          "effect": "信任+1"
-        },
-        "C": {
-          "goto": "dlg_01_eilas_c",
-          "effect": [
-            "信任+1",
-            "关切+1"
-          ]
-        }
-      },
-      "ch_01_06": {
         "A": {
           "goto": "dlg_01_farewell_a",
           "effect": null
         },
         "B": {
           "goto": "dlg_01_farewell_b",
-          "effect": "亲和+1"
+          "effect": null
         },
         "C": {
           "goto": "dlg_01_farewell_c",
@@ -214,142 +144,112 @@
       "dlg_01_01": {
         "id": "dlg_01_01",
         "actor": "Lendro",
-        "text": "……还开着？"
+        "text": "（推门进来，风衣肩头湿了。扫了一眼酒馆——先看屋里，然后窗，然后门。职业习惯。）\nLendro：还开着？好。这天气——关门的酒吧比开着的多。"
       },
       "dlg_01_02a": {
         "id": "dlg_01_02a",
-        "actor": "酒保",
-        "text": "开着。坐吧。"
+        "actor": "老麦",
+        "text": "（抬头。确认\"有人进来\"那个级别的看。下巴朝吧台方向动了一下，不到一厘米。）\n老麦：嗯。\n（继续擦杯子。）\nLendro：（不需要客套——舒服了。他最怕的就是太热情。走向吧台。）"
       },
       "dlg_01_02b": {
         "id": "dlg_01_02b",
-        "actor": "",
-        "text": "（酒保擦杯子，不说话）"
+        "actor": "老麦",
+        "text": "（擦杯子。没抬头。但杯子往吧台中央推了一下——给酒腾了个位置。）\nLendro：（注意到这个动作。嘴角动了一下。走向吧台。）"
       },
       "dlg_01_02c": {
         "id": "dlg_01_02c",
-        "actor": "酒保",
-        "text": "你淋湿了。"
+        "actor": "老麦",
+        "text": "（抬头。看了一眼他的肩膀——湿了半截。）\n老麦：淋得不轻。\nLendro：（低头看了看自己的肩膀。没想到会被注意到。）\nLendro：……习惯了。街上就我一个。\n（走向吧台。）"
       },
       "dlg_01_03": {
         "id": "dlg_01_03",
         "actor": "Lendro",
-        "text": "（拉高脚凳，坐下，动作像在审讯室里找位置）\nLendro：嗯。\n（风衣扣子解开，帽子摘下放在膝上）\nLendro：有什么能喝的。"
-      },
-      "dlg_01_04a": {
-        "id": "dlg_01_04a",
-        "actor": "Lendro",
-        "text": "随便来点什么。"
-      },
-      "dlg_01_04b": {
-        "id": "dlg_01_04b",
-        "actor": "Lendro",
-        "text": "随便来点什么。"
-      },
-      "dlg_01_04c": {
-        "id": "dlg_01_04c",
-        "actor": "Lendro",
-        "text": "（顿了一下，低头看了看自己的肩膀）\nLendro：……习惯了。\n（拉凳子坐下，比前两个选择慢半拍）\nLendro：有什么暖的。"
+        "text": "（拉凳子坐下。帽子摘下来，放在右手边第二个凳子。手指在吧台上敲了三下——哒、哒、哒。不是紧张，是警察的习惯：到新地方，先碰一下最稳的东西。）\nLendro：有什么能喝的。\n（不是问句。是陈述。像在说\"给我一个理由多坐几分钟\"。）"
       },
       "dlg_01_drink_correct": {
         "id": "dlg_01_drink_correct",
-        "actor": "Lendro",
-        "text": "（端起来，没喝，看了看杯中液体的颜色）\nLendro：……清的。\n（小口抿了一下）\nLendro：还行。\n（微微放松，肩线下降约一指宽）"
+        "actor": "",
+        "text": "（老麦倒白酒。一口杯。满的。推过去。不说话。）\nLendro：（端起来，看了看杯中液体的颜色）\nLendro：……清的。\n（小口抿了一下。）\nLendro：还行。\n（肩线放下来半寸。不是好喝——是够了。）"
       },
       "dlg_01_drink_wrong_whisky": {
         "id": "dlg_01_drink_wrong_whisky",
-        "actor": "Lendro",
-        "text": "（端起来闻了一下）\nLendro：……太重了。\n（还是喝了一口，放下时杯底磕得比正常响）\nLendro：有清一点的吗。"
+        "actor": "",
+        "text": "（老麦倒威士忌。推过去。看了他一眼——他知道这不是最好的选择，但不纠正。）\nLendro：（端起来闻了一下）\nLendro：……太重了。\n（还是喝了一口。放下时杯底磕得比正常响。）\nLendro：有清一点的吗。"
       },
       "dlg_01_drink_wrong_beer": {
         "id": "dlg_01_drink_wrong_beer",
-        "actor": "Lendro",
-        "text": "（看了一眼，没端）\nLendro：……算了。\nLendro：有烈的吗。"
+        "actor": "",
+        "text": "（老麦倒啤酒。推过去。顿了一下——这个人不像喝啤酒的，但他不替人决定。）\nLendro：（看了一眼，没端）\nLendro：……算了。\nLendro：有烈的吗。"
       },
       "dlg_01_drink_wrong_lemon": {
         "id": "dlg_01_drink_wrong_lemon",
-        "actor": "Lendro",
-        "text": "（端起来喝了一口，表情没变）\nLendro：……你这儿就这些？\n（放下杯子，手指在吧台上无声地敲了两下）"
-      },
-      "dlg_01_05": {
-        "id": "dlg_01_05",
-        "actor": "Lendro",
-        "text": "（白酒喝到半杯，声音比进门时低了一档）\nLendro：这地方……以前没见过。"
-      },
-      "dlg_01_06a": {
-        "id": "dlg_01_06a",
-        "actor": "酒保",
-        "text": "新开的。"
-      },
-      "dlg_01_06b": {
-        "id": "dlg_01_06b",
-        "actor": "酒保",
-        "text": "你以前常去哪？\nLendro：（手指摩挲杯沿）\nLendro：码头那边。第三街拐角有个地下室。\n（停顿）\nLendro：……不去了。\n（视线短暂移向窗外北墙方向，随即收回）"
-      },
-      "dlg_01_06c": {
-        "id": "dlg_01_06c",
         "actor": "",
-        "text": "（酒保继续擦杯子）"
+        "text": "（老麦倒柠檬水。推过去。手指在杯沿停了一下——是这个人的选择，和他判断的不一样。）\nLendro：（端起来喝了一口。表情没变。）\nLendro：……你这儿就这些？\n（放下杯子。手指在吧台上无声地敲了两下。）"
+      },
+      "dlg_01_04": {
+        "id": "dlg_01_04",
+        "actor": "Lendro",
+        "text": "（白酒喝到半杯。暖和过来了。开始说话——不是倾诉，是让对话别落地。Stage 1 独角戏模式：他不等回应，自己能撑满。）\nLendro：这地方以前没见过。新开的？"
+      },
+      "dlg_01_05a": {
+        "id": "dlg_01_05a",
+        "actor": "老麦",
+        "text": "三年。\nLendro：三年？我在这片跑了二十年，没路过过。怪了。\n（老麦没解释。继续擦杯子。）\nLendro：（看他没展开。不追问。换方向。）\nLendro：你这吧台的木头比我办公桌好。局里的桌子——四条腿有三条垫着书。"
+      },
+      "dlg_01_05b": {
+        "id": "dlg_01_05b",
+        "actor": "老麦",
+        "text": "（擦杯子。停了一下。）\n老麦：算新的。也不算。\nLendro：怎么说？\n老麦：这地方开开关关的。换过人。上一个是个邮差。\nLendro：邮差开酒吧？\n老麦：嗯。\n（Lendro等了两秒。老麦在擦杯子。不展开了。）\nLendro：……行。那我换个问题——你以前干什么的。不是邮差吧。\n老麦：汽车零件。冲压车间。二十二年。\nLendro：（看他的手——不是吧台磨的。是机器磨的。）\nLendro：看出来了。"
+      },
+      "dlg_01_05c": {
+        "id": "dlg_01_05c",
+        "actor": "",
+        "text": "（老麦擦杯子。没说话。但也没避开视线。）\nLendro：（自己接上了——不需要答案的聊天。）\nLendro：你不说我也知道。开在没人路过的地方，还三年——你不是靠客人赚钱的。\n（喝了一口酒。）\nLendro：你是自己想开。\n（老麦看了他一眼。没承认。没否认。擦杯子。）\nLendro：没事。我不问。我今晚就是——路过。"
+      },
+      "dlg_01_06": {
+        "id": "dlg_01_06",
+        "actor": "",
+        "text": "（安静了两秒。雨声。Lendro 正准备发下一个球——）\n老麦：你是警察。\nLendro：（愣了一下。笑了——不是客套的笑，是真的觉得好玩。但眼睛还是不笑。）\nLendro：怎么看出来的。\n老麦：帽子放右手边。伸手能够到。不能挡视线。\n（擦杯子。）\n老麦：还有你进来的时候，先扫了一圈屋里。然后是窗。然后是门。\nLendro：（看着老麦。停了半秒。）\nLendro：……你自己以前也是警察？\n老麦：冲压车间。机器不会跑。但人会出错。\nLendro：出事的多吗。\n老麦：多。手指。胳膊。有时候更糟。\n（擦杯子。节奏没变。）\n老麦：所以看人。谁今天手抖了。谁昨天没睡好。线长不看这个。我看。\nLendro：（端起白酒。没喝。看着老麦。）\nLendro：你在这擦杯子，跟踩踏板差不多。\n老麦：（嘴角动了一下。最轻的笑。）\n老麦：没那么响。"
       },
       "dlg_01_07": {
         "id": "dlg_01_07",
         "actor": "Lendro",
-        "text": "我是个警察。或者说——曾经是。\n（喝一口酒）\nLendro：二十年了。码头区，禁酒令，走私……都是我的辖区。\nLendro：你见过码头凌晨三点的样子吗？"
+        "text": "（又喝了一口。酒过半杯。气氛对了——不是\"被倾听\"那种对，是\"旁边这个人和我一样见过破事\"那种对。）\nLendro：你刚才说看人——跟你说个事。\nLendro：上周逮了个私酒贩子。\n（老麦没接话。但擦杯子的节奏慢了一点——在听。）\nLendro：把酒藏在教堂的洗礼池里。我进去的时候，他站在池子边上，跟我说——他是来受洗的。\nLendro：我说你衣服怎么是干的。他说还没开始。\n（自己先笑了。讲笑话——眼睛不笑。他在填空间。）\nLendro：我说行。那这池子里是什么。他说是圣水。我说圣水怎么是棕色的。他说——新配方。\n（摇头。）\nLendro：我问他叫什么。他说\"我受了洗\"。我说这是名字？他说——对。我受了洗，然后卖威士忌。上帝不会怪我的。\nLendro：写报告的时候我手在抖。笑的。"
       },
       "dlg_01_08a": {
         "id": "dlg_01_08a",
-        "actor": "酒保",
-        "text": "没见过。"
+        "actor": "老麦",
+        "text": "（嘴角动了一下。最轻的笑。）\n老麦：你们这行比我那行麻烦。\nLendro：（得到了确认——他在听，他觉得好笑。deflection -5。）\nLendro：你那边呢？车间里总有什么吧。\n老麦：有个哥们。每天带一样的饭盒。一样的三明治。一样的苹果。吃了十四年。\nLendro：十四年？\n老麦：嗯。后来发现他不是爱吃。是他老婆只做这一种。\n（擦杯子。）\n老麦：他没说。十四年没说。\nLendro：（顿了一下。没笑。笑不出来了——不是不好笑，是听懂了。）\nLendro：……行。十四年的三明治。\n（端起杯子。没喝，但手指放松了。）"
       },
       "dlg_01_08b": {
         "id": "dlg_01_08b",
-        "actor": "酒保",
-        "text": "三点怎么了？"
+        "actor": "",
+        "text": "（老麦擦杯子。没笑。但杯子往Lendro那边推了半寸。）\nLendro：（注意到了。不需要他说出来。）\nLendro：你知道吗，抓他的时候他在唱圣歌。真的。被铐上还在唱。\nLendro：我说你唱什么。他说——赞美上帝。上帝让我多卖了几瓶。\n（摇头。笑出声。但眼睛——还是没跟上。）\nLendro：这人要是当警察，比我强。心理素质。"
       },
       "dlg_01_08c": {
         "id": "dlg_01_08c",
         "actor": "",
-        "text": "（安静等他说）\n（无论选什么，Lendro 都接以下台词。停顿长度不同：A正常 / B更紧 / C最长）\nLendro：雾。从水面升起来，把整个码头吞进去。\nLendro：仓库的灯一盏一盏灭掉，像是有什么东西在吹蜡烛。\n（手指无意识地摸了一下风衣内侧——枪套的位置）\nLendro：……那天也是这样的雾。"
+        "text": "（老麦停下擦杯子。拿起自己的杯子——他给自己倒了一杯。举了一下。没碰，只是举了一下。）\nLendro：（看着老麦自己喝了一口。他认识这个动作——不是敬酒，是\"我听到了\"。）\nLendro：……行。你也听够了。不讲了。\n（把杯子里的酒喝完。比平时慢。）"
       },
-      "dlg_01_warehouse": {
-        "id": "dlg_01_warehouse",
+      "dlg_01_09": {
+        "id": "dlg_01_09",
         "actor": "Lendro",
-        "text": "（酒已经见底，但没有要续的意思）\nLendro：有个搭档。叫 Eilas。\n（停顿很长，像是在决定要不要说出这个名字）\nLendro：比我年轻五岁。刚从学院出来的时候，是我带的他。\n（握杯的手指关节发白）\nLendro：码头第十七号仓库。线人说那批货当晚到。\nLendro：我们两个人进去的。\n（停顿两秒）\nLendro：……出来的只有我一个。"
-      },
-      "dlg_01_eilas_a": {
-        "id": "dlg_01_eilas_a",
-        "actor": "酒保",
-        "text": "发生了什么？\nLendro：（看了你一眼，像是在判断你是不是审讯室里的人）\nLendro：……你真想听？\n（不等回答）\nLendro：仓库里不是走私酒。是——\n（突然停住，喉结动了一下）\nLendro：……我不记得了。\n（声音变硬）\nLendro：不。我记得。我只是——\n（停顿）\nLendro：……还没准备好说。\n（防御姿态，肩线重新绷紧）"
-      },
-      "dlg_01_eilas_b": {
-        "id": "dlg_01_eilas_b",
-        "actor": "酒保",
-        "text": "你不用说了。\nLendro：（明显松了一口气，但嘴角没有上扬）\nLendro：……谢了。\n（把空杯推过来，手指在杯口停了一瞬）\nLendro：下次吧。\n（退回安全距离）"
-      },
-      "dlg_01_eilas_c": {
-        "id": "dlg_01_eilas_c",
-        "actor": "",
-        "text": "（酒保给他倒酒，不说话）\nLendro：（看着新倒的酒，没立刻端起来）\nLendro：……\nLendro：（低声）你倒酒的时候不问问题。\n（端起来，小口喝）\nLendro：……这样挺好。\n（放松程度最高）"
-      },
-      "dlg_01_exit": {
-        "id": "dlg_01_exit",
-        "actor": "Lendro",
-        "text": "（不管之前选了什么，最终都会起身）\nLendro：……该走了。\n（风衣扣子扣上，戴上帽子，帽檐压得很低）\nLendro：这地方——\n（停顿）\nLendro：……还开着吧？"
+        "text": "（喝完最后一口。看杯底——确认喝完了。Stage 1 的仪式：翻到最后一页，看一眼，合上。）\nLendro：该走了。\n（顿了一下。差点说\"还不错\"。改了口。）\nLendro：这地方——\n（看了老麦一眼。老麦在擦杯子。没催。没问。）\nLendro：还开着吧。"
       },
       "dlg_01_farewell_a": {
         "id": "dlg_01_farewell_a",
-        "actor": "酒保",
-        "text": "一直开着。\nLendro：（点头，推门离开）"
+        "actor": "老麦",
+        "text": "（点头。擦杯子。）\n老麦：下雨就开着。\nLendro：（帽子压低。）\nLendro：……行。\n（推门出去。没回头。）"
       },
       "dlg_01_farewell_b": {
         "id": "dlg_01_farewell_b",
-        "actor": "酒保",
-        "text": "你随时来。\nLendro：（顿了一下，没回头，推门离开）"
+        "actor": "老麦",
+        "text": "（看了他一眼。）\n老麦：嗯。你随时来。\nLendro：（顿了一下。手指在门框上敲了一下——和吧台上敲三下同一个节奏。）\nLendro：……下次下雨。\n（推门出去。）"
       },
       "dlg_01_farewell_c": {
         "id": "dlg_01_farewell_c",
         "actor": "",
-        "text": "（酒保点头）\nLendro：（推门离开）"
+        "text": "（老麦点头。把空杯往自己这边挪了半寸——收走了。）\nLendro：（看了这个动作。没说什么。）\n（推门出去。）"
       }
     },
     "dialogueOrder": [
@@ -358,26 +258,20 @@
       "dlg_01_02b",
       "dlg_01_02c",
       "dlg_01_03",
-      "dlg_01_04a",
-      "dlg_01_04b",
-      "dlg_01_04c",
       "dlg_01_drink_correct",
       "dlg_01_drink_wrong_whisky",
       "dlg_01_drink_wrong_beer",
       "dlg_01_drink_wrong_lemon",
-      "dlg_01_05",
-      "dlg_01_06a",
-      "dlg_01_06b",
-      "dlg_01_06c",
+      "dlg_01_04",
+      "dlg_01_05a",
+      "dlg_01_05b",
+      "dlg_01_05c",
+      "dlg_01_06",
       "dlg_01_07",
       "dlg_01_08a",
       "dlg_01_08b",
       "dlg_01_08c",
-      "dlg_01_warehouse",
-      "dlg_01_eilas_a",
-      "dlg_01_eilas_b",
-      "dlg_01_eilas_c",
-      "dlg_01_exit",
+      "dlg_01_09",
       "dlg_01_farewell_a",
       "dlg_01_farewell_b",
       "dlg_01_farewell_c"
@@ -386,7 +280,7 @@
       "narr_01_01": {
         "id": "narr_01_01",
         "actor": "旁白",
-        "text": "吧台上留着一个空杯。\n杯底有一圈水渍——分不清是酒，还是雨水。"
+        "text": "吧台上留着一圈水渍——分不清是酒，还是雨。\n老麦拿起杯子。擦了一下。放回架子。看钟。\n10:43。还早。\n继续擦下一个杯子。"
       }
     },
     "commands": [
@@ -452,16 +346,6 @@
       },
       {
         "type": "CHOICE",
-        "params": "ch_01_02",
-        "raw": "[CHOICE ch_01_02]",
-        "choices": {
-          "A": "dlg_01_04a",
-          "B": "dlg_01_04b",
-          "C": "dlg_01_04c"
-        }
-      },
-      {
-        "type": "CHOICE",
         "params": "drink_01_01",
         "raw": "[CHOICE drink_01_01]",
         "choices": {
@@ -473,18 +357,23 @@
       },
       {
         "type": "GOTO",
-        "params": "dlg_01_05",
-        "raw": "[GOTO dlg_01_05]"
+        "params": "dlg_01_04",
+        "raw": "[GOTO dlg_01_04]"
       },
       {
         "type": "CHOICE",
-        "params": "ch_01_03",
-        "raw": "[CHOICE ch_01_03]",
+        "params": "ch_01_02",
+        "raw": "[CHOICE ch_01_02]",
         "choices": {
-          "A": "dlg_01_06a",
-          "B": "dlg_01_06b",
-          "C": "dlg_01_06c"
+          "A": "dlg_01_05a",
+          "B": "dlg_01_05b",
+          "C": "dlg_01_05c"
         }
+      },
+      {
+        "type": "GOTO",
+        "params": "dlg_01_06",
+        "raw": "[GOTO dlg_01_06]"
       },
       {
         "type": "GOTO",
@@ -493,8 +382,8 @@
       },
       {
         "type": "CHOICE",
-        "params": "ch_01_04",
-        "raw": "[CHOICE ch_01_04]",
+        "params": "ch_01_03",
+        "raw": "[CHOICE ch_01_03]",
         "choices": {
           "A": "dlg_01_08a",
           "B": "dlg_01_08b",
@@ -503,28 +392,13 @@
       },
       {
         "type": "GOTO",
-        "params": "dlg_01_warehouse",
-        "raw": "[GOTO dlg_01_warehouse]"
+        "params": "dlg_01_09",
+        "raw": "[GOTO dlg_01_09]"
       },
       {
         "type": "CHOICE",
-        "params": "ch_01_05",
-        "raw": "[CHOICE ch_01_05]",
-        "choices": {
-          "A": "dlg_01_eilas_a",
-          "B": "dlg_01_eilas_b",
-          "C": "dlg_01_eilas_c"
-        }
-      },
-      {
-        "type": "GOTO",
-        "params": "dlg_01_exit",
-        "raw": "[GOTO dlg_01_exit]"
-      },
-      {
-        "type": "CHOICE",
-        "params": "ch_01_06",
-        "raw": "[CHOICE ch_01_06]",
+        "params": "ch_01_04",
+        "raw": "[CHOICE ch_01_04]",
         "choices": {
           "A": "dlg_01_farewell_a",
           "B": "dlg_01_farewell_b",
@@ -558,8 +432,8 @@
       },
       {
         "type": "PAUSE",
-        "params": "3s",
-        "raw": "[PAUSE 3s]"
+        "params": "2s",
+        "raw": "[PAUSE 2s]"
       },
       {
         "type": "GOTO",
@@ -574,6 +448,10 @@
     ],
     "links": {
       "next_visit": "Day03_警探_第2次",
+      "stage_progress": {
+        "current": "stage_1",
+        "next_trigger": "visits >= 2 且 trust >= 15 → Stage 2"
+      },
       "related": [
         {
           "day": 3,
@@ -581,52 +459,59 @@
           "visit": 2,
           "conditions": [
             {
-              "if": "ch_01_05_C",
-              "then": "跳过寒暄直接讲 Eilas"
+              "if": "ch_01_01_C",
+              "then": "更早开口，寒暄缩短——被注意过一次，这次不用重复确认"
             },
             {
-              "if": "ch_01_01_C",
-              "then": "更早开口"
+              "if": "drink_01_01_correct",
+              "then": "老麦直接倒威士忌，不用问——记得"
+            },
+            {
+              "if": "ch_01_03_A",
+              "then": "Lendro主动提起上次你说的车间——十四年的三明治他没忘"
             }
           ]
         },
         {
           "day": 8,
           "character": "Zombie",
-          "event": "警探拔枪，与 Day01 摸枪套呼应"
+          "event": "警探拔枪。与Day01老麦的观察形成呼应。"
         },
         {
           "day": 9,
-          "character": "Lendro+Zombie",
-          "event": "镜像场景，警探教僵尸存在，僵尸教警探放下"
+          "character": [
+            "Lendro",
+            "Zombie"
+          ],
+          "event": "镜像场景——老麦给的沉默，Lendro给了僵尸。"
         }
       ]
     },
     "metaphor": [
       {
-        "anchor": "dlg_01_07",
-        "surface": "码头凌晨三点的雾",
-        "deep": "PTSD 闪回前兆"
+        "anchor": "dlg_01_03",
+        "surface": "手指在吧台上敲三下——确认这张吧台是实的",
+        "deep": "PTSD——需要反复确认现在是真的。Stage 1 的仪式。"
       },
       {
-        "anchor": "dlg_01_eilas_a",
-        "surface": "'我不记得了'",
-        "deep": "创伤性回避，不是真不记得"
+        "anchor": "dlg_01_06",
+        "surface": "老麦看人——谁今天手抖了。谁昨天没睡好",
+        "deep": "两个在不同世界看了几十年的中年人，用同一种方式活下来：观察。不加判断。"
       },
       {
-        "anchor": "dlg_01_07",
-        "surface": "摸风衣内侧枪套",
-        "deep": "安全感依赖，与僵尸\"什么都没有\"形成镜像"
+        "anchor": "dlg_01_08a",
+        "surface": "十四年的三明治。十四年没说",
+        "deep": "Lendro听懂了——有些东西你咽下去了，不说。和他自己咽下去的码头仓库是同一种沉默。"
+      },
+      {
+        "anchor": "dlg_01_farewell_a",
+        "surface": "下雨就开着",
+        "deep": "老麦版本的随时来。加了条件，加了分寸。Lendro不需要承诺——他需要一个不会变的地方。"
       },
       {
         "anchor": "narr_01_01",
-        "surface": "杯底水渍分不清酒和雨",
-        "deep": "警探分不清现实和创伤记忆"
-      },
-      {
-        "anchor": "dlg_01_06b",
-        "surface": "视线移向北墙",
-        "deep": "'过去之墙'的第一次暗示"
+        "surface": "杯底水渍分不清酒和雨。老麦擦杯子。看钟。10:43。",
+        "deep": "Stage 1 的收尾：老麦在干活。看钟是确认钟还在走。和 Stage 3 看钟形成递进。"
       }
     ]
   }
