@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "default_policy": "ask-before-writing",
+  "owners": {
+    "src/store/**": "runtime-agent",
+    "src/app/**": "frontend-agent",
+    "src/components/**": "frontend-agent",
+    "scripts/**": "compiler-agent",
+    "docs/**": "docs-agent",
+    "脚本/**": "story-agent",
+    "设定/**": "lore-agent",
+    "harness/**": "harness-agent"
+  },
+  "shared": [
+    "AGENTS.md",
+    "README.md"
+  ],
+  "read_only": [
+    "src/data/plot-data.json"
+  ]
+}

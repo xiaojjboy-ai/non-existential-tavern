@@ -1,0 +1,34 @@
+{
+  "id": "harness-setup",
+  "title": "搭建简化版 Agent Team Harness",
+  "owner": "codex",
+  "mode": "drill",
+  "discipline_style": "director",
+  "allowed_files": [
+    "harness/**",
+    "AGENTS.md"
+  ],
+  "forbidden_files": [
+    "src/data/plot-data.json"
+  ],
+  "ignored_existing_changes": [
+    "src/app/globals.css",
+    "src/app/page.tsx",
+    "src/components/GameCanvas.tsx",
+    "public/assets/tavern_bg.png",
+    "public/assets/tavern_bg_rich.png"
+  ],
+  "allow_generated": false,
+  "required_reads": [
+    "AGENTS.md",
+    "harness/protocols/agent-team.md"
+  ],
+  "required_checks": [
+    "powershell -ExecutionPolicy Bypass -File .\\harness\\policy\\guard.ps1 -Stage inspect"
+  ],
+  "required_evidence": [
+    "harness/evidence/harness-setup-inspect.txt"
+  ],
+  "required_work_record": "harness/work-records/harness-setup.md",
+  "handoff_required": true
+}
