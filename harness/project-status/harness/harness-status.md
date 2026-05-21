@@ -23,6 +23,15 @@
 - CI 工作流。
 - required_checks 逐条执行记录校验。
 
+## 已新增分支门禁
+
+`guard.ps1 -Stage ci` 会先检查：
+
+- 当前分支必须是 `main`。
+- upstream 必须是 `origin/main`。
+
+分支不对齐，不准 push。
+
 ## Hook 初始化规范
 
 Hook 不是自动偷偷安装的。每个 agent 或人类成员必须在自己的工具里主动接入。

@@ -53,6 +53,32 @@
 
 不要把 hook 当可选项。hook 是门禁自动化入口。
 
+## 3.5 Push Discipline：上传前分支确认
+
+上传前必须先确认分支。任何 agent 或人类成员推送前都必须记录：
+
+- 当前本地分支。
+- 当前上游分支。
+- 远端默认分支。
+- 准备推送到哪个分支。
+- 是否一致。
+
+必跑命令：
+
+```powershell
+git branch --show-current
+git status -sb
+git remote -v
+git branch -vv
+git log --oneline --decorate -3
+```
+
+铁律：
+
+- 上传前不确认分支，就是流程违规。
+- 本地分支、上游分支、目标远端没对齐，不准 push。
+- 分支没确认，就没有推送资格。
+
 ## 4. Plan：定小步
 
 复杂任务用三到五步即可：

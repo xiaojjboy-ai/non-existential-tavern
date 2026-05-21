@@ -147,6 +147,18 @@ function Fail-Hard {
           "确保该测试命令在本地可以成功跑出绝对绿码！"
         )
     }
+    "branch-not-confirmed" {
+      Write-DrillFailure `
+        -Code $Code `
+        -Conclusion "你准备盲推。" `
+        -Fact $Message `
+        -Qualitative "上传前不确认当前分支、上游分支和目标远端，就是流程违规。分支没确认，就没有推送资格。" `
+        -Remedies @(
+          "立刻运行 git branch --show-current、git status -sb、git branch -vv。",
+          "确认本地分支、上游分支、远端默认分支和准备推送目标一致。",
+          "把分支确认结果写入工作记录。确认前不准 push。"
+        )
+    }
     "missing-file" {
       Write-DrillFailure `
         -Code $Code `
@@ -350,6 +362,36 @@ function Assert-WorkRecord {
   Write-Host "OK work record exists"
 }
 
+function Assert-BranchForPush {
+  Push-Location $RepoRoot
+  try {
+    $current = (git branch --show-current).Trim()
+    $status = git status -sb
+    $upstream = ""
+    $upstreamResult = git rev-parse --abbrev-ref --symbolic-full-name "@{u}" 2>$null
+    if ($LASTEXITCODE -eq 0) {
+      $upstream = ($upstreamResult | Select-Object -First 1).Trim()
+    }
+
+    Write-Host "Current branch: $current"
+    Write-Host "Upstream branch: $upstream"
+    Write-Host "Status: $status"
+
+    if (-not $current) {
+      Fail-Hard "branch-not-confirmed" "当前不在具名分支上，无法确认推送目标。" "Checkout a named branch before pushing."
+    }
+    if (-not $upstream) {
+      Fail-Hard "branch-not-confirmed" "当前分支没有 upstream。当前分支：$current。" "Set upstream before pushing."
+    }
+    if ($current -ne "main" -or $upstream -ne "origin/main") {
+      Fail-Hard "branch-not-confirmed" "当前分支/上游不一致。current=$current upstream=$upstream expected=main/origin/main。" "Switch to main and track origin/main before pushing."
+    }
+  }
+  finally {
+    Pop-Location
+  }
+}
+
 function Write-InspectEvidence {
   param($Task)
   if (-not (Test-Path -LiteralPath $EvidenceRoot)) {
@@ -423,6 +465,8 @@ if ($Stage -eq "pre-stop") {
 }
 
 if ($Stage -eq "ci") {
+  Write-Step "Branch gate"
+  Assert-BranchForPush
   Write-Step "CI gate"
   Invoke-AppCommand "npm run compile"
   Invoke-AppCommand "npx tsc --noEmit --pretty false"
