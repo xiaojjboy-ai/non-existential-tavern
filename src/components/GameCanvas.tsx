@@ -454,7 +454,7 @@ export const GameCanvas = () => {
   };
 
   return (
-    <div ref={containerRef} className="fixed inset-0 z-0 overflow-hidden bg-[#040408]">
+    <div ref={containerRef} className="fixed inset-0 z-0 overflow-hidden bg-[#05050a] pointer-events-none">
       <Application
         resizeTo={containerRef}
         background={'#08080f'}

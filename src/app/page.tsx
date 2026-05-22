@@ -2,9 +2,8 @@
 
 import { useCallback, useMemo, useState } from 'react';
 import { GameCanvas } from '@/components/GameCanvas';
-import { Typewriter } from '@/components/Typewriter';
 import { useGameStore } from '@/store/useGameStore';
-import type { ChoiceBranch, DialogueNode, PlotData } from '@/types/game';
+import type { ChoiceBranch, PlotData } from '@/types/game';
 
 function removeActorPrefix(line: string, actor: string) {
   if (!actor) return line;
@@ -12,7 +11,7 @@ function removeActorPrefix(line: string, actor: string) {
   return line.replace(new RegExp(`^${escapedActor}[：:]\\s*`), '');
 }
 
-function formatNodeText(node: DialogueNode | null) {
+function formatNodeText(node: { text: string; actor: string } | null) {
   if (!node) return '';
   return node.text
     .split(/\r?\n/)
@@ -47,15 +46,16 @@ export default function Home() {
     handleChoice,
     nextStep,
     runtime,
+    setPlot,
   } = useGameStore();
   const [completedNodeId, setCompletedNodeId] = useState<string | null>(null);
   const [debugExpanded, setDebugExpanded] = useState(false);
   const [debugHovered, setDebugHovered] = useState(false);
   const [hoveredChoiceKey, setHoveredChoiceKey] = useState<string | null>(null);
 
+
   const plot = getCurrentPlot();
   const node = getCurrentNode();
-  const isTypingComplete = completedNodeId === currentNodeId;
   const displayText = useMemo(() => formatNodeText(node), [node]);
   const actorLabel = useMemo(() => {
     if (!node) return '';
@@ -83,14 +83,14 @@ export default function Home() {
 
   const handleGlobalClick = useCallback(() => {
     if (!node || activeChoices) return;
-
-    if (!isTypingComplete) {
-      setCompletedNodeId(currentNodeId);
-      return;
-    }
-
+    console.log('[CLICK] advancing...');
     nextStep();
-  }, [activeChoices, currentNodeId, isTypingComplete, nextStep, node]);
+  }, [activeChoices, nextStep, node]);
+
+  // Debug: expose store for console access
+  if (typeof window !== 'undefined') {
+    (window as any).__debugNextStep = nextStep;
+  }
 
   if (!node) {
     return (
@@ -129,7 +129,7 @@ export default function Home() {
       <main className="fixed inset-0 z-20 flex flex-col justify-between p-6 md:p-12 pointer-events-none select-none crt-scanlines crt-screen crt-aberration">
         {/* 顶部 VCR/HUD 沉浸式状态栏 */}
         <div className="w-full max-w-5xl self-center pointer-events-auto">
-          <div 
+          <div
             className="flex w-full items-center justify-between border-b-2 px-4 py-2"
             style={{ borderColor: 'var(--color-terminal-amber)', borderBottomStyle: 'dashed' }}
           >
@@ -140,8 +140,21 @@ export default function Home() {
             <div className="font-mono text-sm tracking-widest text-[var(--color-terminal-amber)] crt-text-glow uppercase">
               DAY_{String(plot?.meta.day).padStart(2, '0')} : {Array.isArray(plot?.meta.character) ? plot.meta.character.join(', ') : plot?.meta.character}
             </div>
-            <div className="font-mono text-sm text-[var(--color-terminal-amber)] crt-text-glow opacity-70">
-              SYS_OK
+            <div className="flex items-center gap-3">
+              <select
+                value={currentPlotId}
+                onChange={(e) => setPlot(e.target.value)}
+                className="rounded border border-[var(--color-terminal-amber)] bg-black/60 px-2 py-1 text-[10px] text-[var(--color-terminal-amber)] cursor-pointer hover:border-[var(--color-phosphor-crimson)] focus:outline-none font-mono"
+              >
+                {Object.keys(getAllPlots()).map((id) => (
+                  <option key={id} value={id} className="bg-zinc-900 text-zinc-200">
+                    {id.replace(/_/g, ' ')}
+                  </option>
+                ))}
+              </select>
+              <div className="font-mono text-sm text-[var(--color-terminal-amber)] crt-text-glow opacity-70">
+                SYS_OK
+              </div>
             </div>
           </div>
         </div>
@@ -184,6 +197,7 @@ export default function Home() {
               {actorLabel}
             </div>
           )}
+<<<<<<< HEAD
 
           <div 
             className="mb-8 min-h-[90px] w-full text-base leading-relaxed" 
@@ -209,6 +223,10 @@ export default function Home() {
                 speed={20}
               />
             )}
+=======
+          <div className="mb-12 min-h-[100px] w-full text-xl leading-relaxed" data-testid="dialogue-text">
+            <div className="whitespace-pre-wrap">{displayText}</div>
+>>>>>>> ea4cf4e (feat: Day02 安尼尔首次来访 + 剧本切换 + 猫咪互动)
           </div>
 
           {/* 终端命令行选项系统 */}
