@@ -6,9 +6,9 @@
     "src/app/**": "frontend-agent",
     "src/components/**": "frontend-agent",
     "scripts/**": "compiler-agent",
+    "docs/characters/**": "lore-agent",
     "docs/**": "docs-agent",
     "脚本/**": "story-agent",
-    "设定/**": "lore-agent",
     "harness/**": "harness-agent"
   },
   "shared": [

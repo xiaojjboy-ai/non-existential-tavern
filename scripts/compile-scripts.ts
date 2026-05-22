@@ -10,8 +10,9 @@ import type {
   PlotData,
 } from '../src/types/game';
 
-const SCRIPT_DIR = path.join(__dirname, '../../脚本');
-const OUTPUT_DIR = path.join(__dirname, '../src/data');
+const PROJECT_ROOT = path.resolve(__dirname, '..');
+const SCRIPT_DIR = path.join(PROJECT_ROOT, '脚本');
+const OUTPUT_DIR = path.join(PROJECT_ROOT, 'src/data');
 const OUTPUT_FILE = path.join(OUTPUT_DIR, 'plot-data.json');
 
 const LAYER_NAMES = ['指令层', '对话层', '数据层'] as const;

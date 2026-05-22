@@ -53,14 +53,14 @@ Drill 三条铁律，对人类和 agent 一视同仁：
 ## Repository shape
 
 - 当前仓库根目录是实际 Next.js 应用和 git 仓库。
-- 上层 `../脚本/` 是剧情 Markdown 源文件目录。
-- 上层 `../设定/` 是世界观、角色、美术和流程设定资料。
+- 仓库内 `脚本/` 是剧情 Markdown 源文件目录。
+- 仓库内 `docs/characters/` 是当前角色设定资料目录。
 - 根目录有 `package.json`；运行 npm 命令在当前仓库根目录执行。
 
 ## Script format contract
 
 - 剧情源文件使用 UTF-8 Markdown + YAML。
-- 正式剧情文件放在上层 `../脚本/*.md`。
+- 正式剧情文件放在仓库内 `脚本/*.md`。
 - 模板文件必须以 `模板_` 开头，编译器会跳过。
 - 正式剧情文件必须包含三层标题，顺序固定：
   - `## 指令层`
@@ -71,7 +71,7 @@ Drill 三条铁律，对人类和 agent 一视同仁：
 
 ## Build/data flow
 
-- `cmd /c npm run compile` 从上层 `../脚本/*.md` 生成 `src/data/plot-data.json`。
+- `cmd /c npm run compile` 从仓库内 `脚本/*.md` 生成 `src/data/plot-data.json`。
 - `src/data/plot-data.json` 是生成物，但当前阶段继续提交；不要手改。
 - `cmd /c npm run dev` 只启动 Next.js，不会自动重新生成剧情 JSON。
 - `cmd /c npm run build` 会先 compile 再 build。

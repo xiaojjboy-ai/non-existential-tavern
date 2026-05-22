@@ -10,12 +10,11 @@
 
 ## 1. 先确认路径
 
-本项目有三层常用根路径：
+本项目只使用仓库内相对路径：
 
-- Workspace root：`H:\AI\非存在主义酒馆`
-- Repo/App root：`H:\AI\非存在主义酒馆\酒馆工作区\tavern\tavern-web`
-- Harness root：`H:\AI\非存在主义酒馆\酒馆工作区\tavern\tavern-web\harness`
-- Story root：`H:\AI\非存在主义酒馆\酒馆工作区\tavern\脚本`
+- Repo/App root：`.`
+- Harness root：`harness/`
+- Story root：`脚本/`
 
 注意：`package.json` 在当前仓库根目录。
 

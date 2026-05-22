@@ -5,12 +5,12 @@
 - Next.js 16 + React 19 + TypeScript
 - Zustand 管理剧情状态
 - `@pixi/react` + PixiJS 渲染占位背景
-- 顶层 `../脚本/*.md` 是剧情源，`npm run compile` 会生成 `src/data/plot-data.json`
+- 仓库内 `脚本/*.md` 是剧情源，`npm run compile` 会生成 `src/data/plot-data.json`
 
 ## 目录关系
 
-- `../脚本/`：剧情 Markdown + YAML 源文件
-- `../设定/`：世界观和资料文档
+- `脚本/`：剧情 Markdown + YAML 源文件
+- `docs/characters/`：角色设定资料
 - `docs/script-format.md`：剧情格式契约
 - `scripts/compile-scripts.ts`：脚本编译器
 - `src/app/page.tsx`：页面入口
@@ -40,7 +40,7 @@ cmd /c npm run build
 
 ## 脚本编译约束
 
-- 正式剧情文件在顶层 `../脚本/*.md`
+- 正式剧情文件在仓库内 `脚本/*.md`
 - 模板文件必须以 `模板_` 开头，编译器会跳过
 - 正式剧情必须包含：
   - `## 指令层`

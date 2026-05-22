@@ -5,9 +5,10 @@
   "scripts": {
     "dev": "next dev",
     "build": "npm run compile && next build",
-    "compile": "tsx scripts/compile-scripts.ts",
+    "compile": "npm run harness -- --task precompile && tsx scripts/compile-scripts.ts",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "harness": "tsx tools/harness/harness.ts"
   },
   "dependencies": {
     "@pixi/react": "^8.0.5",
