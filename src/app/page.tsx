@@ -2,8 +2,9 @@
 
 import { useCallback, useMemo, useState } from 'react';
 import { GameCanvas } from '@/components/GameCanvas';
+import { Typewriter } from '@/components/Typewriter';
 import { useGameStore } from '@/store/useGameStore';
-import type { ChoiceBranch, PlotData } from '@/types/game';
+import type { ChoiceBranch, DialogueNode, PlotData } from '@/types/game';
 
 function removeActorPrefix(line: string, actor: string) {
   if (!actor) return line;
@@ -56,6 +57,7 @@ export default function Home() {
 
   const plot = getCurrentPlot();
   const node = getCurrentNode();
+  const isTypingComplete = completedNodeId === currentNodeId;
   const displayText = useMemo(() => formatNodeText(node), [node]);
   const actorLabel = useMemo(() => {
     if (!node) return '';
@@ -83,9 +85,14 @@ export default function Home() {
 
   const handleGlobalClick = useCallback(() => {
     if (!node || activeChoices) return;
-    console.log('[CLICK] advancing...');
+
+    if (!isTypingComplete) {
+      setCompletedNodeId(currentNodeId);
+      return;
+    }
+
     nextStep();
-  }, [activeChoices, nextStep, node]);
+  }, [activeChoices, currentNodeId, isTypingComplete, nextStep, node]);
 
   // Debug: expose store for console access
   if (typeof window !== 'undefined') {
@@ -197,10 +204,8 @@ export default function Home() {
               {actorLabel}
             </div>
           )}
-<<<<<<< HEAD
-
-          <div 
-            className="mb-8 min-h-[90px] w-full text-base leading-relaxed" 
+          <div
+            className="mb-8 min-h-[90px] w-full text-base leading-relaxed"
             data-testid="dialogue-text"
             style={{
               fontFamily: 'var(--font-noto)',
@@ -223,10 +228,6 @@ export default function Home() {
                 speed={20}
               />
             )}
-=======
-          <div className="mb-12 min-h-[100px] w-full text-xl leading-relaxed" data-testid="dialogue-text">
-            <div className="whitespace-pre-wrap">{displayText}</div>
->>>>>>> ea4cf4e (feat: Day02 安尼尔首次来访 + 剧本切换 + 猫咪互动)
           </div>
 
           {/* 终端命令行选项系统 */}
