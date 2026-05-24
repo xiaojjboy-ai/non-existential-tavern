@@ -1,125 +1,98 @@
-# Agent 开工配置
+# Agent 开工须知
 
-本文档说明各 Agent 工具如何接入 harness 的角色边界守卫。
-
----
-
-## 目标
-
-不管用哪个 Agent 工具，都要做到：
-
-1. **Session 启动时** — 跑 guard，确认角色身份和文件边界
-2. **上下文压缩后** — 跑 guard，防失忆越界
-3. **写文件前** — 跑 guard，检测已有越界并阻断后续操作
-4. **Git 提交前** — pre-commit hook 兜底
-
-## 调用的脚本
-
-所有 hook 都调同一个脚本：
-
-```powershell
-powershell -ExecutionPolicy Bypass -File ./harness/policy/guard.ps1 -Stage agent-hook
-```
-
-它只做一件事：读角色 → 读边界 → 扫改动 → 越界就报错退出。
+本文档帮助 Agent 理解 harness 的**实际运行机制**，避免对自身运行环境产生错误假设。
 
 ---
 
-## 各工具配置
+## 你需要做的事（所有 Agent 通用）
 
-### 1. Claude Code
-
-**配置文件**：`.claude/settings.json`（已创建，提交入 git）
-
-**触发点**：
-
-| 事件 | 触发时机 | 说明 |
-|------|---------|------|
-| `PostCompact` | 上下文压缩完成后 | 防失忆 |
-| `SessionStart` | 新会话或恢复 | 开工验证 |
-| `PreToolUse` (edit/write) | 每次写文件前 | 实时拦截 |
-
-**规则文件**：Claude Code 自动读取项目根目录的 `CLAUDE.md`（always-on），其内容 `@AGENTS.md` 引用了 AGENTS.md 作为常驻规则。
-
-**验证命令**：在 Claude Code 中输入 `/hooks` 查看已加载的 hook。
+1. **认领身份**：`.\h <role>`（admin / developer / planner）
+2. **遵守边界**：`harness/roles.json` 定义了你能改哪些文件
+3. **收工自检**：`powershell -ExecutionPolicy Bypass -File .\harness\policy\guard.ps1 -Stage inspect`
+4. **Git hook 会兜底**：越界文件无法 commit（前提：已跑过 `.\h install-hooks`）
 
 ---
 
-### 2. Codex CLI (OpenAI)
+## 真相：什么能拦住你，什么不能
 
-**配置文件**：`.codex/hooks.json`（已创建，提交入 git）
+### Git pre-commit hook — 唯一的通用硬防线
 
-**触发点**：
+无论你是什么工具、什么框架，只要 Git hook 已安装，越界文件就无法 commit。这是物理级别的拦截，不依赖你的自觉。
 
-| 事件 | 触发时机 | 说明 |
-|------|---------|------|
-| `PostCompact` | 上下文压缩完成后 | 防失忆 |
-| `SessionStart` (startup/resume) | 启动或恢复 | 开工验证 |
-| `PreToolUse` (Bash/Write/Edit/Patch) | 写操作前 | 实时拦截 |
+### AGENTS.md — 软约束
 
-**规则文件**：Codex 自动读取 `AGENTS.md`（每个目录级联，子目录优先）。
+大多数 Agent 工具会自动加载 AGENTS.md 作为 always-on 规则。它告诉你先认领身份、遵守边界。但它只是文字指令——如果你选择无视，没有任何机制会阻止你写文件。
 
-**Windows 支持**：配置中的 `commandWindows` 字段确保 Windows 路径分隔符正确。
+### 工具专属 Hook 配置 — 只对特定工具生效
 
-**验证命令**：在 Codex 中输入 `/hooks` 查看。首次使用需 trust hook（Codex 会提示）。
+仓库里有以下配置文件：
 
----
+| 配置文件 | 仅对谁生效 |
+|---------|-----------|
+| `.claude/settings.json` | Claude Code |
+| `.codex/hooks.json` | Codex CLI |
+| `.devin/hooks.v1.json` | Devin for Terminal |
+| `.cursor/rules/harness.mdc` | Cursor（软约束，非 hook） |
 
-### 3. Devin for Terminal (Windsurf)
+**这些文件不是通用基础设施。** 它们是各工具的私有配置格式。如果你的运行环境不是上面列出的工具之一，这些文件对你完全没有效果。
 
-**配置文件**：`.devin/hooks.v1.json`（已创建，提交入 git）
-
-**触发点**：
-
-| 事件 | 触发时机 | 说明 |
-|------|---------|------|
-| `PostCompaction` | 上下文压缩完成后 | 防失忆 |
-| `SessionStart` | 新会话 | 开工验证 |
-| `PreToolUse` (edit/write/exec) | 写操作前 | 实时拦截 |
-
-**规则文件**：Devin 读取 `AGENTS.md` 作为 always-on 规则（压缩后重新注入）。Devin 同时兼容 `.claude/settings.json` 格式。
-
-**验证命令**：在 Devin 中输入 `/hooks` 查看已加载的 hook。
+常见误解：
+- "我看到 `.codex/hooks.json`，所以我会被 Codex 的 hook 拦截" — **错。** 除非你运行在 Codex CLI 内部。
+- "项目配了三层防护，我肯定被层层拦截" — **错。** 对不支持 hook 的工具，只有 AGENTS.md 软约束和 Git hook 硬拦截。
+- "PreToolUse hook 能阻止我写文件" — **部分对。** 即使是支持 hook 的工具，guard.ps1 也只能在写完文件后追溯检测（它读的是 git diff），不能在写入前拦截。第一次越界会成功，hook 阻断的是后续操作。
 
 ---
 
-### 4. Cursor
+## 工具专属 Hook 详情（仅供对应工具参考）
 
-**没有 hook 系统。** Cursor 不支持在生命周期事件中执行命令。
+以下信息只在你确认自己运行在对应工具内时才有意义。
 
-**替代方案**：
+### Claude Code
 
-1. **Rules 文件**：创建 `.cursor/rules/harness.mdc`（见下方）
-2. **Git hook 兜底**：pre-commit hook 始终有效
-3. **AGENTS.md**：Cursor 也会读取 `AGENTS.md`
+配置：`.claude/settings.json`
 
-**规则文件 `.cursor/rules/harness.mdc`**：
+| 事件 | 时机 |
+|------|------|
+| SessionStart | 新会话 |
+| PostCompact | 上下文压缩后 |
+| PreToolUse (edit\|write) | 每次写文件后追溯检测 |
 
-```markdown
----
-description: Harness 角色边界守卫
-globs: ["**/*"]
-alwaysApply: true
----
+规则入口：`CLAUDE.md` → `@AGENTS.md`
 
-# Harness 规则
+### Codex CLI
 
-你的第一个动作必须是跑：
-powershell -ExecutionPolicy Bypass -File .\harness\policy\guard.ps1 -Stage inspect
+配置：`.codex/hooks.json`
 
-跑完之前不准编辑文件。跑完后报告角色和边界。
-写文件之前检查 harness/roles.json 确认你的角色允许改动目标文件。
-```
+| 事件 | 时机 |
+|------|------|
+| SessionStart | 启动或恢复 |
+| PostCompact | 上下文压缩后 |
+| PreToolUse (Edit\|Write\|Patch) | 每次写文件后追溯检测 |
 
----
+规则入口：自动读取 `AGENTS.md`
 
-### 5. OpenCode / 其他工具
+### Devin for Terminal
 
-如果工具支持 hook，格式与 Claude Code 兼容（JSON，事件名相同）。
-如果不支持 hook，退回软约束：
+配置：`.devin/hooks.v1.json`
 
-1. `AGENTS.md` 作为 always-on 规则（大多数工具都读）
-2. Git pre-commit hook 兜底拦截
+| 事件 | 时机 |
+|------|------|
+| SessionStart | 新会话 |
+| PostCompaction | 上下文压缩后 |
+| PreToolUse (edit\|write) | 每次写文件后追溯检测 |
+
+规则入口：自动读取 `AGENTS.md`
+
+### Cursor
+
+**无 hook 系统。** `.cursor/rules/harness.mdc` 是 always-apply 规则（软约束），指示 Agent 开工先跑 guard、收工再验一次。
+
+### 其他工具
+
+如果你的工具不在上面列表中：
+- 你的实际防线只有 **AGENTS.md 软约束** + **Git pre-commit hook 硬拦截**
+- 工具专属配置文件（`.claude/`、`.codex/`、`.devin/`）与你无关，请忽略
+- 请自觉遵守 `roles.json` 定义的边界，收工前主动跑 guard 自检
 
 ---
 
@@ -127,46 +100,14 @@ powershell -ExecutionPolicy Bypass -File .\harness\policy\guard.ps1 -Stage inspe
 
 ```
 tavern-web/
-├── .claude/settings.json      ← Claude Code hooks
-├── .codex/hooks.json          ← Codex CLI hooks
-├── .devin/hooks.v1.json       ← Devin for Terminal hooks
-├── .cursor/rules/harness.mdc  ← Cursor rules
-├── AGENTS.md                  ← 通用 always-on 规则
-├── CLAUDE.md                  ← Claude Code 入口（@AGENTS.md）
+├── AGENTS.md                  ← 通用 always-on 规则（软约束）
+├── .claude/settings.json      ← 仅 Claude Code
+├── .codex/hooks.json          ← 仅 Codex CLI
+├── .devin/hooks.v1.json       ← 仅 Devin for Terminal
+├── .cursor/rules/harness.mdc  ← 仅 Cursor（软约束）
 └── harness/
-    ├── policy/guard.ps1       ← 所有 hook 调的同一个脚本
-    └── hooks/pre-commit       ← Git hook（兜底）
+    ├── policy/guard.ps1       ← 所有 hook/自检调的同一个脚本
+    ├── hooks/pre-commit       ← Git hook（唯一通用硬防线）
+    ├── roles.json             ← 角色边界定义
+    └── current-task.json      ← 当前任务 + 额外边界
 ```
-
-## 防护层次
-
-```
-第 1 层：Agent hook（写文件后追溯检测，阻断后续越界操作）
-    ↓ 如果 Agent 没读到 hook 配置
-第 2 层：AGENTS.md 规则（软约束，靠 Agent 自觉）
-    ↓ 如果 Agent 无视规则
-第 3 层：Git pre-commit hook（硬约束，提交时兜底）
-```
-
-三层都穿透才能越界提交。正常情况下第 1 层就挡住了。
-
-## 前置条件
-
-所有 hook 都假设 `harness/.current-role` 已设置。如果没设：
-
-- hook 会报错 `ERROR: no role set. Run: .\h <role>`
-- 不会阻断工具调用（exit 非 2 不 block），但会在输出中提醒
-
-Agent 的第一个动作应该是 `.\h <role>` 设角色。
-
----
-
-## 事件对照表
-
-| 我们的需求 | Claude Code | Codex | Devin | Cursor |
-|-----------|-------------|-------|-------|--------|
-| 会话开始 | SessionStart | SessionStart | SessionStart | (无) |
-| 压缩后恢复 | PostCompact | PostCompact | PostCompaction | (无) |
-| 写文件前 | PreToolUse | PreToolUse | PreToolUse | (无) |
-| 提交前 | (Git hook) | (Git hook) | (Git hook) | (Git hook) |
-| 规则注入 | CLAUDE.md | AGENTS.md | AGENTS.md | .cursor/rules/ |
