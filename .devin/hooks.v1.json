@@ -1,0 +1,38 @@
+{
+  "PostCompaction": [
+    {
+      "matcher": "",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "powershell -ExecutionPolicy Bypass -File ./harness/policy/guard.ps1 -Stage agent-hook",
+          "timeout": 10
+        }
+      ]
+    }
+  ],
+  "SessionStart": [
+    {
+      "matcher": "",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "powershell -ExecutionPolicy Bypass -File ./harness/policy/guard.ps1 -Stage agent-hook",
+          "timeout": 10
+        }
+      ]
+    }
+  ],
+  "PreToolUse": [
+    {
+      "matcher": "edit|write",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "powershell -ExecutionPolicy Bypass -File ./harness/policy/guard.ps1 -Stage agent-hook",
+          "timeout": 10
+        }
+      ]
+    }
+  ]
+}

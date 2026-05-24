@@ -1,0 +1,46 @@
+{
+  "hooks": {
+    "PostCompact": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -ExecutionPolicy Bypass -File ./harness/policy/guard.ps1 -Stage agent-hook",
+            "commandWindows": "powershell -ExecutionPolicy Bypass -File .\\harness\\policy\\guard.ps1 -Stage agent-hook",
+            "timeout": 10,
+            "statusMessage": "Harness: re-checking role boundary after compaction"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -ExecutionPolicy Bypass -File ./harness/policy/guard.ps1 -Stage agent-hook",
+            "commandWindows": "powershell -ExecutionPolicy Bypass -File .\\harness\\policy\\guard.ps1 -Stage agent-hook",
+            "timeout": 10,
+            "statusMessage": "Harness: verifying role on session start"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "^(Bash|Write|Edit|Patch)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -ExecutionPolicy Bypass -File ./harness/policy/guard.ps1 -Stage agent-hook",
+            "commandWindows": "powershell -ExecutionPolicy Bypass -File .\\harness\\policy\\guard.ps1 -Stage agent-hook",
+            "timeout": 10,
+            "statusMessage": "Harness: checking file boundary"
+          }
+        ]
+      }
+    ]
+  }
+}

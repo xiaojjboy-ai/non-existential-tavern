@@ -1,68 +1,106 @@
-# Agent Harness
+# Harness
 
-这是给 opencode、Codex、Claude 等 agent 进入本项目时使用的简化版 Agent Team Harness。
+角色边界 + 项目 Hook + 简单留档。
 
-当前工作区结构：
-
-- 当前仓库根目录：酒馆 Web 项目本体。
-- `harness/`：任务票据、文件边界、guard、证据和交接。
-
-目标很简单：任何 agent 进来以后，必须基于任务票据工作，按文件边界行动，留下证据，再交接。
-
-这套 Drill 流程对人类和 agent 一视同仁。没有例外，没有商量余地。
-
-## 入口文件
-
-- `agent-entry.md`：agent 进入项目后必须先读的入口协议。
-- `workflow.md`：从接任务到收尾的固定执行流程。
-- `current-task.json`：当前任务票据，定义 owner、可改文件、禁改文件、证据要求。
-- `claims.json`：文件归属与只读边界。
-- `protocols/agent-team.md`：多 agent 团队协议。
-- `policy/guard.ps1`：强约束检查入口。
-- `templates/task-brief.md`：给复杂任务使用的任务简报模板。
-- `plans/`：执行前计划。
-- `work-records/`：实际修改留档。
-- `project-status/`：当前项目状态，按领域细分。
-- `check.ps1`：本地门禁脚本，用来快速检查项目路径、关键文档和 Web 应用命令。
-
-## 推荐用法
-
-在仓库根目录执行：
+## 快速上手
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\harness\policy\guard.ps1 -Stage inspect
+# 1. 认领身份
+.\h admin          # 或 developer / planner
+
+# 2. 安装 Git hook（首次克隆后跑一次）
+.\h install-hooks
+
+# 3. 自检
+.\h doctor
 ```
 
-完整收口前执行：
+## 角色
+
+| 角色 | 可改 | 不可改 |
+|------|------|--------|
+| admin | 全部 | — |
+| developer | src/ scripts/ tools/ public/ docs/ 配置文件 | 脚本/ docs/characters/ harness/policy/ |
+| planner | 脚本/ docs/ | src/ scripts/ tools/ public/ 配置文件 |
+
+完整边界定义在 `roles.json`。规则：`forbidden` 优先级高于 `allowed`。
+
+## 机制
+
+### 1. Agent Hook（防上下文压缩后失忆）
+
+Agent 工具在上下文压缩、恢复或工具调用前，调用：
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\harness\policy\guard.ps1 -Stage pre-stop
+powershell -ExecutionPolicy Bypass -File .\harness\policy\guard.ps1 -Stage agent-hook
 ```
 
-## 初始化 Hook 要求
+各 Agent 工具已配置硬 hook（配置文件已提交入 git）：
 
-Hook 不由 harness 自动偷偷安装。进入项目的 agent 或人类成员必须在自己的工具里主动添加 hook，并把 hook 指向 `harness/policy/guard.ps1`。
+| 工具 | 配置文件 | 触发事件 |
+|------|---------|---------|
+| Claude Code | `.claude/settings.json` | PostCompact / SessionStart / PreToolUse |
+| Codex CLI | `.codex/hooks.json` | PostCompact / SessionStart / PreToolUse |
+| Devin (Windsurf) | `.devin/hooks.v1.json` | PostCompaction / SessionStart / PreToolUse |
+| Cursor | `.cursor/rules/harness.mdc` | (无硬 hook，靠 rules + Git hook 兜底) |
 
-最低要求：
+详见 `harness/agent-onboarding.md`。
 
-- 开工前 hook：运行 `guard.ps1 -Stage inspect`。
-- 停止/交付前 hook：运行 `guard.ps1 -Stage pre-stop`。
-- 提交前 hook：运行 `guard.ps1 -Stage pre-commit`。
-- 推送或 CI 前 hook：运行 `guard.ps1 -Stage ci`。
+### 2. Git Hook（防越界提交）
 
-如果工具支持 Claude Code、opencode、Codex、Git hook 或自定义 shell hook，就必须接。不会接就先在 `harness/work-records/` 里写明“hook 未接入原因”，否则视作初始化不合格。
+`harness/hooks/pre-commit` 在提交前按当前角色拦越界文件。
 
-## 设计原则
+安装：`.\h install-hooks`
 
-- 中文优先：所有面向用户的回复、计划和交接都用中文。
-- 任务票据优先：没有 `harness/current-task.json`，不要写文件。
-- 文件边界优先：只能改 `allowed_files`，不能碰 `forbidden_files`。
-- 证据优先：没有 evidence，不准说完成。
-- 留档优先：没有 work record，不准收工。
-- 先读契约，再改代码：先读 `AGENTS.md`、`docs/script-format.md` 和相关源码。
-- 小步验证：每次有行为变化，都跑对应命令或浏览器验证。
-- 不手改生成物：`src/data/plot-data.json` 只能由 `npm run compile` 生成。
-- 不扩大任务范围：没有明确要求时，不扩写剧情、不制作正式美术音频、不引入大型框架。
-- 严厉纠错：可以直接指出“你做错了”，但只批评行为，不做人身攻击。
-- 教育门禁：你没有通过检查，就没有资格说完成。
-- 证据铁律：没有 evidence，就没有完成；guard 不绿，不准交付。
+它不做测试、不做 evidence、不判断任务完成。
+
+### 3. Records（简单留档）
+
+按角色分目录：
+
+```
+harness/records/
+  admin/<task-id>.md
+  developer/<task-id>.md
+  planner/<task-id>.md
+```
+
+模板见 `records/_template.md`。留档节点：
+
+- **接任务时**：创建文件，填意图
+- **交付时**：补完成项和验证
+
+## guard.ps1
+
+极简职责：
+
+1. 读 `harness/.current-role`
+2. 读 `harness/roles.json`
+3. 合并 `harness/current-task.json` 的 `extra_allowed` / `extra_forbidden`
+4. 扫 git 改动
+5. forbidden 优先拒 → allowed 次之拒 → 通过
+
+Stage 参数：`inspect` / `agent-hook` / `pre-commit`（逻辑相同，pre-commit 只看 staged）。
+
+## current-task.json
+
+```json
+{
+  "id": "task-id",
+  "title": "...",
+  "role": "admin",
+  "extra_allowed": [],
+  "extra_forbidden": []
+}
+```
+
+用于任务级别的额外边界收紧/追加。
+
+## h.bat 命令
+
+| 命令 | 作用 |
+|------|------|
+| `.\h <role>` | 写身份 + 跑 inspect |
+| `.\h install-hooks` | 安装 Git pre-commit hook |
+| `.\h doctor` | 自检 role/roles.json/guard/hook 是否就绪 |
+| `.\h` | 显示用法和当前 role |
