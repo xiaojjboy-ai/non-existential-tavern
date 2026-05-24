@@ -1,7 +1,7 @@
 'use client';
 
 import { Application, extend } from '@pixi/react';
-import { Container, Graphics, Text, Sprite, Texture, BlurFilter, Assets } from 'pixi.js';
+import { Container, Graphics, Text, Sprite, Texture, BlurFilter, Assets, Rectangle } from 'pixi.js';
 import { useEffect, useRef, useState, useMemo } from 'react';
 import { useGameStore } from '@/store/useGameStore';
 
@@ -62,12 +62,27 @@ export const GameCanvas = () => {
   // 模块化多精灵背景纹理缓存
   const [textures, setTextures] = useState<Record<string, Texture> | null>(null);
 
+  const kittenTextures = useMemo(() => {
+    if (!textures || !textures.kitten_sprite_sheet) return null;
+    const texs = [];
+    for (let i = 0; i < 16; i++) {
+      const col = i % 4;
+      const row = Math.floor(i / 4);
+      texs.push(new Texture({
+        source: textures.kitten_sprite_sheet.source,
+        frame: new Rectangle(col * 256, row * 256, 256, 256)
+      }));
+    }
+    return texs;
+  }, [textures]);
+
   useEffect(() => {
     let isMounted = true;
     const assetsToLoad = {
       wall_concrete: '/assets/wall_concrete.png',
       window_skyline: '/assets/window_skyline.png',
       window_glass_refraction: '/assets/window_glass_refraction.png',
+      kitten_sprite_sheet: '/assets/kitten_sprite_sheet.png',
     };
 
     const loadAll = async () => {
@@ -921,6 +936,17 @@ export const GameCanvas = () => {
               graphics.stroke({ color: '#ffffff', width: 0.8, alpha: 0.32 });
             }}
           />
+
+          {/* 小猫动画：根据 time 循环播放纹理，并在吧台上徘徊 */}
+          {kittenTextures && (
+            <pixiSprite
+              texture={kittenTextures[Math.floor(time * 6) % kittenTextures.length]}
+              x={dimensions.width * 0.4 + Math.sin(time * 0.2) * 50}
+              y={dimensions.height * 0.67 - 5}
+              anchor={{ x: 0.5, y: 1.0 }}
+              scale={{ x: Math.sin(time * 0.2) > 0 ? 0.35 : -0.35, y: 0.35 }}
+            />
+          )}
 
           {/* 7. 复古 CRT 物理扫描线颗粒效果 */}
           <pixiGraphics
