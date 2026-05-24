@@ -40,5 +40,5 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# harness reports
-/harness-runs/
+# harness local state
+harness/.current-role

@@ -1,5 +1,0 @@
-﻿Agent Harness inspect passed
-task=harness-setup
-owner=codex
-stage=inspect
-time=2026-05-22T00:20:19.8990328+08:00

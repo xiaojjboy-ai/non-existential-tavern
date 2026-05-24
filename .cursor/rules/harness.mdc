@@ -1,0 +1,42 @@
+---
+description: Harness 角色边界守卫 - 防止 Agent 越界修改文件
+globs: ["**/*"]
+alwaysApply: true
+---
+
+# Harness 角色边界
+
+## 开工零步
+
+进入项目后，你的第一个动作必须是：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\harness\policy\guard.ps1 -Stage inspect
+```
+
+跑完 inspect 之前不准编辑任何文件。跑完之后必须报告：
+- 当前角色（role）
+- 当前任务（task id）
+- 允许修改的文件范围
+- 禁止修改的文件范围
+
+## 收工验证
+
+完成工作前必须跑：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\harness\policy\guard.ps1 -Stage pre-commit
+```
+
+## 角色边界（快速参考）
+
+- admin：可改全部文件
+- developer：可改 src/ scripts/ tools/ public/ docs/ 配置文件；不可改 脚本/ harness/policy/
+- planner：可改 脚本/ docs/；不可改 src/ scripts/ tools/ public/ 配置文件
+
+完整定义见 `harness/roles.json`。
+
+## 铁律
+
+1. 没有通过检查，就没有资格说完成
+2. guard 不绿，不准交付

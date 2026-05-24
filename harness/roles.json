@@ -1,0 +1,69 @@
+{
+  "version": 1,
+  "roles": {
+    "admin": {
+      "allowed": ["**"],
+      "forbidden": []
+    },
+    "developer": {
+      "allowed": [
+        "src/**",
+        "scripts/**",
+        "tools/**",
+        "public/**",
+        "docs/**",
+        "harness/plans/**",
+        "harness/records/developer/**",
+        "package.json",
+        "package-lock.json",
+        "tsconfig.json",
+        "next.config.ts",
+        "eslint.config.mjs",
+        "postcss.config.mjs",
+        "README.md"
+      ],
+      "forbidden": [
+        "脚本/**",
+        "docs/characters/**",
+        "harness/policy/**",
+        "harness/roles.json",
+        "harness/current-task.json",
+        "harness/.current-role",
+        "harness/records/admin/**",
+        "harness/records/planner/**",
+        "AGENTS.md",
+        "h.bat"
+      ]
+    },
+    "planner": {
+      "allowed": [
+        "脚本/**",
+        "docs/**",
+        "harness/plans/**",
+        "harness/records/planner/**"
+      ],
+      "forbidden": [
+        "src/**",
+        "scripts/**",
+        "tools/**",
+        "public/**",
+        "harness/policy/**",
+        "harness/roles.json",
+        "harness/current-task.json",
+        "harness/.current-role",
+        "harness/records/admin/**",
+        "harness/records/developer/**",
+        "package.json",
+        "package-lock.json",
+        "tsconfig.json",
+        "next.config.ts",
+        "eslint.config.mjs",
+        "postcss.config.mjs",
+        "*.config.*",
+        "AGENTS.md",
+        ".gitignore",
+        "h.bat"
+      ]
+    }
+  }
+}
