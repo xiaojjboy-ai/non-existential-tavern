@@ -7,6 +7,8 @@
 ## 你需要做的事（所有 Agent 通用）
 
 1. **认领身份**：`.\h <role>`（admin / developer / planner）
+   > [!IMPORTANT]
+   > **角色赋权安全约束**：Agent 严禁在未经与用户探讨和确认的情况下，自行运行命令认领角色或进行提权。在检测到 `no role set` 或需要切换身份时，必须停下并主动向用户请示，在人类明确指定角色后方可执行。
 2. **遵守边界**：`harness/roles.json` 定义了你能改哪些文件
 3. **收工自检**：`powershell -ExecutionPolicy Bypass -File .\harness\policy\guard.ps1 -Stage inspect`
 4. **Git hook 会兜底**：越界文件无法 commit（前提：已跑过 `.\h install-hooks`）

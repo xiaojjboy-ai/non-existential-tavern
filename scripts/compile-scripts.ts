@@ -8,6 +8,9 @@ import type {
   DialogueNode,
   DrinkRule,
   PlotData,
+  Resource,
+  AffinityRule,
+  AffinityChange,
 } from '../src/types/game';
 
 const PROJECT_ROOT = path.resolve(__dirname, '..');
@@ -63,6 +66,36 @@ function addIssue(issues: CompileIssue[], file: string, message: string, layer?:
 function formatIssue(issue: CompileIssue) {
   const layer = issue.layer ? ` / ${issue.layer}` : '';
   return `- ${issue.file}${layer}: ${issue.message}`;
+}
+
+function describeType(value: unknown): string {
+  if (value === null) return 'null';
+  if (Array.isArray(value)) return `array(len=${value.length})`;
+  return typeof value;
+}
+
+function previewValue(value: unknown): string {
+  if (value === null || value === undefined) return String(value);
+  if (typeof value === 'string') return value.length > 40 ? `"${value.slice(0, 40)}…"` : `"${value}"`;
+  if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+  if (Array.isArray(value)) return `[${value.length} item(s)]`;
+  if (isRecord(value)) return `{${Object.keys(value).join(', ')}}`;
+  return typeof value;
+}
+
+function addConversionIssue(
+  issues: CompileIssue[],
+  file: string,
+  fieldPath: string,
+  expected: string,
+  actual: unknown,
+) {
+  addIssue(
+    issues,
+    file,
+    `字段 \`${fieldPath}\` 类型转换失败：期望 ${expected}，实际 ${describeType(actual)}（${previewValue(actual)}）。`,
+    '数据层',
+  );
 }
 
 function parseLayers(file: string, content: string, issues: CompileIssue[]): ParsedMarkdown | null {
@@ -237,26 +270,486 @@ function parseYamlLayer(file: string, section: string, issues: CompileIssue[]): 
     return {};
   }
 }
+function asMeta(
+  value: unknown,
+  file: string,
+  issues: CompileIssue[],
+): PlotData['meta'] {
+  const defaultMeta: PlotData['meta'] = {
+    day: '',
+    character: '',
+    visit: null,
+    requires: null,
+    unlocks: [],
+    next: null,
+    resources: {},
+  };
 
-function asBranches(value: unknown): Record<string, Record<string, ChoiceBranch>> {
-  if (!isRecord(value)) return {};
+  if (value === undefined || value === null) {
+    addIssue(issues, file, '数据层缺少 `meta`。', '数据层');
+    return defaultMeta;
+  }
+
+  if (!isRecord(value)) {
+    addConversionIssue(issues, file, 'meta', 'object', value);
+    return defaultMeta;
+  }
+
+  const meta: Partial<PlotData['meta']> = {};
+
+  // 1. day: string | number
+  if (typeof value.day !== 'string' && typeof value.day !== 'number') {
+    addConversionIssue(issues, file, 'meta.day', 'string | number', value.day);
+    meta.day = '';
+  } else {
+    meta.day = value.day;
+  }
+
+  // 2. character: string | string[]
+  if (typeof value.character === 'string') {
+    meta.character = value.character;
+  } else if (Array.isArray(value.character)) {
+    const stringItems = value.character.filter((item): item is string => typeof item === 'string');
+    if (stringItems.length !== value.character.length) {
+      addConversionIssue(issues, file, 'meta.character', 'string[]（仅字符串）', value.character);
+    }
+    meta.character = stringItems;
+  } else {
+    addConversionIssue(issues, file, 'meta.character', 'string | string[]', value.character);
+    meta.character = '';
+  }
+
+  // 3. visit: number | string | null
+  if (value.visit === undefined || value.visit === null) {
+    meta.visit = null;
+  } else if (typeof value.visit === 'number' || typeof value.visit === 'string') {
+    meta.visit = value.visit;
+  } else {
+    addConversionIssue(issues, file, 'meta.visit', 'number | string | null', value.visit);
+    meta.visit = null;
+  }
+
+  // 4. requires: unknown
+  meta.requires = value.requires;
+
+  // 5. unlocks: Array<Record<string, unknown>>
+  if (value.unlocks === undefined || value.unlocks === null) {
+    meta.unlocks = [];
+  } else if (Array.isArray(value.unlocks)) {
+    const records: Array<Record<string, unknown>> = [];
+    for (let i = 0; i < value.unlocks.length; i++) {
+      const item = value.unlocks[i];
+      if (isRecord(item)) {
+        records.push(item);
+      } else {
+        addConversionIssue(issues, file, `meta.unlocks[${i}]`, 'object', item);
+      }
+    }
+    meta.unlocks = records;
+  } else {
+    addConversionIssue(issues, file, 'meta.unlocks', 'array', value.unlocks);
+    meta.unlocks = [];
+  }
+
+  // 6. next: string | null
+  if (value.next === undefined || value.next === null) {
+    meta.next = null;
+  } else if (typeof value.next === 'string') {
+    meta.next = value.next;
+  } else {
+    addConversionIssue(issues, file, 'meta.next', 'string | null', value.next);
+    meta.next = null;
+  }
+
+  // 7. resources: { bg?, bgm?, se?, sprite? }
+  const resources: PlotData['meta']['resources'] = {};
+  if (value.resources !== undefined && value.resources !== null) {
+    if (!isRecord(value.resources)) {
+      addConversionIssue(issues, file, 'meta.resources', 'object', value.resources);
+    } else {
+      const resTypes = ['bg', 'bgm', 'se', 'sprite'] as const;
+      for (const resType of resTypes) {
+        const list = value.resources[resType];
+        if (list === undefined) continue;
+        if (!Array.isArray(list)) {
+          addConversionIssue(issues, file, `meta.resources.${resType}`, 'array', list);
+          continue;
+        }
+        const resourcesList: Resource[] = [];
+        for (let i = 0; i < list.length; i++) {
+          const item = list[i];
+          if (!isRecord(item)) {
+            addConversionIssue(issues, file, `meta.resources.${resType}[${i}]`, 'object', item);
+            continue;
+          }
+          if (typeof item.id !== 'string') {
+            addConversionIssue(issues, file, `meta.resources.${resType}[${i}].id`, 'string', item.id);
+          }
+          if (typeof item.desc !== 'string') {
+            addConversionIssue(issues, file, `meta.resources.${resType}[${i}].desc`, 'string', item.desc);
+          }
+          resourcesList.push({
+            id: typeof item.id === 'string' ? item.id : '',
+            desc: typeof item.desc === 'string' ? item.desc : '',
+          });
+        }
+        resources[resType] = resourcesList;
+      }
+    }
+  }
+  meta.resources = resources;
+
+  // 8. is_ending?: boolean
+  if (value.is_ending !== undefined) {
+    if (typeof value.is_ending === 'boolean') {
+      meta.is_ending = value.is_ending;
+    } else {
+      addConversionIssue(issues, file, 'meta.is_ending', 'boolean', value.is_ending);
+    }
+  }
+
+  // 9. is_reveal?: boolean
+  if (value.is_reveal !== undefined) {
+    if (typeof value.is_reveal === 'boolean') {
+      meta.is_reveal = value.is_reveal;
+    } else {
+      addConversionIssue(issues, file, 'meta.is_reveal', 'boolean', value.is_reveal);
+    }
+  }
+
+  // 10. ending_variants?: Record<string, string>
+  if (value.ending_variants !== undefined) {
+    if (!isRecord(value.ending_variants)) {
+      addConversionIssue(issues, file, 'meta.ending_variants', 'object', value.ending_variants);
+    } else {
+      const variants: Record<string, string> = {};
+      for (const [k, v] of Object.entries(value.ending_variants)) {
+        if (typeof v !== 'string') {
+          addConversionIssue(issues, file, `meta.ending_variants.${k}`, 'string', v);
+        }
+        variants[k] = typeof v === 'string' ? v : '';
+      }
+      meta.ending_variants = variants;
+    }
+  }
+
+  return meta as PlotData['meta'];
+}
+
+function asAffinityRule(
+  value: Record<string, unknown>,
+  file: string,
+  issues: CompileIssue[],
+  pathPrefix: string,
+): AffinityRule {
+  const rule: Partial<AffinityRule> = {};
+
+  if (typeof value.character !== 'string') {
+    addConversionIssue(issues, file, `${pathPrefix}.character`, 'string', value.character);
+    rule.character = '';
+  } else {
+    rule.character = value.character;
+  }
+
+  if (typeof value.start !== 'number') {
+    addConversionIssue(issues, file, `${pathPrefix}.start`, 'number', value.start);
+    rule.start = 0;
+  } else {
+    rule.start = value.start;
+  }
+
+  if (typeof value.max !== 'number') {
+    addConversionIssue(issues, file, `${pathPrefix}.max`, 'number', value.max);
+    rule.max = 0;
+  } else {
+    rule.max = value.max;
+  }
+
+  const changes: AffinityChange[] = [];
+  if (value.changes !== undefined && value.changes !== null) {
+    if (!Array.isArray(value.changes)) {
+      addConversionIssue(issues, file, `${pathPrefix}.changes`, 'array', value.changes);
+    } else {
+      for (let i = 0; i < value.changes.length; i++) {
+        const item = value.changes[i];
+        const changePath = `${pathPrefix}.changes[${i}]`;
+        if (!isRecord(item)) {
+          addConversionIssue(issues, file, changePath, 'object', item);
+          continue;
+        }
+
+        if (typeof item.id !== 'string') {
+          addConversionIssue(issues, file, `${changePath}.id`, 'string', item.id);
+        }
+        if (typeof item.trigger !== 'string') {
+          addConversionIssue(issues, file, `${changePath}.trigger`, 'string', item.trigger);
+        }
+        if (typeof item.field !== 'string') {
+          addConversionIssue(issues, file, `${changePath}.field`, 'string', item.field);
+        }
+        if (typeof item.value !== 'number') {
+          addConversionIssue(issues, file, `${changePath}.value`, 'number', item.value);
+        }
+        let note: string | null = null;
+        if (item.note !== undefined && item.note !== null) {
+          if (typeof item.note === 'string') {
+            note = item.note;
+          } else {
+            addConversionIssue(issues, file, `${changePath}.note`, 'string | null', item.note);
+          }
+        }
+
+        changes.push({
+          id: typeof item.id === 'string' ? item.id : '',
+          trigger: typeof item.trigger === 'string' ? item.trigger : '',
+          field: typeof item.field === 'string' ? item.field : '',
+          value: typeof item.value === 'number' ? item.value : 0,
+          note,
+        });
+      }
+    }
+  }
+  rule.changes = changes;
+
+  return rule as AffinityRule;
+}
+
+function asAffinity(
+  value: unknown,
+  file: string,
+  issues: CompileIssue[],
+): PlotData['affinity'] {
+  if (value === undefined || value === null) {
+    return undefined;
+  }
+
+  if (Array.isArray(value)) {
+    const rules: AffinityRule[] = [];
+    for (let i = 0; i < value.length; i++) {
+      const item = value[i];
+      if (!isRecord(item)) {
+        addConversionIssue(issues, file, `affinity[${i}]`, 'object', item);
+        continue;
+      }
+      rules.push(asAffinityRule(item, file, issues, `affinity[${i}]`));
+    }
+    return rules;
+  }
+
+  if (isRecord(value)) {
+    return asAffinityRule(value, file, issues, 'affinity');
+  }
+
+  addConversionIssue(issues, file, 'affinity', 'object | array', value);
+  return undefined;
+}
+
+function asLinks(
+  value: unknown,
+  file: string,
+  issues: CompileIssue[],
+): unknown {
+  if (value === undefined || value === null) {
+    return undefined;
+  }
+
+  if (!isRecord(value)) {
+    addConversionIssue(issues, file, 'links', 'object', value);
+    return undefined;
+  }
+
+  const links: Record<string, unknown> = {};
+
+  if (value.next_visit !== undefined && value.next_visit !== null) {
+    if (typeof value.next_visit !== 'string') {
+      addConversionIssue(issues, file, 'links.next_visit', 'string', value.next_visit);
+    } else {
+      links.next_visit = value.next_visit;
+    }
+  }
+
+  if (value.related !== undefined && value.related !== null) {
+    if (!Array.isArray(value.related)) {
+      addConversionIssue(issues, file, 'links.related', 'array', value.related);
+    } else {
+      const relatedList: unknown[] = [];
+      for (let i = 0; i < value.related.length; i++) {
+        const item = value.related[i];
+        const itemPath = `links.related[${i}]`;
+        if (!isRecord(item)) {
+          addConversionIssue(issues, file, itemPath, 'object', item);
+          continue;
+        }
+        const rel: Record<string, unknown> = {};
+        if (item.day !== undefined && typeof item.day !== 'number' && typeof item.day !== 'string') {
+          addConversionIssue(issues, file, `${itemPath}.day`, 'number | string', item.day);
+        }
+        if (item.character !== undefined && typeof item.character !== 'string') {
+          addConversionIssue(issues, file, `${itemPath}.character`, 'string', item.character);
+        }
+        if (item.visit !== undefined && typeof item.visit !== 'number' && typeof item.visit !== 'string') {
+          addConversionIssue(issues, file, `${itemPath}.visit`, 'number | string', item.visit);
+        }
+        if (item.event !== undefined && typeof item.event !== 'string') {
+          addConversionIssue(issues, file, `${itemPath}.event`, 'string', item.event);
+        }
+
+        if (item.conditions !== undefined && item.conditions !== null) {
+          if (!Array.isArray(item.conditions)) {
+            addConversionIssue(issues, file, `${itemPath}.conditions`, 'array', item.conditions);
+          } else {
+            const conditionsList: unknown[] = [];
+            for (let j = 0; j < item.conditions.length; j++) {
+              const cond = item.conditions[j];
+              const condPath = `${itemPath}.conditions[${j}]`;
+              if (!isRecord(cond)) {
+                addConversionIssue(issues, file, condPath, 'object', cond);
+                continue;
+              }
+              if (typeof cond.if !== 'string') {
+                addConversionIssue(issues, file, `${condPath}.if`, 'string', cond.if);
+              }
+              if (typeof cond.then !== 'string') {
+                addConversionIssue(issues, file, `${condPath}.then`, 'string', cond.then);
+              }
+              conditionsList.push({
+                if: typeof cond.if === 'string' ? cond.if : '',
+                then: typeof cond.then === 'string' ? cond.then : '',
+              });
+            }
+            rel.conditions = conditionsList;
+          }
+        }
+
+        rel.day = item.day;
+        rel.character = item.character;
+        rel.visit = item.visit;
+        rel.event = item.event;
+        relatedList.push(rel);
+      }
+      links.related = relatedList;
+    }
+  }
+
+  return links;
+}
+
+function asMetaphor(
+  value: unknown,
+  file: string,
+  issues: CompileIssue[],
+): unknown {
+  if (value === undefined || value === null) {
+    return undefined;
+  }
+
+  if (!Array.isArray(value)) {
+    addConversionIssue(issues, file, 'metaphor', 'array', value);
+    return undefined;
+  }
+
+  const list: unknown[] = [];
+  for (let i = 0; i < value.length; i++) {
+    const item = value[i];
+    const itemPath = `metaphor[${i}]`;
+    if (!isRecord(item)) {
+      addConversionIssue(issues, file, itemPath, 'object', item);
+      continue;
+    }
+
+    if (typeof item.anchor !== 'string') {
+      addConversionIssue(issues, file, `${itemPath}.anchor`, 'string', item.anchor);
+    }
+    if (item.surface !== undefined && typeof item.surface !== 'string') {
+      addConversionIssue(issues, file, `${itemPath}.surface`, 'string', item.surface);
+    }
+    if (item.deep !== undefined && typeof item.deep !== 'string') {
+      addConversionIssue(issues, file, `${itemPath}.deep`, 'string', item.deep);
+    }
+
+    list.push({
+      anchor: typeof item.anchor === 'string' ? item.anchor : '',
+      surface: typeof item.surface === 'string' ? item.surface : undefined,
+      deep: typeof item.deep === 'string' ? item.deep : undefined,
+    });
+  }
+
+  return list;
+}
+
+function asBranches(
+  value: unknown,
+  file: string,
+  issues: CompileIssue[],
+): Record<string, Record<string, ChoiceBranch>> {
+  if (value === undefined) return {};
+  if (!isRecord(value)) {
+    addConversionIssue(issues, file, 'branches', 'object', value);
+    return {};
+  }
 
   const branches: Record<string, Record<string, ChoiceBranch>> = {};
   for (const [branchId, branchValue] of Object.entries(value)) {
-    if (!isRecord(branchValue)) continue;
+    if (!isRecord(branchValue)) {
+      addConversionIssue(issues, file, `branches.${branchId}`, 'object（选项表）', branchValue);
+      continue;
+    }
     branches[branchId] = {};
 
     for (const [choiceKey, choiceValue] of Object.entries(branchValue)) {
-      if (!isRecord(choiceValue)) continue;
-      const goto = typeof choiceValue.goto === 'string' ? choiceValue.goto : '';
+      const fieldRoot = `branches.${branchId}.${choiceKey}`;
+      if (!isRecord(choiceValue)) {
+        addConversionIssue(issues, file, fieldRoot, 'object（含 goto/effect 等字段）', choiceValue);
+        continue;
+      }
+
+      const rawGoto = choiceValue.goto;
+      if (typeof rawGoto !== 'string') {
+        addConversionIssue(issues, file, `${fieldRoot}.goto`, 'string', rawGoto);
+      }
+      const goto = typeof rawGoto === 'string' ? rawGoto : '';
+
       const effect = choiceValue.effect;
+      let normalizedEffect: string | string[] | null = null;
+      if (effect === null || effect === undefined) {
+        normalizedEffect = null;
+      } else if (typeof effect === 'string') {
+        normalizedEffect = effect;
+      } else if (Array.isArray(effect)) {
+        const stringItems = effect.filter((item): item is string => typeof item === 'string');
+        if (stringItems.length !== effect.length) {
+          addConversionIssue(issues, file, `${fieldRoot}.effect`, 'string[]（仅字符串）', effect);
+        }
+        normalizedEffect = stringItems;
+      } else {
+        addConversionIssue(issues, file, `${fieldRoot}.effect`, 'string | string[] | null', effect);
+      }
+
       const pace = choiceValue.pace;
+      let normalizedPace: 'normal' | 'tight' | 'slow' | undefined;
+      if (pace === undefined) {
+        normalizedPace = undefined;
+      } else if (pace === 'normal' || pace === 'tight' || pace === 'slow') {
+        normalizedPace = pace;
+      } else {
+        addConversionIssue(issues, file, `${fieldRoot}.pace`, '"normal" | "tight" | "slow"', pace);
+      }
+
       const ending = choiceValue.ending;
+      let normalizedEnding: string | undefined;
+      if (ending === undefined) {
+        normalizedEnding = undefined;
+      } else if (typeof ending === 'string') {
+        normalizedEnding = ending;
+      } else {
+        addConversionIssue(issues, file, `${fieldRoot}.ending`, 'string', ending);
+      }
+
       branches[branchId][choiceKey] = {
         goto,
-        effect: typeof effect === 'string' || Array.isArray(effect) ? effect as string | string[] : null,
-        pace: pace === 'normal' || pace === 'tight' || pace === 'slow' ? pace : undefined,
-        ending: typeof ending === 'string' ? ending : undefined,
+        effect: normalizedEffect,
+        pace: normalizedPace,
+        ending: normalizedEnding,
       };
     }
   }
@@ -264,30 +757,90 @@ function asBranches(value: unknown): Record<string, Record<string, ChoiceBranch>
   return branches;
 }
 
-function asDrinkRule(value: unknown): DrinkRule | null {
-  if (!isRecord(value)) return null;
-  if (typeof value.id !== 'string') return null;
+function asDrinkRule(
+  value: unknown,
+  file: string,
+  issues: CompileIssue[],
+): DrinkRule | null {
+  if (value === null || value === undefined) return null;
+  if (!isRecord(value)) {
+    addConversionIssue(issues, file, 'drink', 'object | null', value);
+    return null;
+  }
+
+  if (typeof value.id !== 'string') {
+    addConversionIssue(issues, file, 'drink.id', 'string', value.id);
+    return null;
+  }
 
   const wrongEffects: DrinkRule['wrong_effects'] = {};
-  if (isRecord(value.wrong_effects)) {
-    for (const [drinkName, effect] of Object.entries(value.wrong_effects)) {
-      if (!isRecord(effect)) continue;
-      wrongEffects[drinkName] = {
-        dialogue: typeof effect.dialogue === 'string' ? effect.dialogue : '',
-        reaction: typeof effect.reaction === 'string' ? effect.reaction : '',
+  if (value.wrong_effects !== undefined) {
+    if (!isRecord(value.wrong_effects)) {
+      addConversionIssue(issues, file, 'drink.wrong_effects', 'object', value.wrong_effects);
+    } else {
+      for (const [drinkName, effect] of Object.entries(value.wrong_effects)) {
+        const root = `drink.wrong_effects.${drinkName}`;
+        if (!isRecord(effect)) {
+          addConversionIssue(issues, file, root, 'object（含 dialogue/reaction）', effect);
+          continue;
+        }
+        if (typeof effect.dialogue !== 'string') {
+          addConversionIssue(issues, file, `${root}.dialogue`, 'string', effect.dialogue);
+        }
+        if (typeof effect.reaction !== 'string') {
+          addConversionIssue(issues, file, `${root}.reaction`, 'string', effect.reaction);
+        }
+        wrongEffects[drinkName] = {
+          dialogue: typeof effect.dialogue === 'string' ? effect.dialogue : '',
+          reaction: typeof effect.reaction === 'string' ? effect.reaction : '',
+        };
+      }
+    }
+  }
+
+  let available: string[] = [];
+  if (Array.isArray(value.available)) {
+    const stringItems = value.available.filter((item): item is string => typeof item === 'string');
+    if (stringItems.length !== value.available.length) {
+      addConversionIssue(issues, file, 'drink.available', 'string[]（仅字符串）', value.available);
+    }
+    available = stringItems;
+  } else if (value.available !== undefined) {
+    addConversionIssue(issues, file, 'drink.available', 'string[]', value.available);
+  }
+
+  if (typeof value.correct !== 'string') {
+    addConversionIssue(issues, file, 'drink.correct', 'string', value.correct);
+  }
+  if (value.hint !== undefined && typeof value.hint !== 'string') {
+    addConversionIssue(issues, file, 'drink.hint', 'string', value.hint);
+  }
+
+  let correctEffect: DrinkRule['correct_effect'] = {};
+  if (value.correct_effect !== undefined) {
+    if (!isRecord(value.correct_effect)) {
+      addConversionIssue(issues, file, 'drink.correct_effect', 'object', value.correct_effect);
+    } else {
+      const ce = value.correct_effect;
+      if (ce.affinity !== undefined && typeof ce.affinity !== 'string') {
+        addConversionIssue(issues, file, 'drink.correct_effect.affinity', 'string', ce.affinity);
+      }
+      if (ce.emotion !== undefined && typeof ce.emotion !== 'string') {
+        addConversionIssue(issues, file, 'drink.correct_effect.emotion', 'string', ce.emotion);
+      }
+      correctEffect = {
+        affinity: typeof ce.affinity === 'string' ? ce.affinity : undefined,
+        emotion: typeof ce.emotion === 'string' ? ce.emotion : undefined,
       };
     }
   }
 
   return {
     id: value.id,
-    available: Array.isArray(value.available) ? value.available.filter((item): item is string => typeof item === 'string') : [],
+    available,
     correct: typeof value.correct === 'string' ? value.correct : '',
     hint: typeof value.hint === 'string' ? value.hint : '',
-    correct_effect: isRecord(value.correct_effect) ? {
-      affinity: typeof value.correct_effect.affinity === 'string' ? value.correct_effect.affinity : undefined,
-      emotion: typeof value.correct_effect.emotion === 'string' ? value.correct_effect.emotion : undefined,
-    } : {},
+    correct_effect: correctEffect,
     wrong_effects: wrongEffects,
   };
 }
@@ -358,26 +911,24 @@ function validatePlot(file: string, plotData: PlotData, choiceRoutes: ChoiceRout
   }
 }
 
-function buildPlotData(yamlData: YamlRecord, commands: Command[], dialoguesResult: ReturnType<typeof parseDialogues>): PlotData {
+function buildPlotData(
+  yamlData: YamlRecord,
+  commands: Command[],
+  dialoguesResult: ReturnType<typeof parseDialogues>,
+  file: string,
+  issues: CompileIssue[],
+): PlotData {
   return {
-    meta: isRecord(yamlData.meta) ? yamlData.meta as unknown as PlotData['meta'] : {
-      day: '',
-      character: '',
-      visit: null,
-      requires: null,
-      unlocks: [],
-      next: null,
-      resources: {},
-    },
-    affinity: yamlData.affinity as PlotData['affinity'],
-    drink: asDrinkRule(yamlData.drink),
-    branches: asBranches(yamlData.branches),
+    meta: asMeta(yamlData.meta, file, issues),
+    affinity: asAffinity(yamlData.affinity, file, issues),
+    drink: asDrinkRule(yamlData.drink, file, issues),
+    branches: asBranches(yamlData.branches, file, issues),
     dialogues: dialoguesResult.dialogues,
     dialogueOrder: dialoguesResult.dialogueOrder,
     narratives: dialoguesResult.narratives,
     commands,
-    links: yamlData.links,
-    metaphor: yamlData.metaphor,
+    links: asLinks(yamlData.links, file, issues),
+    metaphor: asMetaphor(yamlData.metaphor, file, issues),
   };
 }
 
@@ -406,11 +957,13 @@ async function compile() {
     const { commands, choiceRoutes } = parseCommands(file, parsed.layers['指令层'], issues);
     const dialoguesResult = parseDialogues(file, parsed.layers['对话层'], issues);
     const yamlData = parseYamlLayer(file, parsed.layers['数据层'], issues);
-    const plotData = buildPlotData(yamlData, commands, dialoguesResult);
+    const plotData = buildPlotData(yamlData, commands, dialoguesResult, file, issues);
 
     validatePlot(file, plotData, choiceRoutes, issues);
     allPlots[plotId] = plotData;
   }
+
+  await writeIssueLog(issues);
 
   if (issues.length > 0) {
     console.error('\nScript compilation failed:');
@@ -422,6 +975,25 @@ async function compile() {
   await fs.ensureDir(OUTPUT_DIR);
   await fs.writeJson(OUTPUT_FILE, allPlots, { spaces: 2 });
   console.log(`Compilation finished. Saved to ${OUTPUT_FILE}`);
+}
+
+async function writeIssueLog(issues: CompileIssue[]) {
+  const logPath = path.join(__dirname, '..', 'harness', 'evidence', 'compile-issues.log');
+  await fs.ensureDir(path.dirname(logPath));
+
+  const header = [
+    `# compile-issues.log`,
+    `# generated: ${new Date().toISOString()}`,
+    `# total: ${issues.length}`,
+    '',
+  ].join('\n');
+
+  const body = issues.length === 0
+    ? '(no issues — all conversions OK)\n'
+    : issues.map(formatIssue).join('\n') + '\n';
+
+  await fs.writeFile(logPath, header + body, 'utf8');
+  console.log(`Wrote issue log: ${logPath} (${issues.length} issue(s))`);
 }
 
 compile().catch((error: unknown) => {
