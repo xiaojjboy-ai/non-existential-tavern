@@ -58,155 +58,220 @@
       "character": "Lendro",
       "start": 0,
       "max": 5,
-      "changes": [
-        {
-          "id": "ch_01_01_C",
-          "trigger": "ch_01_01 选C（你淋湿了）",
-          "field": "关切",
-          "value": 1,
-          "note": "Day03 更早开口"
-        },
-        {
-          "id": "drink_01_01_correct",
-          "trigger": "调酒正确（白酒）",
-          "field": "信任",
-          "value": 1,
-          "note": null
-        },
-        {
-          "id": "ch_01_05_C",
-          "trigger": "ch_01_05 选C（倒酒不问）",
-          "field": "信任",
-          "value": 1,
-          "note": "Day03 跳过寒暄"
-        },
-        {
-          "id": "ch_01_06_B",
-          "trigger": "ch_01_06 选B（你随时来）",
-          "field": "亲和",
-          "value": 1,
-          "note": null
-        }
-      ]
+      "changes": []
     },
     "drink": {
       "id": "drink_01_01",
-      "available": [
-        "白酒",
-        "威士忌",
-        "啤酒",
-        "柠檬水"
-      ],
-      "correct": "白酒",
-      "hint": "有什么暖的 / 随便来点什么",
-      "correct_effect": {
-        "affinity": "信任+1",
-        "emotion": "放松"
-      },
-      "wrong_effects": {
-        "威士忌": {
-          "dialogue": "dlg_01_drink_wrong_whisky",
-          "reaction": "嫌太重，要清的"
-        },
-        "啤酒": {
-          "dialogue": "dlg_01_drink_wrong_beer",
-          "reaction": "不喝，要烈的"
-        },
-        "柠檬水": {
-          "dialogue": "dlg_01_drink_wrong_lemon",
-          "reaction": "质疑酒架种类"
+      "correctRecipe": {
+        "ingredients": [
+          {
+            "id": "baijiu",
+            "name": "白酒",
+            "volumeOz": 2
+          }
+        ],
+        "method": "build",
+        "glass": {
+          "type": "rock",
+          "iceType": "none"
         }
-      }
+      },
+      "hints": [
+        "有什么暖的",
+        "随便来点什么"
+      ],
+      "evaluationRules": [
+        {
+          "id": "drink_01_01_correct",
+          "match": "all",
+          "conditions": [
+            {
+              "field": "ingredient.baijiu.volumeOz",
+              "op": "gte",
+              "value": 1.5
+            },
+            {
+              "field": "method",
+              "op": "eq",
+              "value": "build"
+            }
+          ],
+          "gotoNodeId": "dlg_01_drink_correct",
+          "affinityEffect": {
+            "character": "Lendro",
+            "field": "信任",
+            "value": 1
+          }
+        },
+        {
+          "id": "drink_01_01_wrong_whisky",
+          "match": "all",
+          "conditions": [
+            {
+              "field": "ingredient.whisky.volumeOz",
+              "op": "gte",
+              "value": 1
+            }
+          ],
+          "gotoNodeId": "dlg_01_drink_wrong_whisky",
+          "affinityEffect": null
+        },
+        {
+          "id": "drink_01_01_wrong_beer",
+          "match": "all",
+          "conditions": [
+            {
+              "field": "ingredient.beer.volumeOz",
+              "op": "gte",
+              "value": 1
+            }
+          ],
+          "gotoNodeId": "dlg_01_drink_wrong_beer",
+          "affinityEffect": null
+        },
+        {
+          "id": "drink_01_01_wrong_lemon",
+          "match": "all",
+          "conditions": [
+            {
+              "field": "ingredient.lemon.volumeOz",
+              "op": "gte",
+              "value": 1
+            }
+          ],
+          "gotoNodeId": "dlg_01_drink_wrong_lemon",
+          "affinityEffect": null
+        },
+        {
+          "id": "drink_01_01_fallback",
+          "match": "all",
+          "conditions": [],
+          "gotoNodeId": "dlg_01_drink_wrong_lemon",
+          "affinityEffect": null
+        }
+      ]
     },
     "branches": {
       "ch_01_01": {
         "A": {
-          "goto": "dlg_01_02a",
-          "effect": "亲和+1"
+          "gotoNodeId": "dlg_01_02a",
+          "effects": [
+            {
+              "character": "Lendro",
+              "field": "亲和",
+              "value": 1
+            }
+          ]
         },
         "B": {
-          "goto": "dlg_01_02b",
-          "effect": null
+          "gotoNodeId": "dlg_01_02b",
+          "effects": []
         },
         "C": {
-          "goto": "dlg_01_02c",
-          "effect": "关切+1"
+          "gotoNodeId": "dlg_01_02c",
+          "effects": [
+            {
+              "character": "Lendro",
+              "field": "关切",
+              "value": 1
+            }
+          ]
         }
       },
       "ch_01_02": {
         "A": {
-          "goto": "dlg_01_04a",
-          "effect": null
+          "gotoNodeId": "dlg_01_04a",
+          "effects": []
         },
         "B": {
-          "goto": "dlg_01_04b",
-          "effect": null
+          "gotoNodeId": "dlg_01_04b",
+          "effects": []
         },
         "C": {
-          "goto": "dlg_01_04c",
-          "effect": null
+          "gotoNodeId": "dlg_01_04c",
+          "effects": []
         }
       },
       "ch_01_03": {
         "A": {
-          "goto": "dlg_01_06a",
-          "effect": null
+          "gotoNodeId": "dlg_01_06a",
+          "effects": []
         },
         "B": {
-          "goto": "dlg_01_06b",
-          "effect": null
+          "gotoNodeId": "dlg_01_06b",
+          "effects": []
         },
         "C": {
-          "goto": "dlg_01_06c",
-          "effect": null
+          "gotoNodeId": "dlg_01_06c",
+          "effects": []
         }
       },
       "ch_01_04": {
         "A": {
-          "goto": "dlg_01_08a",
-          "effect": null,
+          "gotoNodeId": "dlg_01_08a",
+          "effects": [],
           "pace": "normal"
         },
         "B": {
-          "goto": "dlg_01_08b",
-          "effect": null,
+          "gotoNodeId": "dlg_01_08b",
+          "effects": [],
           "pace": "tight"
         },
         "C": {
-          "goto": "dlg_01_08c",
-          "effect": null,
+          "gotoNodeId": "dlg_01_08c",
+          "effects": [],
           "pace": "slow"
         }
       },
       "ch_01_05": {
         "A": {
-          "goto": "dlg_01_eilas_a",
-          "effect": null
+          "gotoNodeId": "dlg_01_eilas_a",
+          "effects": []
         },
         "B": {
-          "goto": "dlg_01_eilas_b",
-          "effect": "信任+1"
+          "gotoNodeId": "dlg_01_eilas_b",
+          "effects": [
+            {
+              "character": "Lendro",
+              "field": "信任",
+              "value": 1
+            }
+          ]
         },
         "C": {
-          "goto": "dlg_01_eilas_c",
-          "effect": [
-            "信任+1",
-            "关切+1"
+          "gotoNodeId": "dlg_01_eilas_c",
+          "effects": [
+            {
+              "character": "Lendro",
+              "field": "信任",
+              "value": 1
+            },
+            {
+              "character": "Lendro",
+              "field": "关切",
+              "value": 1
+            }
           ]
         }
       },
       "ch_01_06": {
         "A": {
-          "goto": "dlg_01_farewell_a",
-          "effect": null
+          "gotoNodeId": "dlg_01_farewell_a",
+          "effects": []
         },
         "B": {
-          "goto": "dlg_01_farewell_b",
-          "effect": "亲和+1"
+          "gotoNodeId": "dlg_01_farewell_b",
+          "effects": [
+            {
+              "character": "Lendro",
+              "field": "亲和",
+              "value": 1
+            }
+          ]
         },
         "C": {
-          "goto": "dlg_01_farewell_c",
-          "effect": null
+          "gotoNodeId": "dlg_01_farewell_c",
+          "effects": []
         }
       }
     },
@@ -214,7 +279,11 @@
       "dlg_01_01": {
         "id": "dlg_01_01",
         "actor": "Lendro",
-        "text": "……还开着？"
+        "text": "……还开着？",
+        "effects": {
+          "soundEffectId": null,
+          "voiceId": "lendro_01_001"
+        }
       },
       "dlg_01_02a": {
         "id": "dlg_01_02a",
@@ -309,7 +378,7 @@
       "dlg_01_08c": {
         "id": "dlg_01_08c",
         "actor": "",
-        "text": "（安静等他说）\n（无论选什么，Lendro 都接以下台词。停顿长度不同：A正常 / B更紧 / C最长）\nLendro：雾。从水面升起来，把整个码头吞进去。\nLendro：仓库的灯一盏一盏灭掉，像是有什么东西在吹蜡烛。\n（手指无意识地摸了一下风衣内侧——枪套的位置）\nLendro：……那天也是这样的雾。"
+        "text": "（安静等他说）"
       },
       "dlg_01_warehouse": {
         "id": "dlg_01_warehouse",
@@ -383,251 +452,268 @@
       "dlg_01_farewell_c"
     ],
     "narratives": {
+      "narr_whatever_01": {
+        "id": "narr_whatever_01",
+        "actor": "旁白",
+        "text": "（无论选什么，Lendro 都接以下台词。停顿长度不同：A正常 / B更紧 / C最长）\n\nLendro：雾。从水面升起来，把整个码头吞进去。\nLendro：仓库的灯一盏一盏灭掉，像是有什么东西在吹蜡烛。\n（手指无意识地摸了一下风衣内侧——枪套的位置）\nLendro：……那天也是这样的雾。"
+      },
       "narr_01_01": {
         "id": "narr_01_01",
         "actor": "旁白",
-        "text": "吧台上留着一个空杯。\r\n杯底有一圈水渍——分不清是酒，还是雨水。"
+        "text": "吧台上留着一个空杯。\n杯底有一圈水渍——分不清是酒，还是雨水。"
       }
     },
     "commands": [
       {
+        "id": "cmd_0001",
         "type": "BG",
-        "params": "tavern_night_rain",
-        "raw": "[BG tavern_night_rain]"
+        "params": {
+          "assetId": "tavern_night_rain",
+          "transition": "none"
+        },
+        "raw": "[BG tavern_night_rain none]"
       },
       {
+        "id": "cmd_0002",
         "type": "BGM",
-        "params": "jazz_piano_low",
-        "raw": "[BGM jazz_piano_low]"
+        "params": {
+          "assetId": "jazz_piano_low",
+          "action": "play"
+        },
+        "raw": "[BGM jazz_piano_low play]"
       },
       {
+        "id": "cmd_0003",
         "type": "LIGHT",
-        "params": "暖黄偏暗，吧台灯亮，角落阴影重",
-        "raw": "[LIGHT 暖黄偏暗，吧台灯亮，角落阴影重]"
+        "params": {
+          "color": "#ffeedd",
+          "intensity": 0.8,
+          "description": "暖黄偏暗，吧台灯亮，角落阴影重"
+        },
+        "raw": "[LIGHT #ffeedd 0.8 暖黄偏暗，吧台灯亮，角落阴影重]"
       },
       {
+        "id": "cmd_0004",
         "type": "PROP",
-        "params": "吧台干净，酒架半满，窗台空",
-        "raw": "[PROP 吧台干净，酒架半满，窗台空]"
+        "params": {
+          "propId": "bar",
+          "action": "show",
+          "state": "吧台干净，酒架半满，窗台空"
+        },
+        "raw": "[PROP bar show 吧台干净，酒架半满，窗台空]"
       },
       {
+        "id": "cmd_0005",
         "type": "SE",
-        "params": "door_open_wind_chime",
+        "params": {
+          "assetId": "door_open_wind_chime",
+          "loop": false
+        },
         "raw": "[SE door_open_wind_chime]"
       },
       {
+        "id": "cmd_0006",
         "type": "SE",
-        "params": "footsteps_heavy 3步 停顿 2步",
-        "raw": "[SE footsteps_heavy 3步 停顿 2步]"
+        "params": {
+          "assetId": "footsteps_heavy",
+          "loop": false
+        },
+        "raw": "[SE footsteps_heavy]"
       },
       {
+        "id": "cmd_0007",
         "type": "ENTER",
-        "params": "Lendro_coat_wet",
-        "raw": "[ENTER Lendro_coat_wet]"
+        "params": {
+          "characterId": "Lendro",
+          "poseId": "Lendro_coat_wet",
+          "position": "center"
+        },
+        "raw": "[ENTER Lendro Lendro_coat_wet center]"
       },
       {
+        "id": "cmd_0008",
         "type": "PAUSE",
-        "params": "1.5s",
-        "raw": "[PAUSE 1.5s]"
+        "params": {
+          "durationMs": 1500
+        },
+        "raw": "[PAUSE 1500]"
       },
       {
+        "id": "cmd_0009",
         "type": "GOTO",
-        "params": "dlg_01_01",
+        "params": {
+          "targetNodeId": "dlg_01_01"
+        },
         "raw": "[GOTO dlg_01_01]"
       },
       {
+        "id": "cmd_0010",
         "type": "CHOICE",
-        "params": "ch_01_01",
-        "raw": "[CHOICE ch_01_01]",
-        "choices": {
-          "A": "dlg_01_02a",
-          "B": "dlg_01_02b",
-          "C": "dlg_01_02c"
-        }
+        "params": {
+          "choiceId": "ch_01_01"
+        },
+        "raw": "[CHOICE ch_01_01]"
       },
       {
+        "id": "cmd_0011",
         "type": "GOTO",
-        "params": "dlg_01_03",
+        "params": {
+          "targetNodeId": "dlg_01_03"
+        },
         "raw": "[GOTO dlg_01_03]"
       },
       {
+        "id": "cmd_0012",
         "type": "CHOICE",
-        "params": "ch_01_02",
-        "raw": "[CHOICE ch_01_02]",
-        "choices": {
-          "A": "dlg_01_04a",
-          "B": "dlg_01_04b",
-          "C": "dlg_01_04c"
-        }
+        "params": {
+          "choiceId": "ch_01_02"
+        },
+        "raw": "[CHOICE ch_01_02]"
       },
       {
+        "id": "cmd_0013",
         "type": "CHOICE",
-        "params": "drink_01_01",
-        "raw": "[CHOICE drink_01_01]",
-        "choices": {
-          "白酒": "dlg_01_drink_correct",
-          "威士忌": "dlg_01_drink_wrong_whisky",
-          "啤酒": "dlg_01_drink_wrong_beer",
-          "柠檬水": "dlg_01_drink_wrong_lemon"
-        }
+        "params": {
+          "choiceId": "drink_01_01"
+        },
+        "raw": "[CHOICE drink_01_01]"
       },
       {
+        "id": "cmd_0014",
         "type": "GOTO",
-        "params": "dlg_01_05",
+        "params": {
+          "targetNodeId": "dlg_01_05"
+        },
         "raw": "[GOTO dlg_01_05]"
       },
       {
+        "id": "cmd_0015",
         "type": "CHOICE",
-        "params": "ch_01_03",
-        "raw": "[CHOICE ch_01_03]",
-        "choices": {
-          "A": "dlg_01_06a",
-          "B": "dlg_01_06b",
-          "C": "dlg_01_06c"
-        }
+        "params": {
+          "choiceId": "ch_01_03"
+        },
+        "raw": "[CHOICE ch_01_03]"
       },
       {
+        "id": "cmd_0016",
         "type": "GOTO",
-        "params": "dlg_01_07",
+        "params": {
+          "targetNodeId": "dlg_01_07"
+        },
         "raw": "[GOTO dlg_01_07]"
       },
       {
+        "id": "cmd_0017",
         "type": "CHOICE",
-        "params": "ch_01_04",
-        "raw": "[CHOICE ch_01_04]",
-        "choices": {
-          "A": "dlg_01_08a",
-          "B": "dlg_01_08b",
-          "C": "dlg_01_08c"
-        }
+        "params": {
+          "choiceId": "ch_01_04"
+        },
+        "raw": "[CHOICE ch_01_04]"
       },
       {
+        "id": "cmd_0018",
         "type": "GOTO",
-        "params": "dlg_01_warehouse",
+        "params": {
+          "targetNodeId": "dlg_01_warehouse"
+        },
         "raw": "[GOTO dlg_01_warehouse]"
       },
       {
+        "id": "cmd_0019",
         "type": "CHOICE",
-        "params": "ch_01_05",
-        "raw": "[CHOICE ch_01_05]",
-        "choices": {
-          "A": "dlg_01_eilas_a",
-          "B": "dlg_01_eilas_b",
-          "C": "dlg_01_eilas_c"
-        }
+        "params": {
+          "choiceId": "ch_01_05"
+        },
+        "raw": "[CHOICE ch_01_05]"
       },
       {
+        "id": "cmd_0020",
         "type": "GOTO",
-        "params": "dlg_01_exit",
+        "params": {
+          "targetNodeId": "dlg_01_exit"
+        },
         "raw": "[GOTO dlg_01_exit]"
       },
       {
+        "id": "cmd_0021",
         "type": "CHOICE",
-        "params": "ch_01_06",
-        "raw": "[CHOICE ch_01_06]",
-        "choices": {
-          "A": "dlg_01_farewell_a",
-          "B": "dlg_01_farewell_b",
-          "C": "dlg_01_farewell_c"
-        }
+        "params": {
+          "choiceId": "ch_01_06"
+        },
+        "raw": "[CHOICE ch_01_06]"
       },
       {
+        "id": "cmd_0022",
         "type": "EXIT",
-        "params": "Lendro",
+        "params": {
+          "characterId": "Lendro"
+        },
         "raw": "[EXIT Lendro]"
       },
       {
+        "id": "cmd_0023",
         "type": "SE",
-        "params": "door_close_wind_chime",
+        "params": {
+          "assetId": "door_close_wind_chime",
+          "loop": false
+        },
         "raw": "[SE door_close_wind_chime]"
       },
       {
+        "id": "cmd_0024",
         "type": "SE",
-        "params": "rain_louder_then_fade",
+        "params": {
+          "assetId": "rain_louder_then_fade",
+          "loop": false
+        },
         "raw": "[SE rain_louder_then_fade]"
       },
       {
+        "id": "cmd_0025",
         "type": "BG",
-        "params": "tavern_night_rain_empty",
+        "params": {
+          "assetId": "tavern_night_rain_empty",
+          "transition": "none"
+        },
         "raw": "[BG tavern_night_rain_empty]"
       },
       {
+        "id": "cmd_0026",
         "type": "BGM",
-        "params": "fade_out 3s",
-        "raw": "[BGM fade_out 3s]"
+        "params": {
+          "assetId": "jazz_piano_low",
+          "action": "fade_out",
+          "duration": 3000
+        },
+        "raw": "[BGM jazz_piano_low fade_out 3000]"
       },
       {
+        "id": "cmd_0027",
         "type": "PAUSE",
-        "params": "3s",
-        "raw": "[PAUSE 3s]"
+        "params": {
+          "durationMs": 3000
+        },
+        "raw": "[PAUSE 3000]"
       },
       {
+        "id": "cmd_0028",
         "type": "GOTO",
-        "params": "narr_01_01",
+        "params": {
+          "targetNodeId": "narr_01_01"
+        },
         "raw": "[GOTO narr_01_01]"
       },
       {
+        "id": "cmd_0029",
         "type": "END",
-        "params": "",
+        "params": {},
         "raw": "[END]"
       }
     ],
     "links": {
       "next_visit": "Day03_警探_第2次",
-      "related": [
-        {
-          "day": 3,
-          "character": "Lendro",
-          "visit": 2,
-          "conditions": [
-            {
-              "if": "ch_01_05_C",
-              "then": "跳过寒暄直接讲 Eilas"
-            },
-            {
-              "if": "ch_01_01_C",
-              "then": "更早开口"
-            }
-          ]
-        },
-        {
-          "day": 8,
-          "character": "Zombie",
-          "event": "警探拔枪，与 Day01 摸枪套呼应"
-        },
-        {
-          "day": 9,
-          "character": "Lendro+Zombie",
-          "event": "镜像场景，警探教僵尸存在，僵尸教警探放下"
-        }
-      ]
+      "related": []
     },
-    "metaphor": [
-      {
-        "anchor": "dlg_01_07",
-        "surface": "码头凌晨三点的雾",
-        "deep": "PTSD 闪回前兆"
-      },
-      {
-        "anchor": "dlg_01_eilas_a",
-        "surface": "'我不记得了'",
-        "deep": "创伤性回避，不是真不记得"
-      },
-      {
-        "anchor": "dlg_01_07",
-        "surface": "摸风衣内侧枪套",
-        "deep": "安全感依赖，与僵尸\"什么都没有\"形成镜像"
-      },
-      {
-        "anchor": "narr_01_01",
-        "surface": "杯底水渍分不清酒和雨",
-        "deep": "警探分不清现实和创伤记忆"
-      },
-      {
-        "anchor": "dlg_01_06b",
-        "surface": "视线移向北墙",
-        "deep": "'过去之墙'的第一次暗示"
-      }
-    ]
+    "metaphor": []
   }
 }

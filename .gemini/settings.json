@@ -1,0 +1,20 @@
+{
+  "hooksConfig": {
+    "enabled": true
+  },
+  "hooks": {
+    "BeforeModel": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "name": "project-test-hook-settings",
+            "type": "command",
+            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"H:/AI/非存在主义酒馆/非存在主义酒馆/.gemini/hooks/test-hook.ps1\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

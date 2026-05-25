@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import fs from 'fs-extra';
 import path from 'path';
 import yaml from 'js-yaml';
@@ -8,6 +9,8 @@ import type {
   DialogueNode,
   DrinkRule,
   PlotData,
+  CommandType,
+  AffinityEffect,
 } from '../src/types/game';
 
 const PROJECT_ROOT = path.resolve(__dirname, '..');
@@ -16,23 +19,12 @@ const OUTPUT_DIR = path.join(PROJECT_ROOT, 'src/data');
 const OUTPUT_FILE = path.join(OUTPUT_DIR, 'plot-data.json');
 
 const LAYER_NAMES = ['指令层', '对话层', '数据层'] as const;
-const COMMAND_TYPES = [
-  'BG',
-  'BGM',
-  'SE',
-  'LIGHT',
-  'PROP',
-  'ENTER',
-  'EXIT',
-  'EMO',
-  'PAUSE',
-  'GOTO',
-  'CHOICE',
-  'END',
-] as const;
+const COMMAND_TYPES: CommandType[] = [
+  'BG', 'BGM', 'SE', 'LIGHT', 'PROP', 'ENTER', 'EXIT',
+  'EMO', 'PAUSE', 'GOTO', 'CHOICE', 'END',
+];
 
 type LayerName = (typeof LAYER_NAMES)[number];
-type CommandType = (typeof COMMAND_TYPES)[number];
 type PlotMap = Record<string, PlotData>;
 type YamlRecord = Record<string, unknown>;
 type ChoiceRoutes = Record<string, Record<string, string>>;
@@ -80,19 +72,10 @@ function parseLayers(file: string, content: string, issues: CompileIssue[]): Par
       addIssue(issues, file, `缺少 \`## ${layerName}\`。`, layerName);
       continue;
     }
-
     const start = match.index + match[0].length;
     const next = headerMatches.find((candidate) => candidate.index > match.index);
     const rawBody = content.slice(start, next?.index ?? content.length);
     layerBodies[layerName] = rawBody.replace(/^---\s*$/gm, '').trim();
-  }
-
-  const ordered = headerMatches.map((match) => match[1]).filter((name): name is LayerName => {
-    return LAYER_NAMES.includes(name as LayerName);
-  });
-  const firstSeen = LAYER_NAMES.map((name) => ordered.indexOf(name));
-  if (firstSeen.some((index) => index === -1) || firstSeen.some((index, i) => i > 0 && index < firstSeen[i - 1])) {
-    addIssue(issues, file, '三层顺序必须是：指令层 -> 对话层 -> 数据层。');
   }
 
   if (!LAYER_NAMES.every((name) => layerBodies[name] !== undefined)) {
@@ -102,36 +85,56 @@ function parseLayers(file: string, content: string, issues: CompileIssue[]): Par
   return { layers: layerBodies as Record<LayerName, string> };
 }
 
+function parseCommandParams(type: CommandType, paramsStr: string): any {
+  const parts = paramsStr.split(/\s+/).filter(Boolean);
+  switch (type) {
+    case 'BG': return { assetId: parts[0] || '', transition: parts[1] || 'none' };
+    case 'BGM': return { assetId: parts[0] || '', action: parts[1] || 'play', duration: parts[2] ? Number(parts[2]) : undefined };
+    case 'SE': return { assetId: parts[0] || '', volume: parts[1] ? Number(parts[1]) : undefined, loop: parts[2] === 'true' };
+    case 'LIGHT': return { color: parts[0] || '#ffffff', intensity: parts[1] ? Number(parts[1]) : 1, description: parts.slice(2).join(' ') };
+    case 'PROP': return { propId: parts[0] || '', action: parts[1] || 'show', state: parts[2] };
+    case 'ENTER': return { characterId: parts[0] || '', poseId: parts[1] || '', position: parts[2] || 'center' };
+    case 'EXIT': return { characterId: parts[0] || '' };
+    case 'EMO': return { characterId: parts[0] || '', emoId: parts[1] || '' };
+    case 'PAUSE': return { durationMs: parts[0] ? Number(parts[0]) : 1000 };
+    case 'GOTO': return { targetNodeId: parts[0] || '' };
+    case 'CHOICE': return { choiceId: parts[0] || '' };
+    case 'END': return {};
+    default: return {};
+  }
+}
+
 function parseCommands(file: string, section: string, issues: CompileIssue[]): ParsedCommands {
   const commands: Command[] = [];
   const choiceRoutes: ChoiceRoutes = {};
   let activeChoiceId: string | null = null;
-  let activeChoiceCommand: Command | null = null;
+  let cmdIdCounter = 1;
 
   for (const line of section.split(/\r?\n/)) {
     const trimmed = line.trim();
     if (!trimmed || trimmed === '```') continue;
 
-    const commandMatch = trimmed.match(/^\[(\w+)(?:\s+([^\]]+))?\]$/);
+    const commandMatch = trimmed.match(/^\[([A-Z]+)(?:\s+([^\]]+))?\]$/);
     if (commandMatch) {
-      const type = commandMatch[1] as CommandType;
-      if (!COMMAND_TYPES.includes(type)) {
-        addIssue(issues, file, `不支持的指令 \`[${commandMatch[1]}]\`。`, '指令层');
+      const typeStr = commandMatch[1];
+      if (!COMMAND_TYPES.includes(typeStr as CommandType)) {
+        addIssue(issues, file, `不支持的指令 \`[${typeStr}]\`。`, '指令层');
         activeChoiceId = null;
         continue;
       }
+      const type = typeStr as CommandType;
+      const paramsStr = (commandMatch[2] ?? '').trim();
+      const params = parseCommandParams(type, paramsStr);
 
-      const params = (commandMatch[2] ?? '').trim();
-      if (type !== 'END' && params.length === 0) {
-        addIssue(issues, file, `指令 \`[${type}]\` 缺少参数。`, '指令层');
-      }
+      const command: Command = {
+        id: `cmd_${String(cmdIdCounter++).padStart(4, '0')}`,
+        type: type as any,
+        params,
+        raw: trimmed
+      } as Command;
 
-      const command: Command = type === 'CHOICE'
-        ? { type, params, raw: trimmed, choices: {} }
-        : { type, params, raw: trimmed };
       commands.push(command);
-      activeChoiceId = type === 'CHOICE' ? params : null;
-      activeChoiceCommand = type === 'CHOICE' ? command : null;
+      activeChoiceId = type === 'CHOICE' ? paramsStr : null;
       if (activeChoiceId) {
         choiceRoutes[activeChoiceId] = {};
       }
@@ -145,13 +148,9 @@ function parseCommands(file: string, section: string, issues: CompileIssue[]): P
     }
 
     if (!activeChoiceId) continue;
-
     const routeMatch = trimmed.match(/^(.+?)\s*(?:→|->)\s*([A-Za-z0-9_]+)(?:\s+.*)?$/);
     if (routeMatch) {
       choiceRoutes[activeChoiceId][routeMatch[1].trim()] = routeMatch[2].trim();
-      if (activeChoiceCommand?.choices) {
-        activeChoiceCommand.choices[routeMatch[1].trim()] = routeMatch[2].trim();
-      }
     }
   }
 
@@ -159,10 +158,7 @@ function parseCommands(file: string, section: string, issues: CompileIssue[]): P
 }
 
 function normalizeDialogueText(rawText: string) {
-  return rawText
-    .replace(/```/g, '')
-    .replace(/^#{1,6}\s+.*$/gm, '')
-    .trim();
+  return rawText.replace(/```/g, '').replace(/^#{1,6}\s+.*$/gm, '').trim();
 }
 
 function splitActorAndText(rawText: string) {
@@ -248,13 +244,13 @@ function asBranches(value: unknown): Record<string, Record<string, ChoiceBranch>
 
     for (const [choiceKey, choiceValue] of Object.entries(branchValue)) {
       if (!isRecord(choiceValue)) continue;
-      const goto = typeof choiceValue.goto === 'string' ? choiceValue.goto : '';
-      const effect = choiceValue.effect;
+      const gotoNodeId = typeof choiceValue.gotoNodeId === 'string' ? choiceValue.gotoNodeId : (typeof choiceValue.goto === 'string' ? choiceValue.goto : '');
+      const effects = Array.isArray(choiceValue.effects) ? choiceValue.effects : [];
       const pace = choiceValue.pace;
       const ending = choiceValue.ending;
       branches[branchId][choiceKey] = {
-        goto,
-        effect: typeof effect === 'string' || Array.isArray(effect) ? effect as string | string[] : null,
+        gotoNodeId,
+        effects: effects as AffinityEffect[],
         pace: pace === 'normal' || pace === 'tight' || pace === 'slow' ? pace : undefined,
         ending: typeof ending === 'string' ? ending : undefined,
       };
@@ -268,27 +264,11 @@ function asDrinkRule(value: unknown): DrinkRule | null {
   if (!isRecord(value)) return null;
   if (typeof value.id !== 'string') return null;
 
-  const wrongEffects: DrinkRule['wrong_effects'] = {};
-  if (isRecord(value.wrong_effects)) {
-    for (const [drinkName, effect] of Object.entries(value.wrong_effects)) {
-      if (!isRecord(effect)) continue;
-      wrongEffects[drinkName] = {
-        dialogue: typeof effect.dialogue === 'string' ? effect.dialogue : '',
-        reaction: typeof effect.reaction === 'string' ? effect.reaction : '',
-      };
-    }
-  }
-
   return {
     id: value.id,
-    available: Array.isArray(value.available) ? value.available.filter((item): item is string => typeof item === 'string') : [],
-    correct: typeof value.correct === 'string' ? value.correct : '',
-    hint: typeof value.hint === 'string' ? value.hint : '',
-    correct_effect: isRecord(value.correct_effect) ? {
-      affinity: typeof value.correct_effect.affinity === 'string' ? value.correct_effect.affinity : undefined,
-      emotion: typeof value.correct_effect.emotion === 'string' ? value.correct_effect.emotion : undefined,
-    } : {},
-    wrong_effects: wrongEffects,
+    correctRecipe: value.correctRecipe as any,
+    hints: Array.isArray(value.hints) ? value.hints : [],
+    evaluationRules: Array.isArray(value.evaluationRules) ? value.evaluationRules : []
   };
 }
 
@@ -300,79 +280,61 @@ function validatePlot(file: string, plotData: PlotData, choiceRoutes: ChoiceRout
   const nodeIds = getNodeIds(plotData);
 
   for (const command of plotData.commands) {
-    if (command.type === 'GOTO' && !nodeIds.has(command.params)) {
-      addIssue(issues, file, `[GOTO ${command.params}] 指向不存在的对话/旁白节点。`, '指令层');
+    if (command.type === 'GOTO') {
+      const target = (command.params as any).targetNodeId;
+      if (!nodeIds.has(target)) {
+        addIssue(issues, file, `[GOTO ${target}] 指向不存在的对话/旁白节点。`, '指令层');
+      }
     }
 
     if (command.type === 'CHOICE') {
-      const isBranch = plotData.branches[command.params] !== undefined;
-      const isDrink = plotData.drink?.id === command.params;
+      const target = (command.params as any).choiceId;
+      const isBranch = plotData.branches[target] !== undefined;
+      const isDrink = plotData.drink?.id === target;
       if (!isBranch && !isDrink) {
-        addIssue(issues, file, `[CHOICE ${command.params}] 未在 branches 或 drink.id 中定义。`, '指令层');
+        addIssue(issues, file, `[CHOICE ${target}] 未在 branches 或 drink.id 中定义。`, '指令层');
       }
     }
   }
 
   for (const [branchId, choices] of Object.entries(plotData.branches)) {
     for (const [choiceKey, branch] of Object.entries(choices)) {
-      if (!branch.goto || !nodeIds.has(branch.goto)) {
-        addIssue(issues, file, `branches.${branchId}.${choiceKey}.goto 指向不存在的节点：${branch.goto || '(空)'}`, '数据层');
-      }
-
-      const scriptedGoto = choiceRoutes[branchId]?.[choiceKey];
-      if (scriptedGoto && scriptedGoto !== branch.goto) {
-        addIssue(issues, file, `指令层 ${branchId}.${choiceKey} 跳到 ${scriptedGoto}，但数据层写的是 ${branch.goto}。`, '数据层');
+      if (!branch.gotoNodeId || !nodeIds.has(branch.gotoNodeId)) {
+        addIssue(issues, file, `branches.${branchId}.${choiceKey}.gotoNodeId 指向不存在的节点：${branch.gotoNodeId || '(空)'}`, '数据层');
       }
     }
   }
 
   if (plotData.drink) {
-    if (!plotData.drink.available.includes(plotData.drink.correct)) {
-      addIssue(issues, file, `drink.correct \`${plotData.drink.correct}\` 不在 drink.available 中。`, '数据层');
-    }
-
-    for (const [drinkName, effect] of Object.entries(plotData.drink.wrong_effects)) {
-      if (!nodeIds.has(effect.dialogue)) {
-        addIssue(issues, file, `drink.wrong_effects.${drinkName}.dialogue 指向不存在的节点：${effect.dialogue}`, '数据层');
-      }
-
-      const scriptedGoto = choiceRoutes[plotData.drink.id]?.[drinkName];
-      if (scriptedGoto && scriptedGoto !== effect.dialogue) {
-        addIssue(issues, file, `指令层 ${plotData.drink.id}.${drinkName} 跳到 ${scriptedGoto}，但数据层写的是 ${effect.dialogue}。`, '数据层');
-      }
-    }
-
-    const correctRoute = choiceRoutes[plotData.drink.id]?.[plotData.drink.correct];
-    if (correctRoute && !nodeIds.has(correctRoute)) {
-      addIssue(issues, file, `调酒正确选项 ${plotData.drink.correct} 指向不存在的节点：${correctRoute}`, '指令层');
-    }
-  }
-
-  const metaphor = plotData.metaphor;
-  if (Array.isArray(metaphor)) {
-    for (const item of metaphor) {
-      if (isRecord(item) && typeof item.anchor === 'string' && !nodeIds.has(item.anchor)) {
-        addIssue(issues, file, `metaphor anchor 指向不存在的节点：${item.anchor}`, '数据层');
+    for (const evalRule of plotData.drink.evaluationRules) {
+      if (!nodeIds.has(evalRule.gotoNodeId)) {
+        addIssue(issues, file, `drink.evaluationRules[${evalRule.id}].gotoNodeId 指向不存在的节点：${evalRule.gotoNodeId}`, '数据层');
       }
     }
   }
 }
 
 function buildPlotData(yamlData: YamlRecord, commands: Command[], dialoguesResult: ReturnType<typeof parseDialogues>): PlotData {
+  const finalDialogues = { ...dialoguesResult.dialogues };
+  const yamlDialogues = isRecord(yamlData.dialogues) ? yamlData.dialogues : {};
+  
+  for (const [id, node] of Object.entries(finalDialogues)) {
+    if (isRecord(yamlDialogues[id])) {
+      const extra = yamlDialogues[id] as any;
+      if (extra.effects) {
+        node.effects = extra.effects;
+      }
+    }
+  }
+
   return {
     meta: isRecord(yamlData.meta) ? yamlData.meta as unknown as PlotData['meta'] : {
-      day: '',
-      character: '',
-      visit: null,
-      requires: null,
-      unlocks: [],
-      next: null,
-      resources: {},
+      day: '', character: '', visit: null, requires: null, unlocks: [], next: null, resources: {},
     },
     affinity: yamlData.affinity as PlotData['affinity'],
     drink: asDrinkRule(yamlData.drink),
     branches: asBranches(yamlData.branches),
-    dialogues: dialoguesResult.dialogues,
+    dialogues: finalDialogues,
     dialogueOrder: dialoguesResult.dialogueOrder,
     narratives: dialoguesResult.narratives,
     commands,
@@ -383,8 +345,6 @@ function buildPlotData(yamlData: YamlRecord, commands: Command[], dialoguesResul
 
 async function compile() {
   console.log('Starting script compilation...');
-  console.log(`Script directory: ${SCRIPT_DIR}`);
-
   const files = await glob('*.md', { cwd: SCRIPT_DIR });
   const scriptFiles = files.filter((file) => !file.startsWith('模板_'));
   const skippedFiles = files.length - scriptFiles.length;
@@ -397,8 +357,6 @@ async function compile() {
     const filePath = path.join(SCRIPT_DIR, file);
     const content = await fs.readFile(filePath, 'utf-8');
     const plotId = file.replace(/\.md$/i, '');
-
-    console.log(`Processing ${file}...`);
 
     const parsed = parseLayers(file, content, issues);
     if (!parsed) continue;

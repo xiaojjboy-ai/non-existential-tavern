@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import type { ChoiceBranch, Command, DialogueNode, GameState, PlotData, RuntimeDebugState } from '../types/game';
+import type { Command, DialogueNode, GameState, PlotData, RuntimeDebugState, AffinityEffect, MixingRecipe } from '../types/game';
+import { evaluateDrink } from '../engine/DrinkEvaluator';
 import allPlotsRaw from '../data/plot-data.json';
 
 const allPlots = allPlotsRaw as unknown as Record<string, PlotData>;
@@ -19,11 +20,11 @@ function createEmptyRuntime(): RuntimeDebugState {
 function applyRuntimeCommand(runtime: RuntimeDebugState, command: Command): RuntimeDebugState {
   switch (command.type) {
     case 'BG':
-      return { ...runtime, backgroundId: command.params, lastCommandRaw: command.raw };
+      return { ...runtime, backgroundId: command.params.assetId, lastCommandRaw: command.raw };
     case 'BGM':
-      return { ...runtime, bgmId: command.params, lastCommandRaw: command.raw };
+      return { ...runtime, bgmId: command.params.assetId, lastCommandRaw: command.raw };
     case 'ENTER':
-      return { ...runtime, activeSpriteId: command.params, lastCommandRaw: command.raw };
+      return { ...runtime, activeSpriteId: command.params.characterId, lastCommandRaw: command.raw };
     case 'EXIT':
       return { ...runtime, activeSpriteId: '', lastCommandRaw: command.raw };
     case 'END':
@@ -56,7 +57,7 @@ function findFirstPlayableCommandIndex(plot: PlotData | undefined) {
 function findFirstNodeId(plot: PlotData | undefined) {
   if (!plot) return '';
   const firstGoto = plot.commands.find((command) => command.type === 'GOTO');
-  return firstGoto?.params ?? plot.dialogueOrder[0] ?? Object.keys(plot.narratives)[0] ?? '';
+  return firstGoto?.params?.targetNodeId ?? plot.dialogueOrder[0] ?? Object.keys(plot.narratives)[0] ?? '';
 }
 
 function getInitialRuntime(plot: PlotData | undefined) {
@@ -64,40 +65,14 @@ function getInitialRuntime(plot: PlotData | undefined) {
   return replayNonBlockingCommands(plot, 0, firstPlayableIndex - 1);
 }
 
-function getDrinkBranch(plot: PlotData, choiceKey: string): ChoiceBranch | null {
-  const drink = plot.drink;
-  if (!drink) return null;
-  const drinkCommand = plot.commands.find((command) => command.type === 'CHOICE' && command.params === drink.id);
-
-  if (choiceKey === drink.correct) {
-    const scriptedGoto = drinkCommand?.choices?.[choiceKey];
-    return {
-      goto: scriptedGoto ?? Object.keys(plot.dialogues).find((id) => id.includes('drink_correct')) ?? '',
-      effect: drink.correct_effect.affinity ?? null,
-    };
-  }
-
-  const wrongEffect = drink.wrong_effects[choiceKey];
-  if (!wrongEffect) return null;
-
-  return {
-    goto: wrongEffect.dialogue,
-    effect: null,
-  };
-}
-
-function getAffinityCharacter(plot: PlotData | undefined) {
-  if (!plot?.affinity) return null;
-  return Array.isArray(plot.affinity) ? (plot.affinity[0]?.character ?? null) : plot.affinity.character;
-}
-
 interface GameStore extends GameState {
   setPlot: (plotId: string) => void;
   setNode: (nodeId: string) => void;
   updateAffinity: (character: string, field: string, value: number) => void;
-  applyEffect: (effect: string | string[] | null | undefined) => void;
+  applyEffect: (effects: AffinityEffect[] | undefined) => void;
   nextStep: () => void;
   handleChoice: (branchId: string, choiceKey: string) => void;
+  handleDrinkMix: (recipe: MixingRecipe) => void;
   getCurrentPlot: () => PlotData | undefined;
   getCurrentNode: () => DialogueNode | null;
   getAllPlots: () => Record<string, PlotData>;
@@ -143,20 +118,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     },
   })),
 
-  applyEffect: (effect) => {
-    if (!effect) return;
-
-    const character = getAffinityCharacter(get().getCurrentPlot());
-    if (!character) return;
-
-    const effects = Array.isArray(effect) ? effect : [effect];
-
-    for (const entry of effects) {
-      const match = /^(.+?)([+-]\d+)$/.exec(entry.trim());
-      if (!match) continue;
-
-      const [, field, rawValue] = match;
-      get().updateAffinity(character, field, Number(rawValue));
+  applyEffect: (effects) => {
+    if (!effects || effects.length === 0) return;
+    for (const effect of effects) {
+      get().updateAffinity(effect.character, effect.field, effect.value);
     }
   },
 
@@ -183,12 +148,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const runtime = replayNonBlockingCommands(plot, state.currentCommandIndex + 1, i);
 
       if (command.type === 'GOTO') {
-        set({ currentNodeId: command.params, currentCommandIndex: i, currentChoiceId: null, runtime });
+        set({ currentNodeId: command.params.targetNodeId, currentCommandIndex: i, currentChoiceId: null, runtime });
         return;
       }
 
       if (command.type === 'CHOICE') {
-        set({ currentCommandIndex: i, currentChoiceId: command.params, runtime });
+        set({ currentCommandIndex: i, currentChoiceId: command.params.choiceId, runtime });
         return;
       }
 
@@ -204,17 +169,48 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const plot = state.getCurrentPlot();
     if (!plot) return;
 
-    const branch = plot.branches[branchId]?.[choiceKey] ?? (
-      plot.drink?.id === branchId ? getDrinkBranch(plot, choiceKey) : null
-    );
-    if (!branch) return;
+    const branch = plot.branches[branchId]?.[choiceKey];
+    if (branch) {
+      state.applyEffect(branch.effects);
+      set((currentState) => ({
+        currentNodeId: branch.gotoNodeId,
+        currentChoiceId: null,
+        history: [...currentState.history, `${branchId}:${choiceKey}`],
+      }));
+      return;
+    }
 
-    state.applyEffect(branch.effect);
+    if (plot.drink?.id === branchId) {
+      const rule = plot.drink.evaluationRules.find(r => r.id === choiceKey);
+      if (rule) {
+        if (rule.affinityEffect) {
+          state.applyEffect([rule.affinityEffect]);
+        }
+        set((currentState) => ({
+          currentNodeId: rule.gotoNodeId,
+          currentChoiceId: null,
+          history: [...currentState.history, `drink:${rule.id}`],
+        }));
+      }
+    }
+  },
+
+  handleDrinkMix: (recipe) => {
+    const state = get();
+    const plot = state.getCurrentPlot();
+    if (!plot || !plot.drink) return;
+
+    const evalRule = evaluateDrink(recipe, plot.drink);
+    if (!evalRule) return;
+
+    if (evalRule.affinityEffect) {
+      state.applyEffect([evalRule.affinityEffect]);
+    }
 
     set((currentState) => ({
-      currentNodeId: branch.goto,
+      currentNodeId: evalRule.gotoNodeId,
       currentChoiceId: null,
-      history: [...currentState.history, `${branchId}:${choiceKey}`],
+      history: [...currentState.history, `drink:${evalRule.id}`],
     }));
-  },
+  }
 }));

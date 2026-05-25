@@ -1,0 +1,12 @@
+{
+  "hooks": {
+    "BeforeModel": [
+      {
+        "name": "project-test-hook",
+        "type": "command",
+        "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"H:/AI/非存在主义酒馆/非存在主义酒馆/tavern-web/.gemini/hooks/test-hook.ps1\"",
+        "timeout": 10
+      }
+    ]
+  }
+}

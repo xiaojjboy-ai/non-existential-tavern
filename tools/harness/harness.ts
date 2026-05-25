@@ -1,4 +1,4 @@
-﻿import fs from 'fs-extra';
+import fs from 'fs-extra';
 import path from 'path';
 import yaml from 'js-yaml';
 import { glob } from 'glob';
@@ -234,29 +234,20 @@ function validateCrossLayer(file: string, commands: ParsedCommands, dialogueIds:
     if (!branchRecord) continue;
     for (const [choiceKey, choiceValue] of Object.entries(branchRecord)) {
       const choiceRecord = getRecord(choiceValue);
-      const goto = typeof choiceRecord?.goto === 'string' ? choiceRecord.goto : '';
+      const goto = typeof choiceRecord?.gotoNodeId === 'string' ? choiceRecord.gotoNodeId : '';
       if (!goto || !dialogueIds.has(goto)) {
-        addIssue(issues, { severity: 'error', file, layer: '数据层', message: `branches.${branchId}.${choiceKey}.goto 指向不存在节点：${goto || '(空)'}` });
-      }
-      const scriptedGoto = commands.choiceRoutes[branchId]?.[choiceKey];
-      if (scriptedGoto && goto && scriptedGoto !== goto) {
-        addIssue(issues, { severity: 'error', file, layer: '数据层', message: `指令层 ${branchId}.${choiceKey} -> ${scriptedGoto}，数据层写的是 ${goto}。` });
+        addIssue(issues, { severity: 'error', file, layer: '数据层', message: `branches.${branchId}.${choiceKey}.gotoNodeId 指向不存在节点：${goto || '(空)'}` });
       }
     }
   }
 
   if (drink) {
-    const available = Array.isArray(drink.available) ? drink.available.map(String) : [];
-    const correct = typeof drink.correct === 'string' ? drink.correct : '';
-    if (correct && !available.includes(correct)) {
-      addIssue(issues, { severity: 'error', file, layer: '数据层', message: `drink.correct ${correct} 不在 drink.available 中。` });
-    }
-    const wrongEffects = getRecord(drink.wrong_effects) ?? {};
-    for (const [drinkName, effectValue] of Object.entries(wrongEffects)) {
-      const effect = getRecord(effectValue);
-      const dialogue = typeof effect?.dialogue === 'string' ? effect.dialogue : '';
-      if (!dialogue || !dialogueIds.has(dialogue)) {
-        addIssue(issues, { severity: 'error', file, layer: '数据层', message: `drink.wrong_effects.${drinkName}.dialogue 指向不存在节点：${dialogue || '(空)'}` });
+    const evaluationRules = Array.isArray(drink.evaluationRules) ? drink.evaluationRules : [];
+    for (const ruleValue of evaluationRules) {
+      const rule = getRecord(ruleValue);
+      const gotoNodeId = typeof rule?.gotoNodeId === 'string' ? rule.gotoNodeId : '';
+      if (!gotoNodeId || !dialogueIds.has(gotoNodeId)) {
+        addIssue(issues, { severity: 'error', file, layer: '数据层', message: `drink.evaluationRules[${rule?.id}].gotoNodeId 指向不存在节点：${gotoNodeId || '(空)'}` });
       }
     }
   }

@@ -3,6 +3,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { GameCanvas } from '@/components/GameCanvas';
 import { Typewriter } from '@/components/Typewriter';
+import { MixingStation } from '@/components/MixingStation';
 import { useGameStore } from '@/store/useGameStore';
 import type { ChoiceBranch, DialogueNode, PlotData } from '@/types/game';
 
@@ -24,15 +25,15 @@ function formatNodeText(node: DialogueNode | null) {
 function getChoiceLabel(plot: PlotData | undefined, branch: ChoiceBranch) {
   if (branch.ending) return branch.ending;
 
-  const targetNode = plot?.dialogues[branch.goto] ?? plot?.narratives[branch.goto];
-  if (!targetNode) return branch.goto;
+  const targetNode = plot?.dialogues[branch.gotoNodeId] ?? plot?.narratives[branch.gotoNodeId];
+  if (!targetNode) return branch.gotoNodeId;
 
   const preview = formatNodeText(targetNode)
     .split(/\r?\n/)
     .map((line) => line.trim())
     .find(Boolean);
 
-  return preview ?? branch.goto;
+  return preview ?? branch.gotoNodeId;
 }
 
 export default function Home() {
@@ -45,6 +46,7 @@ export default function Home() {
     getCurrentNode,
     getCurrentPlot,
     handleChoice,
+    handleDrinkMix,
     nextStep,
     runtime,
   } = useGameStore();
@@ -52,6 +54,7 @@ export default function Home() {
   const [debugExpanded, setDebugExpanded] = useState(false);
   const [debugHovered, setDebugHovered] = useState(false);
   const [hoveredChoiceKey, setHoveredChoiceKey] = useState<string | null>(null);
+  const [isMixingActive, setIsMixingActive] = useState(false);
 
   const plot = getCurrentPlot();
   const node = getCurrentNode();
@@ -69,13 +72,7 @@ export default function Home() {
     if (branchChoices) return branchChoices;
 
     if (plot.drink?.id === currentChoiceId) {
-      const drinkCommand = plot.commands.find((command) => command.type === 'CHOICE' && command.params === currentChoiceId);
-      return Object.fromEntries(plot.drink.available.map((drinkName) => {
-        const goto = drinkCommand?.choices?.[drinkName]
-          ?? plot.drink?.wrong_effects[drinkName]?.dialogue
-          ?? '';
-        return [drinkName, { goto, effect: drinkName === plot.drink?.correct ? plot.drink?.correct_effect.affinity ?? null : null }];
-      }));
+      return null;
     }
 
     return null;
@@ -212,7 +209,7 @@ export default function Home() {
           </div>
 
           {/* 终端命令行选项系统 */}
-          {activeChoices && currentChoiceId && (
+          {activeChoices && currentChoiceId && currentChoiceId !== plot?.drink?.id && (
             <div className="mt-4 flex w-full flex-col gap-3 font-mono">
               <div className="text-xs tracking-widest text-[var(--color-text-dim)] mb-2">AWAITING_INPUT...</div>
               {Object.entries(activeChoices).map(([key, branch]) => {
@@ -248,7 +245,26 @@ export default function Home() {
             </div>
           )}
 
-          {!activeChoices && (
+          {!activeChoices && currentChoiceId === plot?.drink?.id && !isMixingActive && (
+            <div className="mt-4 flex w-full justify-center font-mono pointer-events-auto">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsMixingActive(true);
+                }}
+                className="w-full border-2 p-4 text-center text-lg font-bold transition-all duration-300 hover:bg-[var(--color-terminal-amber)] hover:text-black crt-text-glow cursor-pointer"
+                style={{
+                  borderColor: 'var(--color-terminal-amber)',
+                  color: 'var(--color-terminal-amber)',
+                  boxShadow: '0 0 15px var(--color-terminal-amber) inset, 0 0 15px var(--color-terminal-amber)',
+                }}
+              >
+                &gt; [ INITIATE_MIXING_INTERFACE ]
+              </button>
+            </div>
+          )}
+
+          {!activeChoices && currentChoiceId !== plot?.drink?.id && (
             <div className="absolute bottom-4 right-5 flex items-center justify-center">
               <span className="font-mono text-[10px] text-[var(--color-terminal-amber)] crt-text-glow" style={{ animation: 'cursorBlink 1.5s infinite' }}>
                 [ CLICK_TO_CONTINUE ]
@@ -256,6 +272,17 @@ export default function Home() {
             </div>
           )}
         </div>
+
+        {/* Mixing Station Modal */}
+        {isMixingActive && (
+          <MixingStation 
+            onCancel={() => setIsMixingActive(false)} 
+            onServe={(recipe) => {
+              setIsMixingActive(false);
+              handleDrinkMix(recipe);
+            }} 
+          />
+        )}
 
         {/* 可折叠 Debug Monitor */}
         <div className="fixed bottom-4 left-4 z-50 pointer-events-auto">

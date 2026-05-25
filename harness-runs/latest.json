@@ -1,0 +1,30 @@
+{
+  "harness_result": {
+    "task_type": "precompile",
+    "target": "all",
+    "context_pack": {
+      "loaded": [
+        "package.json",
+        "docs/script-format.md",
+        "docs/data-contract-v2.md",
+        "scripts/compile-scripts.ts",
+        "src/types/game.ts",
+        "脚本/模板_脚本层.md",
+        "脚本/模板_指令层.md",
+        "脚本/模板_对话层.md",
+        "脚本/模板_数据层.md"
+      ],
+      "missing": []
+    },
+    "generated_artifacts": [
+      "harness-runs/latest.json"
+    ],
+    "validation": {
+      "passed": true,
+      "errors": 0,
+      "warnings": 0
+    },
+    "blockers": [],
+    "next_action": "run compile-scripts"
+  }
+}
