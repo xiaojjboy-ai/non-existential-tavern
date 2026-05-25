@@ -6,6 +6,10 @@
 
 角色：`admin` / `developer` / `planner`。跑完之前不准编辑文件。
 
+## 强制留档纪律 (Mandatory Record Keeping)
+**注意：本项为硬性规定，任务结束前必须执行。**
+在向人类汇报工作完成前，Agent 必须在 `harness/records/<角色>/` 目录下，按照 `records/_template.md` 的格式新建一个 `<task-id>.md` 文件，详细记录本次更改的内容和验证方式。**未写入物理留档前，禁止宣告任务结束！**
+
 详见 `harness/README.md`。
 
 ---
