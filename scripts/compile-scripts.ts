@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import fs from 'fs-extra';
 import path from 'path';
 import yaml from 'js-yaml';
@@ -9,8 +8,9 @@ import type {
   DialogueNode,
   DrinkRule,
   PlotData,
-  CommandType,
-  AffinityEffect,
+  Resource,
+  AffinityRule,
+  AffinityChange,
 } from '../src/types/game';
 
 const PROJECT_ROOT = path.resolve(__dirname, '..');
@@ -19,12 +19,23 @@ const OUTPUT_DIR = path.join(PROJECT_ROOT, 'src/data');
 const OUTPUT_FILE = path.join(OUTPUT_DIR, 'plot-data.json');
 
 const LAYER_NAMES = ['指令层', '对话层', '数据层'] as const;
-const COMMAND_TYPES: CommandType[] = [
-  'BG', 'BGM', 'SE', 'LIGHT', 'PROP', 'ENTER', 'EXIT',
-  'EMO', 'PAUSE', 'GOTO', 'CHOICE', 'END',
-];
+const COMMAND_TYPES = [
+  'BG',
+  'BGM',
+  'SE',
+  'LIGHT',
+  'PROP',
+  'ENTER',
+  'EXIT',
+  'EMO',
+  'PAUSE',
+  'GOTO',
+  'CHOICE',
+  'END',
+] as const;
 
 type LayerName = (typeof LAYER_NAMES)[number];
+type CommandType = (typeof COMMAND_TYPES)[number];
 type PlotMap = Record<string, PlotData>;
 type YamlRecord = Record<string, unknown>;
 type ChoiceRoutes = Record<string, Record<string, string>>;
@@ -57,6 +68,36 @@ function formatIssue(issue: CompileIssue) {
   return `- ${issue.file}${layer}: ${issue.message}`;
 }
 
+function describeType(value: unknown): string {
+  if (value === null) return 'null';
+  if (Array.isArray(value)) return `array(len=${value.length})`;
+  return typeof value;
+}
+
+function previewValue(value: unknown): string {
+  if (value === null || value === undefined) return String(value);
+  if (typeof value === 'string') return value.length > 40 ? `"${value.slice(0, 40)}…"` : `"${value}"`;
+  if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+  if (Array.isArray(value)) return `[${value.length} item(s)]`;
+  if (isRecord(value)) return `{${Object.keys(value).join(', ')}}`;
+  return typeof value;
+}
+
+function addConversionIssue(
+  issues: CompileIssue[],
+  file: string,
+  fieldPath: string,
+  expected: string,
+  actual: unknown,
+) {
+  addIssue(
+    issues,
+    file,
+    `字段 \`${fieldPath}\` 类型转换失败：期望 ${expected}，实际 ${describeType(actual)}（${previewValue(actual)}）。`,
+    '数据层',
+  );
+}
+
 function parseLayers(file: string, content: string, issues: CompileIssue[]): ParsedMarkdown | null {
   const headerMatches = [...content.matchAll(/^##\s*(指令层|对话层|数据层)\s*$/gm)];
   const layerBodies: Partial<Record<LayerName, string>> = {};
@@ -72,10 +113,19 @@ function parseLayers(file: string, content: string, issues: CompileIssue[]): Par
       addIssue(issues, file, `缺少 \`## ${layerName}\`。`, layerName);
       continue;
     }
+
     const start = match.index + match[0].length;
     const next = headerMatches.find((candidate) => candidate.index > match.index);
     const rawBody = content.slice(start, next?.index ?? content.length);
     layerBodies[layerName] = rawBody.replace(/^---\s*$/gm, '').trim();
+  }
+
+  const ordered = headerMatches.map((match) => match[1]).filter((name): name is LayerName => {
+    return LAYER_NAMES.includes(name as LayerName);
+  });
+  const firstSeen = LAYER_NAMES.map((name) => ordered.indexOf(name));
+  if (firstSeen.some((index) => index === -1) || firstSeen.some((index, i) => i > 0 && index < firstSeen[i - 1])) {
+    addIssue(issues, file, '三层顺序必须是：指令层 -> 对话层 -> 数据层。');
   }
 
   if (!LAYER_NAMES.every((name) => layerBodies[name] !== undefined)) {
@@ -85,56 +135,36 @@ function parseLayers(file: string, content: string, issues: CompileIssue[]): Par
   return { layers: layerBodies as Record<LayerName, string> };
 }
 
-function parseCommandParams(type: CommandType, paramsStr: string): any {
-  const parts = paramsStr.split(/\s+/).filter(Boolean);
-  switch (type) {
-    case 'BG': return { assetId: parts[0] || '', transition: parts[1] || 'none' };
-    case 'BGM': return { assetId: parts[0] || '', action: parts[1] || 'play', duration: parts[2] ? Number(parts[2]) : undefined };
-    case 'SE': return { assetId: parts[0] || '', volume: parts[1] ? Number(parts[1]) : undefined, loop: parts[2] === 'true' };
-    case 'LIGHT': return { color: parts[0] || '#ffffff', intensity: parts[1] ? Number(parts[1]) : 1, description: parts.slice(2).join(' ') };
-    case 'PROP': return { propId: parts[0] || '', action: parts[1] || 'show', state: parts[2] };
-    case 'ENTER': return { characterId: parts[0] || '', poseId: parts[1] || '', position: parts[2] || 'center' };
-    case 'EXIT': return { characterId: parts[0] || '' };
-    case 'EMO': return { characterId: parts[0] || '', emoId: parts[1] || '' };
-    case 'PAUSE': return { durationMs: parts[0] ? Number(parts[0]) : 1000 };
-    case 'GOTO': return { targetNodeId: parts[0] || '' };
-    case 'CHOICE': return { choiceId: parts[0] || '' };
-    case 'END': return {};
-    default: return {};
-  }
-}
-
 function parseCommands(file: string, section: string, issues: CompileIssue[]): ParsedCommands {
   const commands: Command[] = [];
   const choiceRoutes: ChoiceRoutes = {};
   let activeChoiceId: string | null = null;
-  let cmdIdCounter = 1;
+  let activeChoiceCommand: Command | null = null;
 
   for (const line of section.split(/\r?\n/)) {
     const trimmed = line.trim();
     if (!trimmed || trimmed === '```') continue;
 
-    const commandMatch = trimmed.match(/^\[([A-Z]+)(?:\s+([^\]]+))?\]$/);
+    const commandMatch = trimmed.match(/^\[(\w+)(?:\s+([^\]]+))?\]$/);
     if (commandMatch) {
-      const typeStr = commandMatch[1];
-      if (!COMMAND_TYPES.includes(typeStr as CommandType)) {
-        addIssue(issues, file, `不支持的指令 \`[${typeStr}]\`。`, '指令层');
+      const type = commandMatch[1] as CommandType;
+      if (!COMMAND_TYPES.includes(type)) {
+        addIssue(issues, file, `不支持的指令 \`[${commandMatch[1]}]\`。`, '指令层');
         activeChoiceId = null;
         continue;
       }
-      const type = typeStr as CommandType;
-      const paramsStr = (commandMatch[2] ?? '').trim();
-      const params = parseCommandParams(type, paramsStr);
 
-      const command: Command = {
-        id: `cmd_${String(cmdIdCounter++).padStart(4, '0')}`,
-        type: type as any,
-        params,
-        raw: trimmed
-      } as Command;
+      const params = (commandMatch[2] ?? '').trim();
+      if (type !== 'END' && params.length === 0) {
+        addIssue(issues, file, `指令 \`[${type}]\` 缺少参数。`, '指令层');
+      }
 
+      const command: Command = type === 'CHOICE'
+        ? { type, params, raw: trimmed, choices: {} }
+        : { type, params, raw: trimmed };
       commands.push(command);
-      activeChoiceId = type === 'CHOICE' ? paramsStr : null;
+      activeChoiceId = type === 'CHOICE' ? params : null;
+      activeChoiceCommand = type === 'CHOICE' ? command : null;
       if (activeChoiceId) {
         choiceRoutes[activeChoiceId] = {};
       }
@@ -148,9 +178,13 @@ function parseCommands(file: string, section: string, issues: CompileIssue[]): P
     }
 
     if (!activeChoiceId) continue;
+
     const routeMatch = trimmed.match(/^(.+?)\s*(?:→|->)\s*([A-Za-z0-9_]+)(?:\s+.*)?$/);
     if (routeMatch) {
       choiceRoutes[activeChoiceId][routeMatch[1].trim()] = routeMatch[2].trim();
+      if (activeChoiceCommand?.choices) {
+        activeChoiceCommand.choices[routeMatch[1].trim()] = routeMatch[2].trim();
+      }
     }
   }
 
@@ -158,7 +192,10 @@ function parseCommands(file: string, section: string, issues: CompileIssue[]): P
 }
 
 function normalizeDialogueText(rawText: string) {
-  return rawText.replace(/```/g, '').replace(/^#{1,6}\s+.*$/gm, '').trim();
+  return rawText
+    .replace(/```/g, '')
+    .replace(/^#{1,6}\s+.*$/gm, '')
+    .trim();
 }
 
 function splitActorAndText(rawText: string) {
@@ -233,26 +270,493 @@ function parseYamlLayer(file: string, section: string, issues: CompileIssue[]): 
     return {};
   }
 }
+function asMeta(
+  value: unknown,
+  file: string,
+  issues: CompileIssue[],
+): PlotData['meta'] {
+  const defaultMeta: PlotData['meta'] = {
+    day: '',
+    character: '',
+    visit: null,
+    requires: null,
+    unlocks: [],
+    next: null,
+    resources: {},
+  };
 
-function asBranches(value: unknown): Record<string, Record<string, ChoiceBranch>> {
-  if (!isRecord(value)) return {};
+  if (value === undefined || value === null) {
+    addIssue(issues, file, '数据层缺少 `meta`。', '数据层');
+    return defaultMeta;
+  }
+
+  if (!isRecord(value)) {
+    addConversionIssue(issues, file, 'meta', 'object', value);
+    return defaultMeta;
+  }
+
+  const meta: Partial<PlotData['meta']> = {};
+
+  // 1. day: string | number
+  if (typeof value.day !== 'string' && typeof value.day !== 'number') {
+    addConversionIssue(issues, file, 'meta.day', 'string | number', value.day);
+    meta.day = '';
+  } else {
+    meta.day = value.day;
+  }
+
+  // 2. character: string | string[]
+  if (typeof value.character === 'string') {
+    meta.character = value.character;
+  } else if (Array.isArray(value.character)) {
+    const stringItems = value.character.filter((item): item is string => typeof item === 'string');
+    if (stringItems.length !== value.character.length) {
+      addConversionIssue(issues, file, 'meta.character', 'string[]（仅字符串）', value.character);
+    }
+    meta.character = stringItems;
+  } else {
+    addConversionIssue(issues, file, 'meta.character', 'string | string[]', value.character);
+    meta.character = '';
+  }
+
+  // 3. visit: number | string | null
+  if (value.visit === undefined || value.visit === null) {
+    meta.visit = null;
+  } else if (typeof value.visit === 'number' || typeof value.visit === 'string') {
+    meta.visit = value.visit;
+  } else {
+    addConversionIssue(issues, file, 'meta.visit', 'number | string | null', value.visit);
+    meta.visit = null;
+  }
+
+  // 4. requires: unknown
+  meta.requires = value.requires;
+
+  // 5. unlocks: Array<Record<string, unknown>>
+  if (value.unlocks === undefined || value.unlocks === null) {
+    meta.unlocks = [];
+  } else if (Array.isArray(value.unlocks)) {
+    const records: Array<Record<string, unknown>> = [];
+    for (let i = 0; i < value.unlocks.length; i++) {
+      const item = value.unlocks[i];
+      if (isRecord(item)) {
+        records.push(item);
+      } else {
+        addConversionIssue(issues, file, `meta.unlocks[${i}]`, 'object', item);
+      }
+    }
+    meta.unlocks = records;
+  } else {
+    addConversionIssue(issues, file, 'meta.unlocks', 'array', value.unlocks);
+    meta.unlocks = [];
+  }
+
+  // 6. next: string | null
+  if (value.next === undefined || value.next === null) {
+    meta.next = null;
+  } else if (typeof value.next === 'string') {
+    meta.next = value.next;
+  } else {
+    addConversionIssue(issues, file, 'meta.next', 'string | null', value.next);
+    meta.next = null;
+  }
+
+  // 7. resources: { bg?, bgm?, se?, sprite? }
+  const resources: PlotData['meta']['resources'] = {};
+  if (value.resources !== undefined && value.resources !== null) {
+    if (!isRecord(value.resources)) {
+      addConversionIssue(issues, file, 'meta.resources', 'object', value.resources);
+    } else {
+      const resTypes = ['bg', 'bgm', 'se', 'sprite'] as const;
+      for (const resType of resTypes) {
+        const list = value.resources[resType];
+        if (list === undefined) continue;
+        if (!Array.isArray(list)) {
+          addConversionIssue(issues, file, `meta.resources.${resType}`, 'array', list);
+          continue;
+        }
+        const resourcesList: Resource[] = [];
+        for (let i = 0; i < list.length; i++) {
+          const item = list[i];
+          if (!isRecord(item)) {
+            addConversionIssue(issues, file, `meta.resources.${resType}[${i}]`, 'object', item);
+            continue;
+          }
+          if (typeof item.id !== 'string') {
+            addConversionIssue(issues, file, `meta.resources.${resType}[${i}].id`, 'string', item.id);
+          }
+          if (typeof item.desc !== 'string') {
+            addConversionIssue(issues, file, `meta.resources.${resType}[${i}].desc`, 'string', item.desc);
+          }
+          resourcesList.push({
+            id: typeof item.id === 'string' ? item.id : '',
+            desc: typeof item.desc === 'string' ? item.desc : '',
+          });
+        }
+        resources[resType] = resourcesList;
+      }
+    }
+  }
+  meta.resources = resources;
+
+  // 8. is_ending?: boolean
+  if (value.is_ending !== undefined) {
+    if (typeof value.is_ending === 'boolean') {
+      meta.is_ending = value.is_ending;
+    } else {
+      addConversionIssue(issues, file, 'meta.is_ending', 'boolean', value.is_ending);
+    }
+  }
+
+  // 9. is_reveal?: boolean
+  if (value.is_reveal !== undefined) {
+    if (typeof value.is_reveal === 'boolean') {
+      meta.is_reveal = value.is_reveal;
+    } else {
+      addConversionIssue(issues, file, 'meta.is_reveal', 'boolean', value.is_reveal);
+    }
+  }
+
+  // 10. ending_variants?: Record<string, string>
+  if (value.ending_variants !== undefined) {
+    if (!isRecord(value.ending_variants)) {
+      addConversionIssue(issues, file, 'meta.ending_variants', 'object', value.ending_variants);
+    } else {
+      const variants: Record<string, string> = {};
+      for (const [k, v] of Object.entries(value.ending_variants)) {
+        if (typeof v !== 'string') {
+          addConversionIssue(issues, file, `meta.ending_variants.${k}`, 'string', v);
+        }
+        variants[k] = typeof v === 'string' ? v : '';
+      }
+      meta.ending_variants = variants;
+    }
+  }
+
+  return meta as PlotData['meta'];
+}
+
+function asAffinityRule(
+  value: Record<string, unknown>,
+  file: string,
+  issues: CompileIssue[],
+  pathPrefix: string,
+): AffinityRule {
+  const rule: Partial<AffinityRule> = {};
+
+  if (typeof value.character !== 'string') {
+    addConversionIssue(issues, file, `${pathPrefix}.character`, 'string', value.character);
+    rule.character = '';
+  } else {
+    rule.character = value.character;
+  }
+
+  if (typeof value.start !== 'number') {
+    addConversionIssue(issues, file, `${pathPrefix}.start`, 'number', value.start);
+    rule.start = 0;
+  } else {
+    rule.start = value.start;
+  }
+
+  if (typeof value.max !== 'number') {
+    addConversionIssue(issues, file, `${pathPrefix}.max`, 'number', value.max);
+    rule.max = 0;
+  } else {
+    rule.max = value.max;
+  }
+
+  const changes: AffinityChange[] = [];
+  if (value.changes !== undefined && value.changes !== null) {
+    if (!Array.isArray(value.changes)) {
+      addConversionIssue(issues, file, `${pathPrefix}.changes`, 'array', value.changes);
+    } else {
+      for (let i = 0; i < value.changes.length; i++) {
+        const item = value.changes[i];
+        const changePath = `${pathPrefix}.changes[${i}]`;
+        if (!isRecord(item)) {
+          addConversionIssue(issues, file, changePath, 'object', item);
+          continue;
+        }
+
+        if (typeof item.id !== 'string') {
+          addConversionIssue(issues, file, `${changePath}.id`, 'string', item.id);
+        }
+        if (typeof item.trigger !== 'string') {
+          addConversionIssue(issues, file, `${changePath}.trigger`, 'string', item.trigger);
+        }
+        if (typeof item.field !== 'string') {
+          addConversionIssue(issues, file, `${changePath}.field`, 'string', item.field);
+        }
+        if (typeof item.value !== 'number') {
+          addConversionIssue(issues, file, `${changePath}.value`, 'number', item.value);
+        }
+        let note: string | null = null;
+        if (item.note !== undefined && item.note !== null) {
+          if (typeof item.note === 'string') {
+            note = item.note;
+          } else {
+            addConversionIssue(issues, file, `${changePath}.note`, 'string | null', item.note);
+          }
+        }
+
+        changes.push({
+          id: typeof item.id === 'string' ? item.id : '',
+          trigger: typeof item.trigger === 'string' ? item.trigger : '',
+          field: typeof item.field === 'string' ? item.field : '',
+          value: typeof item.value === 'number' ? item.value : 0,
+          note,
+        });
+      }
+    }
+  }
+  rule.changes = changes;
+
+  return rule as AffinityRule;
+}
+
+function asAffinity(
+  value: unknown,
+  file: string,
+  issues: CompileIssue[],
+): PlotData['affinity'] {
+  if (value === undefined || value === null) {
+    return undefined;
+  }
+
+  if (Array.isArray(value)) {
+    const rules: AffinityRule[] = [];
+    for (let i = 0; i < value.length; i++) {
+      const item = value[i];
+      if (!isRecord(item)) {
+        addConversionIssue(issues, file, `affinity[${i}]`, 'object', item);
+        continue;
+      }
+      rules.push(asAffinityRule(item, file, issues, `affinity[${i}]`));
+    }
+    return rules;
+  }
+
+  if (isRecord(value)) {
+    return asAffinityRule(value, file, issues, 'affinity');
+  }
+
+  addConversionIssue(issues, file, 'affinity', 'object | array', value);
+  return undefined;
+}
+
+function asLinks(
+  value: unknown,
+  file: string,
+  issues: CompileIssue[],
+): unknown {
+  if (value === undefined || value === null) {
+    return undefined;
+  }
+
+  if (!isRecord(value)) {
+    addConversionIssue(issues, file, 'links', 'object', value);
+    return undefined;
+  }
+
+  const links: Record<string, unknown> = {};
+
+  if (value.next_visit !== undefined && value.next_visit !== null) {
+    if (typeof value.next_visit !== 'string') {
+      addConversionIssue(issues, file, 'links.next_visit', 'string', value.next_visit);
+    } else {
+      links.next_visit = value.next_visit;
+    }
+  }
+
+  if (value.related !== undefined && value.related !== null) {
+    if (!Array.isArray(value.related)) {
+      addConversionIssue(issues, file, 'links.related', 'array', value.related);
+    } else {
+      const relatedList: unknown[] = [];
+      for (let i = 0; i < value.related.length; i++) {
+        const item = value.related[i];
+        const itemPath = `links.related[${i}]`;
+        if (!isRecord(item)) {
+          addConversionIssue(issues, file, itemPath, 'object', item);
+          continue;
+        }
+        const rel: Record<string, unknown> = {};
+        if (item.day !== undefined && typeof item.day !== 'number' && typeof item.day !== 'string') {
+          addConversionIssue(issues, file, `${itemPath}.day`, 'number | string', item.day);
+        }
+        if (item.character !== undefined) {
+          if (typeof item.character !== 'string' && !Array.isArray(item.character)) {
+            addConversionIssue(issues, file, `${itemPath}.character`, 'string | string[]', item.character);
+          } else if (Array.isArray(item.character)) {
+            const stringItems = item.character.filter((x): x is string => typeof x === 'string');
+            if (stringItems.length !== item.character.length) {
+              addConversionIssue(issues, file, `${itemPath}.character`, 'string[]（仅字符串）', item.character);
+            }
+          }
+        }
+        if (item.visit !== undefined && typeof item.visit !== 'number' && typeof item.visit !== 'string') {
+          addConversionIssue(issues, file, `${itemPath}.visit`, 'number | string', item.visit);
+        }
+        if (item.event !== undefined && typeof item.event !== 'string') {
+          addConversionIssue(issues, file, `${itemPath}.event`, 'string', item.event);
+        }
+
+        if (item.conditions !== undefined && item.conditions !== null) {
+          if (!Array.isArray(item.conditions)) {
+            addConversionIssue(issues, file, `${itemPath}.conditions`, 'array', item.conditions);
+          } else {
+            const conditionsList: unknown[] = [];
+            for (let j = 0; j < item.conditions.length; j++) {
+              const cond = item.conditions[j];
+              const condPath = `${itemPath}.conditions[${j}]`;
+              if (!isRecord(cond)) {
+                addConversionIssue(issues, file, condPath, 'object', cond);
+                continue;
+              }
+              if (typeof cond.if !== 'string') {
+                addConversionIssue(issues, file, `${condPath}.if`, 'string', cond.if);
+              }
+              if (typeof cond.then !== 'string') {
+                addConversionIssue(issues, file, `${condPath}.then`, 'string', cond.then);
+              }
+              conditionsList.push({
+                if: typeof cond.if === 'string' ? cond.if : '',
+                then: typeof cond.then === 'string' ? cond.then : '',
+              });
+            }
+            rel.conditions = conditionsList;
+          }
+        }
+
+        rel.day = item.day;
+        rel.character = item.character;
+        rel.visit = item.visit;
+        rel.event = item.event;
+        relatedList.push(rel);
+      }
+      links.related = relatedList;
+    }
+  }
+
+  return links;
+}
+
+function asMetaphor(
+  value: unknown,
+  file: string,
+  issues: CompileIssue[],
+): unknown {
+  if (value === undefined || value === null) {
+    return undefined;
+  }
+
+  if (!Array.isArray(value)) {
+    addConversionIssue(issues, file, 'metaphor', 'array', value);
+    return undefined;
+  }
+
+  const list: unknown[] = [];
+  for (let i = 0; i < value.length; i++) {
+    const item = value[i];
+    const itemPath = `metaphor[${i}]`;
+    if (!isRecord(item)) {
+      addConversionIssue(issues, file, itemPath, 'object', item);
+      continue;
+    }
+
+    if (typeof item.anchor !== 'string') {
+      addConversionIssue(issues, file, `${itemPath}.anchor`, 'string', item.anchor);
+    }
+    if (item.surface !== undefined && typeof item.surface !== 'string') {
+      addConversionIssue(issues, file, `${itemPath}.surface`, 'string', item.surface);
+    }
+    if (item.deep !== undefined && typeof item.deep !== 'string') {
+      addConversionIssue(issues, file, `${itemPath}.deep`, 'string', item.deep);
+    }
+
+    list.push({
+      anchor: typeof item.anchor === 'string' ? item.anchor : '',
+      surface: typeof item.surface === 'string' ? item.surface : undefined,
+      deep: typeof item.deep === 'string' ? item.deep : undefined,
+    });
+  }
+
+  return list;
+}
+
+function asBranches(
+  value: unknown,
+  file: string,
+  issues: CompileIssue[],
+): Record<string, Record<string, ChoiceBranch>> {
+  if (value === undefined) return {};
+  if (!isRecord(value)) {
+    addConversionIssue(issues, file, 'branches', 'object', value);
+    return {};
+  }
 
   const branches: Record<string, Record<string, ChoiceBranch>> = {};
   for (const [branchId, branchValue] of Object.entries(value)) {
-    if (!isRecord(branchValue)) continue;
+    if (!isRecord(branchValue)) {
+      addConversionIssue(issues, file, `branches.${branchId}`, 'object（选项表）', branchValue);
+      continue;
+    }
     branches[branchId] = {};
 
     for (const [choiceKey, choiceValue] of Object.entries(branchValue)) {
-      if (!isRecord(choiceValue)) continue;
-      const gotoNodeId = typeof choiceValue.gotoNodeId === 'string' ? choiceValue.gotoNodeId : (typeof choiceValue.goto === 'string' ? choiceValue.goto : '');
-      const effects = Array.isArray(choiceValue.effects) ? choiceValue.effects : [];
+      const fieldRoot = `branches.${branchId}.${choiceKey}`;
+      if (!isRecord(choiceValue)) {
+        addConversionIssue(issues, file, fieldRoot, 'object（含 goto/effect 等字段）', choiceValue);
+        continue;
+      }
+
+      const rawGoto = choiceValue.goto;
+      if (typeof rawGoto !== 'string') {
+        addConversionIssue(issues, file, `${fieldRoot}.goto`, 'string', rawGoto);
+      }
+      const goto = typeof rawGoto === 'string' ? rawGoto : '';
+
+      const effect = choiceValue.effect;
+      let normalizedEffect: string | string[] | null = null;
+      if (effect === null || effect === undefined) {
+        normalizedEffect = null;
+      } else if (typeof effect === 'string') {
+        normalizedEffect = effect;
+      } else if (Array.isArray(effect)) {
+        const stringItems = effect.filter((item): item is string => typeof item === 'string');
+        if (stringItems.length !== effect.length) {
+          addConversionIssue(issues, file, `${fieldRoot}.effect`, 'string[]（仅字符串）', effect);
+        }
+        normalizedEffect = stringItems;
+      } else {
+        addConversionIssue(issues, file, `${fieldRoot}.effect`, 'string | string[] | null', effect);
+      }
+
       const pace = choiceValue.pace;
+      let normalizedPace: 'normal' | 'tight' | 'slow' | undefined;
+      if (pace === undefined) {
+        normalizedPace = undefined;
+      } else if (pace === 'normal' || pace === 'tight' || pace === 'slow') {
+        normalizedPace = pace;
+      } else {
+        addConversionIssue(issues, file, `${fieldRoot}.pace`, '"normal" | "tight" | "slow"', pace);
+      }
+
       const ending = choiceValue.ending;
+      let normalizedEnding: string | undefined;
+      if (ending === undefined) {
+        normalizedEnding = undefined;
+      } else if (typeof ending === 'string') {
+        normalizedEnding = ending;
+      } else {
+        addConversionIssue(issues, file, `${fieldRoot}.ending`, 'string', ending);
+      }
+
       branches[branchId][choiceKey] = {
-        gotoNodeId,
-        effects: effects as AffinityEffect[],
-        pace: pace === 'normal' || pace === 'tight' || pace === 'slow' ? pace : undefined,
-        ending: typeof ending === 'string' ? ending : undefined,
+        goto,
+        effect: normalizedEffect,
+        pace: normalizedPace,
+        ending: normalizedEnding,
       };
     }
   }
@@ -260,15 +764,91 @@ function asBranches(value: unknown): Record<string, Record<string, ChoiceBranch>
   return branches;
 }
 
-function asDrinkRule(value: unknown): DrinkRule | null {
-  if (!isRecord(value)) return null;
-  if (typeof value.id !== 'string') return null;
+function asDrinkRule(
+  value: unknown,
+  file: string,
+  issues: CompileIssue[],
+): DrinkRule | null {
+  if (value === null || value === undefined) return null;
+  if (!isRecord(value)) {
+    addConversionIssue(issues, file, 'drink', 'object | null', value);
+    return null;
+  }
+
+  if (typeof value.id !== 'string') {
+    addConversionIssue(issues, file, 'drink.id', 'string', value.id);
+    return null;
+  }
+
+  const wrongEffects: DrinkRule['wrong_effects'] = {};
+  if (value.wrong_effects !== undefined) {
+    if (!isRecord(value.wrong_effects)) {
+      addConversionIssue(issues, file, 'drink.wrong_effects', 'object', value.wrong_effects);
+    } else {
+      for (const [drinkName, effect] of Object.entries(value.wrong_effects)) {
+        const root = `drink.wrong_effects.${drinkName}`;
+        if (!isRecord(effect)) {
+          addConversionIssue(issues, file, root, 'object（含 dialogue/reaction）', effect);
+          continue;
+        }
+        if (typeof effect.dialogue !== 'string') {
+          addConversionIssue(issues, file, `${root}.dialogue`, 'string', effect.dialogue);
+        }
+        if (typeof effect.reaction !== 'string') {
+          addConversionIssue(issues, file, `${root}.reaction`, 'string', effect.reaction);
+        }
+        wrongEffects[drinkName] = {
+          dialogue: typeof effect.dialogue === 'string' ? effect.dialogue : '',
+          reaction: typeof effect.reaction === 'string' ? effect.reaction : '',
+        };
+      }
+    }
+  }
+
+  let available: string[] = [];
+  if (Array.isArray(value.available)) {
+    const stringItems = value.available.filter((item): item is string => typeof item === 'string');
+    if (stringItems.length !== value.available.length) {
+      addConversionIssue(issues, file, 'drink.available', 'string[]（仅字符串）', value.available);
+    }
+    available = stringItems;
+  } else if (value.available !== undefined) {
+    addConversionIssue(issues, file, 'drink.available', 'string[]', value.available);
+  }
+
+  if (typeof value.correct !== 'string') {
+    addConversionIssue(issues, file, 'drink.correct', 'string', value.correct);
+  }
+  if (value.hint !== undefined && typeof value.hint !== 'string') {
+    addConversionIssue(issues, file, 'drink.hint', 'string', value.hint);
+  }
+
+  let correctEffect: DrinkRule['correct_effect'] = {};
+  if (value.correct_effect !== undefined) {
+    if (!isRecord(value.correct_effect)) {
+      addConversionIssue(issues, file, 'drink.correct_effect', 'object', value.correct_effect);
+    } else {
+      const ce = value.correct_effect;
+      if (ce.affinity !== undefined && typeof ce.affinity !== 'string') {
+        addConversionIssue(issues, file, 'drink.correct_effect.affinity', 'string', ce.affinity);
+      }
+      if (ce.emotion !== undefined && typeof ce.emotion !== 'string') {
+        addConversionIssue(issues, file, 'drink.correct_effect.emotion', 'string', ce.emotion);
+      }
+      correctEffect = {
+        affinity: typeof ce.affinity === 'string' ? ce.affinity : undefined,
+        emotion: typeof ce.emotion === 'string' ? ce.emotion : undefined,
+      };
+    }
+  }
 
   return {
     id: value.id,
-    correctRecipe: value.correctRecipe as any,
-    hints: Array.isArray(value.hints) ? value.hints : [],
-    evaluationRules: Array.isArray(value.evaluationRules) ? value.evaluationRules : []
+    available,
+    correct: typeof value.correct === 'string' ? value.correct : '',
+    hint: typeof value.hint === 'string' ? value.hint : '',
+    correct_effect: correctEffect,
+    wrong_effects: wrongEffects,
   };
 }
 
@@ -280,71 +860,89 @@ function validatePlot(file: string, plotData: PlotData, choiceRoutes: ChoiceRout
   const nodeIds = getNodeIds(plotData);
 
   for (const command of plotData.commands) {
-    if (command.type === 'GOTO') {
-      const target = (command.params as any).targetNodeId;
-      if (!nodeIds.has(target)) {
-        addIssue(issues, file, `[GOTO ${target}] 指向不存在的对话/旁白节点。`, '指令层');
-      }
+    if (command.type === 'GOTO' && !nodeIds.has(command.params)) {
+      addIssue(issues, file, `[GOTO ${command.params}] 指向不存在的对话/旁白节点。`, '指令层');
     }
 
     if (command.type === 'CHOICE') {
-      const target = (command.params as any).choiceId;
-      const isBranch = plotData.branches[target] !== undefined;
-      const isDrink = plotData.drink?.id === target;
+      const isBranch = plotData.branches[command.params] !== undefined;
+      const isDrink = plotData.drink?.id === command.params;
       if (!isBranch && !isDrink) {
-        addIssue(issues, file, `[CHOICE ${target}] 未在 branches 或 drink.id 中定义。`, '指令层');
+        addIssue(issues, file, `[CHOICE ${command.params}] 未在 branches 或 drink.id 中定义。`, '指令层');
       }
     }
   }
 
   for (const [branchId, choices] of Object.entries(plotData.branches)) {
     for (const [choiceKey, branch] of Object.entries(choices)) {
-      if (!branch.gotoNodeId || !nodeIds.has(branch.gotoNodeId)) {
-        addIssue(issues, file, `branches.${branchId}.${choiceKey}.gotoNodeId 指向不存在的节点：${branch.gotoNodeId || '(空)'}`, '数据层');
+      if (!branch.goto || !nodeIds.has(branch.goto)) {
+        addIssue(issues, file, `branches.${branchId}.${choiceKey}.goto 指向不存在的节点：${branch.goto || '(空)'}`, '数据层');
+      }
+
+      const scriptedGoto = choiceRoutes[branchId]?.[choiceKey];
+      if (scriptedGoto && scriptedGoto !== branch.goto) {
+        addIssue(issues, file, `指令层 ${branchId}.${choiceKey} 跳到 ${scriptedGoto}，但数据层写的是 ${branch.goto}。`, '数据层');
       }
     }
   }
 
   if (plotData.drink) {
-    for (const evalRule of plotData.drink.evaluationRules) {
-      if (!nodeIds.has(evalRule.gotoNodeId)) {
-        addIssue(issues, file, `drink.evaluationRules[${evalRule.id}].gotoNodeId 指向不存在的节点：${evalRule.gotoNodeId}`, '数据层');
+    if (!plotData.drink.available.includes(plotData.drink.correct)) {
+      addIssue(issues, file, `drink.correct \`${plotData.drink.correct}\` 不在 drink.available 中。`, '数据层');
+    }
+
+    for (const [drinkName, effect] of Object.entries(plotData.drink.wrong_effects)) {
+      if (!nodeIds.has(effect.dialogue)) {
+        addIssue(issues, file, `drink.wrong_effects.${drinkName}.dialogue 指向不存在的节点：${effect.dialogue}`, '数据层');
+      }
+
+      const scriptedGoto = choiceRoutes[plotData.drink.id]?.[drinkName];
+      if (scriptedGoto && scriptedGoto !== effect.dialogue) {
+        addIssue(issues, file, `指令层 ${plotData.drink.id}.${drinkName} 跳到 ${scriptedGoto}，但数据层写的是 ${effect.dialogue}。`, '数据层');
+      }
+    }
+
+    const correctRoute = choiceRoutes[plotData.drink.id]?.[plotData.drink.correct];
+    if (correctRoute && !nodeIds.has(correctRoute)) {
+      addIssue(issues, file, `调酒正确选项 ${plotData.drink.correct} 指向不存在的节点：${correctRoute}`, '指令层');
+    }
+  }
+
+  const metaphor = plotData.metaphor;
+  if (Array.isArray(metaphor)) {
+    for (const item of metaphor) {
+      if (isRecord(item) && typeof item.anchor === 'string' && !nodeIds.has(item.anchor)) {
+        addIssue(issues, file, `metaphor anchor 指向不存在的节点：${item.anchor}`, '数据层');
       }
     }
   }
 }
 
-function buildPlotData(yamlData: YamlRecord, commands: Command[], dialoguesResult: ReturnType<typeof parseDialogues>): PlotData {
-  const finalDialogues = { ...dialoguesResult.dialogues };
-  const yamlDialogues = isRecord(yamlData.dialogues) ? yamlData.dialogues : {};
-  
-  for (const [id, node] of Object.entries(finalDialogues)) {
-    if (isRecord(yamlDialogues[id])) {
-      const extra = yamlDialogues[id] as any;
-      if (extra.effects) {
-        node.effects = extra.effects;
-      }
-    }
-  }
-
+function buildPlotData(
+  yamlData: YamlRecord,
+  commands: Command[],
+  dialoguesResult: ReturnType<typeof parseDialogues>,
+  file: string,
+  issues: CompileIssue[],
+): PlotData {
   return {
-    meta: isRecord(yamlData.meta) ? yamlData.meta as unknown as PlotData['meta'] : {
-      day: '', character: '', visit: null, requires: null, unlocks: [], next: null, resources: {},
-    },
-    affinity: yamlData.affinity as PlotData['affinity'],
-    drink: asDrinkRule(yamlData.drink),
-    branches: asBranches(yamlData.branches),
-    dialogues: finalDialogues,
+    meta: asMeta(yamlData.meta, file, issues),
+    affinity: asAffinity(yamlData.affinity, file, issues),
+    drink: asDrinkRule(yamlData.drink, file, issues),
+    branches: asBranches(yamlData.branches, file, issues),
+    dialogues: dialoguesResult.dialogues,
     dialogueOrder: dialoguesResult.dialogueOrder,
     narratives: dialoguesResult.narratives,
     commands,
-    links: yamlData.links,
-    metaphor: yamlData.metaphor,
+    links: asLinks(yamlData.links, file, issues),
+    metaphor: asMetaphor(yamlData.metaphor, file, issues),
   };
 }
 
 async function compile() {
   console.log('Starting script compilation...');
+  console.log(`Script directory: ${SCRIPT_DIR}`);
+
   const files = await glob('*.md', { cwd: SCRIPT_DIR });
   const scriptFiles = files.filter((file) => !file.startsWith('模板_'));
   const skippedFiles = files.length - scriptFiles.length;
@@ -358,17 +956,21 @@ async function compile() {
     const content = await fs.readFile(filePath, 'utf-8');
     const plotId = file.replace(/\.md$/i, '');
 
+    console.log(`Processing ${file}...`);
+
     const parsed = parseLayers(file, content, issues);
     if (!parsed) continue;
 
     const { commands, choiceRoutes } = parseCommands(file, parsed.layers['指令层'], issues);
     const dialoguesResult = parseDialogues(file, parsed.layers['对话层'], issues);
     const yamlData = parseYamlLayer(file, parsed.layers['数据层'], issues);
-    const plotData = buildPlotData(yamlData, commands, dialoguesResult);
+    const plotData = buildPlotData(yamlData, commands, dialoguesResult, file, issues);
 
     validatePlot(file, plotData, choiceRoutes, issues);
     allPlots[plotId] = plotData;
   }
+
+  await writeIssueLog(issues);
 
   if (issues.length > 0) {
     console.error('\nScript compilation failed:');
@@ -380,6 +982,25 @@ async function compile() {
   await fs.ensureDir(OUTPUT_DIR);
   await fs.writeJson(OUTPUT_FILE, allPlots, { spaces: 2 });
   console.log(`Compilation finished. Saved to ${OUTPUT_FILE}`);
+}
+
+async function writeIssueLog(issues: CompileIssue[]) {
+  const logPath = path.join(__dirname, '..', 'harness', 'evidence', 'compile-issues.log');
+  await fs.ensureDir(path.dirname(logPath));
+
+  const header = [
+    `# compile-issues.log`,
+    `# generated: ${new Date().toISOString()}`,
+    `# total: ${issues.length}`,
+    '',
+  ].join('\n');
+
+  const body = issues.length === 0
+    ? '(no issues — all conversions OK)\n'
+    : issues.map(formatIssue).join('\n') + '\n';
+
+  await fs.writeFile(logPath, header + body, 'utf8');
+  console.log(`Wrote issue log: ${logPath} (${issues.length} issue(s))`);
 }
 
 compile().catch((error: unknown) => {

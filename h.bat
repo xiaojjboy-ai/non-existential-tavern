@@ -9,7 +9,7 @@ if "%arg1%"=="" (
     echo Roles: admin, developer, planner
     echo.
     echo Current role:
-    type "harness\.current-role" 2>nul || echo   (none)
+    type "harness\.current-role" 2>nul || echo   none
     goto end
 )
 
@@ -24,7 +24,7 @@ if "%arg1%"=="doctor" (
     echo === Doctor Check ===
     echo.
     echo Role:
-    type "harness\.current-role" 2>nul || echo   (none)
+    type "harness\.current-role" 2>nul || echo   none
     echo.
     if exist "harness\roles.json" (
         echo OK roles.json exists

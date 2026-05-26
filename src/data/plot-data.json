@@ -1,4 +1,545 @@
 {
+  "Day02_维修师_第1次": {
+    "meta": {
+      "day": 2,
+      "character": "安尼尔（En neer）",
+      "visit": 1,
+      "requires": [
+        {
+          "character": "Lendro",
+          "stage_progress": "stage_1_active"
+        }
+      ],
+      "unlocks": [
+        {
+          "character": "Enneer",
+          "stage_progress": "stage_1_active"
+        }
+      ],
+      "next": "Day0x_安尼尔_第2次",
+      "resources": {
+        "bg": [
+          {
+            "id": "tavern_evening_clear",
+            "desc": "酒馆傍晚，窗外深蓝，夕照余光"
+          },
+          {
+            "id": "tavern_evening_empty",
+            "desc": "酒馆傍晚，空景，角色已离场"
+          }
+        ],
+        "bgm": [
+          {
+            "id": "blues_slide_guitar_low",
+            "desc": "低沉滑棒吉他蓝调"
+          }
+        ],
+        "se": [
+          {
+            "id": "door_open_wind_chime",
+            "desc": "推门，风铃响"
+          },
+          {
+            "id": "door_close_wind_chime",
+            "desc": "关门，风铃余响"
+          },
+          {
+            "id": "window_scratch_light",
+            "desc": "窗外轻微刮擦声（猫）"
+          },
+          {
+            "id": "footsteps_heavy_slow",
+            "desc": "沉重缓慢脚步声"
+          },
+          {
+            "id": "cat_jump_light",
+            "desc": "猫轻盈跳上吧台"
+          }
+        ],
+        "sprite": [
+          {
+            "id": "Enneer_work_suit",
+            "desc": "不考究西服，内露吊带工服，发际线稀疏，微胖"
+          },
+          {
+            "id": "cat_purple_windowsill",
+            "desc": "紫色小猫，魔法帽歪戴，脖挂水晶吊坠，趴窗台"
+          },
+          {
+            "id": "cat_purple_counter",
+            "desc": "紫色小猫蹲在吧台上，帽檐遮眼，吊坠泛幽光，与老麦对视"
+          }
+        ]
+      }
+    },
+    "drink": {
+      "id": "drink_02_01",
+      "available": [
+        "啤酒"
+      ],
+      "correct": "啤酒",
+      "hint": "啤酒。就啤酒。",
+      "correct_effect": {},
+      "wrong_effects": {}
+    },
+    "branches": {
+      "ch_02_01": {
+        "A": {
+          "goto": "dlg_02_02a",
+          "effect": null
+        },
+        "B": {
+          "goto": "dlg_02_02b",
+          "effect": null
+        },
+        "C": {
+          "goto": "dlg_02_02c",
+          "effect": null
+        }
+      },
+      "ch_02_02": {
+        "A": {
+          "goto": "dlg_02_05a",
+          "effect": null
+        },
+        "B": {
+          "goto": "dlg_02_05b",
+          "effect": null
+        },
+        "C": {
+          "goto": "dlg_02_05c",
+          "effect": null
+        }
+      },
+      "ch_02_03": {
+        "A": {
+          "goto": "dlg_02_farewell_a",
+          "effect": null
+        },
+        "B": {
+          "goto": "dlg_02_farewell_b",
+          "effect": null
+        },
+        "C": {
+          "goto": "dlg_02_farewell_c",
+          "effect": null
+        }
+      },
+      "ch_02_cat": {
+        "摸摸猫": {
+          "goto": "dlg_02_cat_pet",
+          "effect": null
+        },
+        "给啤酒": {
+          "goto": "dlg_02_cat_beer",
+          "effect": null
+        }
+      }
+    },
+    "dialogues": {
+      "dlg_02_cat": {
+        "id": "dlg_02_cat",
+        "actor": "",
+        "text": "（窗外一声轻微的刮擦。老麦抬头——一只紫色小猫蹲在窗台上。戴着一顶漂亮的深紫色魔法帽，帽檐歪斜，对她来说大了两号，却有种古怪的合适。脖子上挂着一块水晶吊坠，在夕照里微微泛着幽光。）\n（不是野猫——毛色干净，眼神太灵。它没叫。没蹭。只是坐着。看着老麦。）\n（老麦放下杯子。没赶，也没招手。一人一猫对视了三秒。猫的眼睛没有猫咪的好奇——那是一种审视。像督察在检查这间酒馆是否够格。）\n老麦：（看着猫。声音不高。）\n老麦：这年头客人来也不定会花钱。\n（猫没动。尾巴尖轻轻晃了一下——吊坠跟着晃了一下，折射了一小片光斑在吧台上。）\n老麦：小客人我就不招待你了。你自己找地方呆着吧。\n（猫像是听懂了一样——尾巴尖又晃了一下。然后沿着吧台走了一圈，帽檐擦过酒架边缘。跳下去，在靠窗的桌子趴下。正好在最后一缕夕照里。收起爪子。帽子往前滑了一点，盖住一只耳朵。它没管。开始——观察。）"
+      },
+      "dlg_02_01": {
+        "id": "dlg_02_01",
+        "actor": "",
+        "text": "（风铃声。门开了。进来的是一个人——体型偏胖，发际线稀疏。穿着一件不大考究的西服外套，里面露出一截吊带工服的边缘。步子不快。像是走了一天的路。）\n（老麦的鼻子动了动。比眼睛先一步做了判断。）\n（三种味道——车间的机油。新贵族的薰衣草香水。烟草。混在一起，比任何自我介绍都准确。）\n老麦：（心里想——跟车间打交道的上流人士。以前的工头也是这个味道。）\n（安尼尔走到吧台前。站了一秒。没急着坐。）\n安尼尔：……开着？\n老麦：（点头。没多说话。）\n安尼尔：（点头。像是确认了一个不需要回答的问题。）"
+      },
+      "dlg_02_02a": {
+        "id": "dlg_02_02a",
+        "actor": "",
+        "text": "（老麦拿起手边的杯子。开始擦。没看安尼尔。动作利索——公事公办。）\n老麦：坐吧。\n（没说\"随便坐\"。没给酒单。不想多交流。这是个会走的客人，不需要他多花力气。）\n安尼尔：（注意到了老麦的冷淡。没说什么。拉凳子坐下。动作很重——凳脚刮过地板。）"
+      },
+      "dlg_02_02b": {
+        "id": "dlg_02_02b",
+        "actor": "",
+        "text": "（老麦拿起杯子。开始擦。擦了一下。停了一下。多看了安尼尔一眼。）\n（那双眼睛里没有以前上司的傲慢。安尼尔只是坐在那里。手指在吧台上轻轻敲了一下——累的。不是不耐烦。）\n老麦：（停了一秒。）\n老麦：……坐吧。\n（语气比计划中轻了一点。只是一点。）"
+      },
+      "dlg_02_02c": {
+        "id": "dlg_02_02c",
+        "actor": "",
+        "text": "（老麦没拿杯子。手撑在吧台上。）\n老麦：你身上有机油味。\n安尼尔：（愣了一下。低头看了看自己的袖子——袖口有一块新的油渍，还没干。他自己都没注意到。）\n安尼尔：……是。今天在车间待了一天。\n老麦：（停了一秒。不知道这句是赞赏还是试探。）\n老麦：坐吧。"
+      },
+      "dlg_02_03": {
+        "id": "dlg_02_03",
+        "actor": "",
+        "text": "（安尼尔坐下。凳子承重地咯吱了一下。他的手指在吧台上摊开——粗短、有力，指甲缝里有洗不掉的黑色。）\n安尼尔：啤酒。就啤酒。\n（不是问有什么选择。是自己已经做好了决定。）\n（老麦转身拿杯子。安尼尔解开西服扣子，从内侧口袋里掏出一卷旧纸——被折了很多次，边角磨毛了。摊在吧台上。）\n（他没解释这是什么。老麦也没问。）\n（老麦倒啤酒。满杯，泡沫刚好到杯口。推过去。）\n安尼尔：（端起来喝了一口。然后低头看图纸。拿起笔——不是钢笔，是一截磨短了的铅笔——在上面改了点什么。）"
+      },
+      "dlg_02_04": {
+        "id": "dlg_02_04",
+        "actor": "",
+        "text": "（安静。只有老麦擦杯子的声音，和安尼尔铅笔划过纸面的沙沙声。这两种声音混在一起，互不干扰。）\n（安尼尔喝了一口啤酒。盯着图纸上某个点，没动笔。手指在吧台上敲了一下——不是不耐烦，是在想。老麦认识这个动作——车间里的工人在等机器停下来的时候也这样敲。）\n（窗外，紫猫的尾巴在夕照里晃了一下。帽檐的影子投在桌面上——一个很小的三角形。）\n（安尼尔没注意到猫。老麦注意到了。）"
+      },
+      "dlg_02_05a": {
+        "id": "dlg_02_05a",
+        "actor": "",
+        "text": "（老麦继续擦杯子。没说话。安静是今晚的默认状态。）\n（安尼尔也没有打破它的意思。两个人隔着吧台——一个在看图纸，一个在擦杯子。不是尴尬的沉默。是那种不需要说话也可以各干各的不说话。）\n（安尼尔端起啤酒又喝了一口。泡沫在下唇留下了一道白。他没擦。）\n（铅笔继续在纸上走。）"
+      },
+      "dlg_02_05b": {
+        "id": "dlg_02_05b",
+        "actor": "",
+        "text": "（老麦擦完一个杯子。放到架子上。然后——多拿了一个杯子。开始擦。）\n（为了多站一会儿。）\n老麦：……那是图纸？\n安尼尔：（抬头。没想到老麦开了口。手指在纸上停了一下。）\n安尼尔：……嗯。\n（沉默。）\n安尼尔：一个不可能的东西。呵呵。\n（把啤酒端起来喝了一口。没说是什么。老麦没问第二句。但擦杯子的手停了一下——\"不可能的东西\"这句话，他在别的地方听过。）"
+      },
+      "dlg_02_05c": {
+        "id": "dlg_02_05c",
+        "actor": "",
+        "text": "（老麦擦杯子。看安尼尔低头画图的侧脸。啤酒在旁边——喝了两口。泡还在杯沿上渐渐塌下去。）\n老麦：下班过来的？\n安尼尔：（没抬头。）\n安尼尔：……没下班。从车间出来，顺路。\n老麦：车间？\n安尼尔：（铅笔停了一下。抬头。）\n安尼尔：蒸汽列车制造中心。我是那里的——\n（顿了一下。不太想说职位。）\n安尼尔：……管事的。\n老麦：（手没停。）\n老麦：不像。\n安尼尔：（愣了一下。）\n老麦：管事的不会这个味道。\n（安尼尔低头看了自己的袖子。那坨机油。然后——嘴角动了一下。不是笑。是\"被你发现了\"。）\n安尼尔：……每天都下一线。锅炉那边的新人——不盯着不行。\n（老麦没接话。但擦杯子的节奏变了一点点。不是前任工头的节奏了。）"
+      },
+      "dlg_02_06": {
+        "id": "dlg_02_06",
+        "actor": "",
+        "text": "（啤酒喝到一半。安尼尔看了看窗外——深蓝已经变成墨黑。第一颗星出来了。）\n安尼尔：该走了。还有些图纸今晚要改完。\n（把铅笔插回口袋。卷图纸的动作很慢——一层层叠回去，每一层都贴边对齐。不是整理文件的手艺，是组精密零件的习惯。）\n（安尼尔站起来。手指撑了一下吧台——坐久了腿有点僵。）\n安尼尔：……这地方安静。\n（不是\"好\"。是\"安静\"。对他来说是一回事。）"
+      },
+      "dlg_02_farewell_a": {
+        "id": "dlg_02_farewell_a",
+        "actor": "老麦",
+        "text": "（收走空杯。杯底还有小半圈泡印。）\n老麦：还开着。\n安尼尔：（点了一下头。把西服扣子扣上一颗。走到门口。）\n（紫猫的耳朵从帽檐下转了一下。跟踪他每一步。然后收回。）\n（门关上。风铃响了一声。）"
+      },
+      "dlg_02_farewell_b": {
+        "id": "dlg_02_farewell_b",
+        "actor": "老麦",
+        "text": "（没拿走杯子。让他自己喝完的已经是个信号。）\n老麦：下次来。\n安尼尔：（停了一下。像是没想到。然后点了一下头。）\n安尼尔：……嗯。\n（推门出去。步子比进来时轻了——不是身体轻了。是少了一件要防的事。）"
+      },
+      "dlg_02_farewell_c": {
+        "id": "dlg_02_farewell_c",
+        "actor": "",
+        "text": "（老麦什么都没说。把一块新的杯布放在吧台上——不是给他。但放在他能看见的位置。和收杯子不一样。）\n安尼尔：（看了一眼那块布。然后看了看老麦。老麦在擦杯子——没看他。）\n安尼尔：……走了。\n（安尼尔推门出去。老麦等门关上后才拿起那块新布。继续擦杯子。）"
+      },
+      "dlg_02_cat_bar": {
+        "id": "dlg_02_cat_bar",
+        "actor": "",
+        "text": "（门关上。风铃余响散尽。安静了几秒。）\n（紫猫从窗台跳下来——帽子差点掉了，它甩了一下头扶正。踱到吧台前——安尼尔刚才坐过的位置。低头嗅了嗅凳子腿。打了个喷嚏。）\n（然后它跳上了吧台。动作很轻，几乎没有声音。坐在老麦面前。魔法帽歪得更厉害了——左边帽檐快要遮住整只眼睛。脖子上的水晶吊坠在吧台灯下泛着幽紫色微光。看着老麦。眼神还是那种审视——但多了一点别的。也许是好奇。）\n（安尼尔的杯子还在吧台上。杯底剩了浅浅的一圈啤酒。猫低头闻了闻——耳朵向后压了一下。不喜欢这个味道。）\n老麦：（看着猫。擦杯子的手没停。）\n老麦：……你也不喝啤酒？\n（猫没理他。尾巴扫过安尼尔摊过图纸的位置，扫过那块新杯布。然后在吧台正中间坐下来。两只前爪并拢——吊坠搭在左爪上。像在等什么。）\n老麦：（放下杯子。手在吧台上空着——没拿东西。他看着猫。猫看着他。）\n（一人一猫。中间的空气可以伸手，也可以不伸手。）"
+      },
+      "dlg_02_cat_pet": {
+        "id": "dlg_02_cat_pet",
+        "actor": "",
+        "text": "（老麦伸出手。手背朝上——先让猫闻。手指有啤酒花的味道，也有擦杯布的味道。）\n（猫低头。鼻尖碰了一下老麦的指节。凉的。湿的。帽子往前滑——老麦的另一只手条件反射地接了一下帽檐，没让它掉。猫没躲。然后——它把头顶蹭进了老麦的掌心。）\n（不是撒娇。是批准。像是签了一份只有他们两个懂的契约。）\n（老麦没说话。手指轻轻挠过猫的耳后——那里有一小撮白毛，藏在紫色里，被帽檐压得有点乱。猫的眼睛眯起来。水晶吊坠贴着老麦的手腕——冰凉的。喉咙里发出一声极低的咕噜——像是机器启动前的那一下震颤。）\n老麦：（嘴角动了一下。极淡。）\n老麦：……行了。帽子戴好。\n（猫没动。他把手收回来。猫的耳朵追着他的手指转了一下——帽檐跟着耳朵一起动。但没跟。）"
+      },
+      "dlg_02_cat_beer": {
+        "id": "dlg_02_cat_beer",
+        "actor": "",
+        "text": "（老麦把安尼尔剩的啤酒推过去。杯底那浅浅一圈——刚好够猫舔一口。）\n（猫低头闻了闻。抬头看老麦。帽檐下面那双眼睛里有一种\"你在逗我\"的意思。）\n老麦：（不为所动。）\n老麦：不喝算了。\n（猫的尾巴不满地甩了一下——吊坠链子跟着轻轻响了一声。但还是低下头——舔了一口。然后立刻抬头，伸出舌头，一脸\"这什么东西\"的嫌弃表情。）\n（老麦嘴角动了一下——极淡。猫瞪了他一眼。帽子歪得只剩一只眼睛看着他。但没跳下去。还是在吧台上坐着。）"
+      },
+      "dlg_02_cat_result": {
+        "id": "dlg_02_cat_result",
+        "actor": "",
+        "text": "（猫在吧台上踱了两步。帽子歪斜，吊坠拖在吧台面上划出一道细小的反光。挑了个位置——安尼尔放过图纸的那块空处。转了两圈。蜷下来。）\n（一只爪子搭在老麦擦杯子的手旁边。肉垫是凉的。没有伸出指甲。也没有碰到他。）\n（老麦停了一下。没抽手。过了两秒，猫把爪子收回去，塞进肚子下面——顺便把吊坠也压在肚子底下。闭上眼。）\n老麦：你比刚才那个客人好伺候。\n（声音很低。像是说给自己听的。）"
+      }
+    },
+    "dialogueOrder": [
+      "dlg_02_cat",
+      "dlg_02_01",
+      "dlg_02_02a",
+      "dlg_02_02b",
+      "dlg_02_02c",
+      "dlg_02_03",
+      "dlg_02_04",
+      "dlg_02_05a",
+      "dlg_02_05b",
+      "dlg_02_05c",
+      "dlg_02_06",
+      "dlg_02_farewell_a",
+      "dlg_02_farewell_b",
+      "dlg_02_farewell_c",
+      "dlg_02_cat_bar",
+      "dlg_02_cat_pet",
+      "dlg_02_cat_beer",
+      "dlg_02_cat_result"
+    ],
+    "narratives": {
+      "narr_02_01": {
+        "id": "narr_02_01",
+        "actor": "旁白",
+        "text": "老麦看了一眼钟。离夜班结束还早。他拿起杯子——继续擦。\r\n猫的耳朵跟着擦杯子的沙沙声转了半圈。帽子彻底滑下来，盖住了半边脸。然后不动了。在吧台上睡着了。尾巴盖住了鼻子，刚好遮住耳后那撮白毛。吊坠从肚子底下滑出来——幽光暗了，但没灭。"
+      }
+    },
+    "commands": [
+      {
+        "type": "BG",
+        "params": "tavern_evening_clear",
+        "raw": "[BG tavern_evening_clear]"
+      },
+      {
+        "type": "BGM",
+        "params": "blues_slide_guitar_low",
+        "raw": "[BGM blues_slide_guitar_low]"
+      },
+      {
+        "type": "LIGHT",
+        "params": "暖黄偏暗，窗外是傍晚深蓝色，吧台灯亮，窗台有夕照余光",
+        "raw": "[LIGHT 暖黄偏暗，窗外是傍晚深蓝色，吧台灯亮，窗台有夕照余光]"
+      },
+      {
+        "type": "PROP",
+        "params": "吧台干净，酒架半满，窗台空，角落桌有阳光余温",
+        "raw": "[PROP 吧台干净，酒架半满，窗台空，角落桌有阳光余温]"
+      },
+      {
+        "type": "SE",
+        "params": "window_scratch_light 窗外轻微刮擦声",
+        "raw": "[SE window_scratch_light 窗外轻微刮擦声]"
+      },
+      {
+        "type": "ENTER",
+        "params": "cat_purple_windowsill 窗台",
+        "raw": "[ENTER cat_purple_windowsill 窗台]"
+      },
+      {
+        "type": "PAUSE",
+        "params": "1s",
+        "raw": "[PAUSE 1s]"
+      },
+      {
+        "type": "GOTO",
+        "params": "dlg_02_cat",
+        "raw": "[GOTO dlg_02_cat]"
+      },
+      {
+        "type": "SE",
+        "params": "door_open_wind_chime",
+        "raw": "[SE door_open_wind_chime]"
+      },
+      {
+        "type": "SE",
+        "params": "footsteps_heavy_slow 沉重缓慢 4步 停顿 2步",
+        "raw": "[SE footsteps_heavy_slow 沉重缓慢 4步 停顿 2步]"
+      },
+      {
+        "type": "ENTER",
+        "params": "Enneer_work_suit",
+        "raw": "[ENTER Enneer_work_suit]"
+      },
+      {
+        "type": "PAUSE",
+        "params": "2s",
+        "raw": "[PAUSE 2s]"
+      },
+      {
+        "type": "GOTO",
+        "params": "dlg_02_01",
+        "raw": "[GOTO dlg_02_01]"
+      },
+      {
+        "type": "CHOICE",
+        "params": "ch_02_01",
+        "raw": "[CHOICE ch_02_01]",
+        "choices": {
+          "A": "dlg_02_02a",
+          "B": "dlg_02_02b",
+          "C": "dlg_02_02c"
+        }
+      },
+      {
+        "type": "GOTO",
+        "params": "dlg_02_03",
+        "raw": "[GOTO dlg_02_03]"
+      },
+      {
+        "type": "GOTO",
+        "params": "dlg_02_04",
+        "raw": "[GOTO dlg_02_04]"
+      },
+      {
+        "type": "CHOICE",
+        "params": "ch_02_02",
+        "raw": "[CHOICE ch_02_02]",
+        "choices": {
+          "A": "dlg_02_05a",
+          "B": "dlg_02_05b",
+          "C": "dlg_02_05c"
+        }
+      },
+      {
+        "type": "GOTO",
+        "params": "dlg_02_06",
+        "raw": "[GOTO dlg_02_06]"
+      },
+      {
+        "type": "CHOICE",
+        "params": "ch_02_03",
+        "raw": "[CHOICE ch_02_03]",
+        "choices": {
+          "A": "dlg_02_farewell_a",
+          "B": "dlg_02_farewell_b",
+          "C": "dlg_02_farewell_c"
+        }
+      },
+      {
+        "type": "EXIT",
+        "params": "Enneer",
+        "raw": "[EXIT Enneer]"
+      },
+      {
+        "type": "SE",
+        "params": "door_close_wind_chime",
+        "raw": "[SE door_close_wind_chime]"
+      },
+      {
+        "type": "BG",
+        "params": "tavern_evening_empty",
+        "raw": "[BG tavern_evening_empty]"
+      },
+      {
+        "type": "BGM",
+        "params": "fade_out 3s",
+        "raw": "[BGM fade_out 3s]"
+      },
+      {
+        "type": "PAUSE",
+        "params": "2s",
+        "raw": "[PAUSE 2s]"
+      },
+      {
+        "type": "SE",
+        "params": "cat_jump_light 轻微落地声",
+        "raw": "[SE cat_jump_light 轻微落地声]"
+      },
+      {
+        "type": "ENTER",
+        "params": "cat_purple_counter",
+        "raw": "[ENTER cat_purple_counter]"
+      },
+      {
+        "type": "PAUSE",
+        "params": "1s",
+        "raw": "[PAUSE 1s]"
+      },
+      {
+        "type": "GOTO",
+        "params": "dlg_02_cat_bar",
+        "raw": "[GOTO dlg_02_cat_bar]"
+      },
+      {
+        "type": "CHOICE",
+        "params": "ch_02_cat",
+        "raw": "[CHOICE ch_02_cat]",
+        "choices": {
+          "摸摸猫": "dlg_02_cat_pet",
+          "给啤酒": "dlg_02_cat_beer"
+        }
+      },
+      {
+        "type": "GOTO",
+        "params": "dlg_02_cat_result",
+        "raw": "[GOTO dlg_02_cat_result]"
+      },
+      {
+        "type": "PAUSE",
+        "params": "2s",
+        "raw": "[PAUSE 2s]"
+      },
+      {
+        "type": "GOTO",
+        "params": "narr_02_01",
+        "raw": "[GOTO narr_02_01]"
+      },
+      {
+        "type": "END",
+        "params": "",
+        "raw": "[END]"
+      }
+    ],
+    "links": {
+      "next_visit": "Day0x_安尼尔_第2次",
+      "related": [
+        {
+          "conditions": [
+            {
+              "if": "ch_02_01_C",
+              "then": "老麦已经拆穿过他一次——第二次来访时不用再试探，直接进入吐槽模式"
+            },
+            {
+              "if": "ch_02_02_B",
+              "then": "安尼尔记得老麦问过图纸——第二次他会自己摊开，不用等老麦问"
+            },
+            {
+              "if": "ch_02_02_C",
+              "then": "安尼尔记得'不像'这两个字——Stage 2 会对老麦多一分信任"
+            },
+            {
+              "if": "ch_02_03_B",
+              "then": "老麦说了下次来——第二次安尼尔进门时脚步更轻"
+            }
+          ],
+          "character": "Enneer",
+          "visit": 2
+        },
+        {
+          "character": [
+            "Enneer",
+            "Sylvena"
+          ],
+          "visit": 3,
+          "event": "猫女少女苏醒后第3天——安尼尔见到学院袍子和天才少女，触发完整回忆"
+        },
+        {
+          "character": [
+            "Enneer",
+            "Sylvena"
+          ],
+          "visit": 4,
+          "event": "结局分支——破土 / 永眠的花 / 苗"
+        },
+        {
+          "day": 8,
+          "character": [
+            "Enneer",
+            "Lendro"
+          ],
+          "event": "两个在系统中爬到高处的人——车间vs警局——可以有一次并排喝酒的场景"
+        }
+      ]
+    },
+    "metaphor": [
+      {
+        "anchor": "dlg_02_cat",
+        "surface": "猫像督察一样审视酒馆。老麦让它自己找地方。猫留下来了。",
+        "deep": "老麦认可了猫的审视——他不怕被看。魔法帽和水晶吊坠暗示这只猫不是普通的猫。对猫是这样。对人呢？还不是。Stage 4 他会是。"
+      },
+      {
+        "anchor": "dlg_02_01",
+        "surface": "三种味道——机油、香水、烟草——比任何自我介绍都准确。",
+        "deep": "老麦的鼻子是他最准的社交探测器。但这次的味道混在了一起——让判断变得复杂。标签（上流人士）和证据（机油）冲突了。"
+      },
+      {
+        "anchor": "dlg_02_04",
+        "surface": "擦杯子的沙沙声和铅笔划过纸面的沙沙声互不干扰。",
+        "deep": "两个人各干各的，但声音混在一起。这是安尼尔在酒馆找到的第一个东西——不需要交流的共存。"
+      },
+      {
+        "anchor": "dlg_02_05c",
+        "surface": "老麦：'管事的不会这个味道。'",
+        "deep": "话语是最轻的拆穿。老麦把自己的标签摘掉了。安尼尔被看见的不是职位，是机油。这是两个人之间第一个真实的瞬间。"
+      },
+      {
+        "anchor": "dlg_02_06",
+        "surface": "安尼尔卷图纸的动作——每一层贴边对齐。不是整理文件，是组精密零件的习惯。",
+        "deep": "他在学院学的魔法用不上。但他的手指学会了另一种尊重——对精确的尊重。这是他的天赋。'这个还不错'，跟警探的肩线下放一样，是 Stage 1 的安全确认。"
+      },
+      {
+        "anchor": "dlg_02_farewell_c",
+        "surface": "老麦放了一块新布在吧台上。安尼尔看了它一眼。老麦没看他。",
+        "deep": "不说再见，但留了一个不会消失的东西。布=吧台=还在。安尼尔认出了这个信号——不需要语言的承诺。"
+      },
+      {
+        "anchor": "dlg_02_cat_pet",
+        "surface": "老麦伸手——手背朝上先让猫闻。猫把头顶蹭进他掌心。耳后有一撮白毛。",
+        "deep": "第一次身体接触的仪式。老麦伸出手的方式是车间教的——先让对方检查你手里没有危险。猫批准了。白毛藏在紫色里，像酒馆藏在没人路过的街角——要仔细看才能发现。老麦接住帽檐的那一下——他已经在乎了。水晶吊坠贴着老麦手腕的冰凉——灵魂锚点第一次触到了酒馆。"
+      },
+      {
+        "anchor": "dlg_02_cat_result",
+        "surface": "猫把一只爪子搭在老麦手旁边——没碰到他。吊坠压在肚子底下。过了两秒，收回去。",
+        "deep": "接近但不触碰=猫的信任方式。和老麦对客人的方式一样——在，但不越界。吊坠被藏起来——灵魂的秘密还在她肚子里。两个保持距离的观察者，用了同一种语言。"
+      },
+      {
+        "anchor": "narr_02_01",
+        "surface": "猫的耳朵跟着擦杯子的沙沙声转了半圈。帽子滑下来盖住脸。尾巴盖住鼻子，遮住耳后白毛。吊坠落出——幽光暗了但没灭。",
+        "deep": "Stage 1 收尾：酒馆多了一个常客。不是人——是猫。它睡在吧台上，伴着擦杯子的声音。帽子歪了，吊坠暗了——但种子种下了。幽光没灭。两个观察者共享一个吧台。酒馆的'督察'通过了考察——它选择留下来。"
+      }
+    ]
+  },
   "Day01_警探_第1次": {
     "meta": {
       "day": 1,
@@ -7,7 +548,8 @@
       "requires": null,
       "unlocks": [
         {
-          "character": "Lendro"
+          "character": "Lendro",
+          "stage_progress": "stage_1_active"
         }
       ],
       "next": "Day02_维修师_第1次",
@@ -44,6 +586,10 @@
           {
             "id": "rain_louder_then_fade",
             "desc": "雨声变大后渐弱"
+          },
+          {
+            "id": "door_creak_slow",
+            "desc": "门缓慢嘎吱——被什么东西推开一道缝"
           }
         ],
         "sprite": [
@@ -54,224 +600,87 @@
         ]
       }
     },
-    "affinity": {
-      "character": "Lendro",
-      "start": 0,
-      "max": 5,
-      "changes": []
-    },
     "drink": {
       "id": "drink_01_01",
-      "correctRecipe": {
-        "ingredients": [
-          {
-            "id": "baijiu",
-            "name": "白酒",
-            "volumeOz": 2
-          }
-        ],
-        "method": "build",
-        "glass": {
-          "type": "rock",
-          "iceType": "none"
-        }
-      },
-      "hints": [
-        "有什么暖的",
-        "随便来点什么"
+      "available": [
+        "白酒",
+        "威士忌",
+        "啤酒",
+        "柠檬水"
       ],
-      "evaluationRules": [
-        {
-          "id": "drink_01_01_correct",
-          "match": "all",
-          "conditions": [
-            {
-              "field": "ingredient.baijiu.volumeOz",
-              "op": "gte",
-              "value": 1.5
-            },
-            {
-              "field": "method",
-              "op": "eq",
-              "value": "build"
-            }
-          ],
-          "gotoNodeId": "dlg_01_drink_correct",
-          "affinityEffect": {
-            "character": "Lendro",
-            "field": "信任",
-            "value": 1
-          }
+      "correct": "白酒",
+      "hint": "有什么能喝的 / 随便来点什么",
+      "correct_effect": {},
+      "wrong_effects": {
+        "威士忌": {
+          "dialogue": "dlg_01_drink_wrong_whisky",
+          "reaction": "嫌太重，要清的——老麦学到了：这个人不需要重的东西"
         },
-        {
-          "id": "drink_01_01_wrong_whisky",
-          "match": "all",
-          "conditions": [
-            {
-              "field": "ingredient.whisky.volumeOz",
-              "op": "gte",
-              "value": 1
-            }
-          ],
-          "gotoNodeId": "dlg_01_drink_wrong_whisky",
-          "affinityEffect": null
+        "啤酒": {
+          "dialogue": "dlg_01_drink_wrong_beer",
+          "reaction": "不喝，要烈的——老麦学到了：不是啤酒的人"
         },
-        {
-          "id": "drink_01_01_wrong_beer",
-          "match": "all",
-          "conditions": [
-            {
-              "field": "ingredient.beer.volumeOz",
-              "op": "gte",
-              "value": 1
-            }
-          ],
-          "gotoNodeId": "dlg_01_drink_wrong_beer",
-          "affinityEffect": null
-        },
-        {
-          "id": "drink_01_01_wrong_lemon",
-          "match": "all",
-          "conditions": [
-            {
-              "field": "ingredient.lemon.volumeOz",
-              "op": "gte",
-              "value": 1
-            }
-          ],
-          "gotoNodeId": "dlg_01_drink_wrong_lemon",
-          "affinityEffect": null
-        },
-        {
-          "id": "drink_01_01_fallback",
-          "match": "all",
-          "conditions": [],
-          "gotoNodeId": "dlg_01_drink_wrong_lemon",
-          "affinityEffect": null
+        "柠檬水": {
+          "dialogue": "dlg_01_drink_wrong_lemon",
+          "reaction": "质疑酒架种类——老麦学到了：别给他倒没味道的"
         }
-      ]
+      }
     },
     "branches": {
       "ch_01_01": {
         "A": {
-          "gotoNodeId": "dlg_01_02a",
-          "effects": [
-            {
-              "character": "Lendro",
-              "field": "亲和",
-              "value": 1
-            }
-          ]
+          "goto": "dlg_01_02a",
+          "effect": null
         },
         "B": {
-          "gotoNodeId": "dlg_01_02b",
-          "effects": []
+          "goto": "dlg_01_02b",
+          "effect": null
         },
         "C": {
-          "gotoNodeId": "dlg_01_02c",
-          "effects": [
-            {
-              "character": "Lendro",
-              "field": "关切",
-              "value": 1
-            }
-          ]
+          "goto": "dlg_01_02c",
+          "effect": null
         }
       },
       "ch_01_02": {
         "A": {
-          "gotoNodeId": "dlg_01_04a",
-          "effects": []
+          "goto": "dlg_01_05a",
+          "effect": null
         },
         "B": {
-          "gotoNodeId": "dlg_01_04b",
-          "effects": []
+          "goto": "dlg_01_05b",
+          "effect": null
         },
         "C": {
-          "gotoNodeId": "dlg_01_04c",
-          "effects": []
+          "goto": "dlg_01_05c",
+          "effect": null
         }
       },
       "ch_01_03": {
         "A": {
-          "gotoNodeId": "dlg_01_06a",
-          "effects": []
+          "goto": "dlg_01_08a",
+          "effect": null
         },
         "B": {
-          "gotoNodeId": "dlg_01_06b",
-          "effects": []
+          "goto": "dlg_01_08b",
+          "effect": null
         },
         "C": {
-          "gotoNodeId": "dlg_01_06c",
-          "effects": []
+          "goto": "dlg_01_08c",
+          "effect": null
         }
       },
       "ch_01_04": {
         "A": {
-          "gotoNodeId": "dlg_01_08a",
-          "effects": [],
-          "pace": "normal"
+          "goto": "dlg_01_farewell_a",
+          "effect": null
         },
         "B": {
-          "gotoNodeId": "dlg_01_08b",
-          "effects": [],
-          "pace": "tight"
+          "goto": "dlg_01_farewell_b",
+          "effect": null
         },
         "C": {
-          "gotoNodeId": "dlg_01_08c",
-          "effects": [],
-          "pace": "slow"
-        }
-      },
-      "ch_01_05": {
-        "A": {
-          "gotoNodeId": "dlg_01_eilas_a",
-          "effects": []
-        },
-        "B": {
-          "gotoNodeId": "dlg_01_eilas_b",
-          "effects": [
-            {
-              "character": "Lendro",
-              "field": "信任",
-              "value": 1
-            }
-          ]
-        },
-        "C": {
-          "gotoNodeId": "dlg_01_eilas_c",
-          "effects": [
-            {
-              "character": "Lendro",
-              "field": "信任",
-              "value": 1
-            },
-            {
-              "character": "Lendro",
-              "field": "关切",
-              "value": 1
-            }
-          ]
-        }
-      },
-      "ch_01_06": {
-        "A": {
-          "gotoNodeId": "dlg_01_farewell_a",
-          "effects": []
-        },
-        "B": {
-          "gotoNodeId": "dlg_01_farewell_b",
-          "effects": [
-            {
-              "character": "Lendro",
-              "field": "亲和",
-              "value": 1
-            }
-          ]
-        },
-        "C": {
-          "gotoNodeId": "dlg_01_farewell_c",
-          "effects": []
+          "goto": "dlg_01_farewell_c",
+          "effect": null
         }
       }
     },
@@ -279,146 +688,112 @@
       "dlg_01_01": {
         "id": "dlg_01_01",
         "actor": "Lendro",
-        "text": "……还开着？",
-        "effects": {
-          "soundEffectId": null,
-          "voiceId": "lendro_01_001"
-        }
+        "text": "（推门进来，风衣肩头湿了。扫了一眼酒馆——先看屋里，然后窗，然后门。职业习惯。）\nLendro：还开着？好。这天气——关门的酒吧比开着的多。"
       },
       "dlg_01_02a": {
         "id": "dlg_01_02a",
-        "actor": "酒保",
-        "text": "开着。坐吧。"
+        "actor": "老麦",
+        "text": "（抬头。确认\"有人进来\"那个级别的看。下巴朝吧台方向动了一下，不到一厘米。）\n老麦：嗯。\n（继续擦杯子。）\nLendro：（不需要客套——舒服了。他最怕的就是太热情。走向吧台。）"
       },
       "dlg_01_02b": {
         "id": "dlg_01_02b",
-        "actor": "",
-        "text": "（酒保擦杯子，不说话）"
+        "actor": "老麦",
+        "text": "（擦杯子。没抬头。但杯子往吧台中央推了一下——给酒腾了个位置。）\nLendro：（注意到这个动作。嘴角动了一下。走向吧台。）"
       },
       "dlg_01_02c": {
         "id": "dlg_01_02c",
-        "actor": "酒保",
-        "text": "你淋湿了。"
+        "actor": "老麦",
+        "text": "（抬头。看了一眼他的肩膀——湿了半截。）\n老麦：淋得不轻。\nLendro：（低头看了看自己的肩膀。没想到会被注意到。）\nLendro：……习惯了。街上就我一个。\n（走向吧台。）"
       },
       "dlg_01_03": {
         "id": "dlg_01_03",
         "actor": "Lendro",
-        "text": "（拉高脚凳，坐下，动作像在审讯室里找位置）\nLendro：嗯。\n（风衣扣子解开，帽子摘下放在膝上）\nLendro：有什么能喝的。"
-      },
-      "dlg_01_04a": {
-        "id": "dlg_01_04a",
-        "actor": "Lendro",
-        "text": "随便来点什么。"
-      },
-      "dlg_01_04b": {
-        "id": "dlg_01_04b",
-        "actor": "Lendro",
-        "text": "随便来点什么。"
-      },
-      "dlg_01_04c": {
-        "id": "dlg_01_04c",
-        "actor": "Lendro",
-        "text": "（顿了一下，低头看了看自己的肩膀）\nLendro：……习惯了。\n（拉凳子坐下，比前两个选择慢半拍）\nLendro：有什么暖的。"
+        "text": "（拉凳子坐下。帽子摘下来，放在右手边第二个凳子。手指在吧台上敲了三下——哒、哒、哒。不是紧张，是警察的习惯：到新地方，先碰一下最稳的东西。）\nLendro：有什么能喝的。\n（不是问句。是陈述。像在说\"给我一个理由多坐几分钟\"。）"
       },
       "dlg_01_drink_correct": {
         "id": "dlg_01_drink_correct",
-        "actor": "Lendro",
-        "text": "（端起来，没喝，看了看杯中液体的颜色）\nLendro：……清的。\n（小口抿了一下）\nLendro：还行。\n（微微放松，肩线下降约一指宽）"
+        "actor": "",
+        "text": "（老麦倒白酒。一口杯。满的。推过去。不说话。）\nLendro：（端起来，看了看杯中液体的颜色）\nLendro：……清的。\n（小口抿了一下。）\nLendro：还行。\n（肩线放下来半寸。不是好喝——是够了。）"
       },
       "dlg_01_drink_wrong_whisky": {
         "id": "dlg_01_drink_wrong_whisky",
-        "actor": "Lendro",
-        "text": "（端起来闻了一下）\nLendro：……太重了。\n（还是喝了一口，放下时杯底磕得比正常响）\nLendro：有清一点的吗。"
+        "actor": "",
+        "text": "（老麦倒威士忌。推过去。看了他一眼——他知道这不是最好的选择，但不纠正。）\nLendro：（端起来闻了一下）\nLendro：……太重了。\n（还是喝了一口。放下时杯底磕得比正常响。）\nLendro：有清一点的吗。"
       },
       "dlg_01_drink_wrong_beer": {
         "id": "dlg_01_drink_wrong_beer",
-        "actor": "Lendro",
-        "text": "（看了一眼，没端）\nLendro：……算了。\nLendro：有烈的吗。"
+        "actor": "",
+        "text": "（老麦倒啤酒。推过去。顿了一下——这个人不像喝啤酒的，但他不替人决定。）\nLendro：（看了一眼，没端）\nLendro：……算了。\nLendro：有烈的吗。"
       },
       "dlg_01_drink_wrong_lemon": {
         "id": "dlg_01_drink_wrong_lemon",
-        "actor": "Lendro",
-        "text": "（端起来喝了一口，表情没变）\nLendro：……你这儿就这些？\n（放下杯子，手指在吧台上无声地敲了两下）"
-      },
-      "dlg_01_05": {
-        "id": "dlg_01_05",
-        "actor": "Lendro",
-        "text": "（白酒喝到半杯，声音比进门时低了一档）\nLendro：这地方……以前没见过。"
-      },
-      "dlg_01_06a": {
-        "id": "dlg_01_06a",
-        "actor": "酒保",
-        "text": "新开的。"
-      },
-      "dlg_01_06b": {
-        "id": "dlg_01_06b",
-        "actor": "酒保",
-        "text": "你以前常去哪？\nLendro：（手指摩挲杯沿）\nLendro：码头那边。第三街拐角有个地下室。\n（停顿）\nLendro：……不去了。\n（视线短暂移向窗外北墙方向，随即收回）"
-      },
-      "dlg_01_06c": {
-        "id": "dlg_01_06c",
         "actor": "",
-        "text": "（酒保继续擦杯子）"
+        "text": "（老麦倒柠檬水。推过去。手指在杯沿停了一下——是这个人的选择，和他判断的不一样。）\nLendro：（端起来喝了一口。表情没变。）\nLendro：……你这儿就这些？\n（放下杯子。手指在吧台上无声地敲了两下。）"
+      },
+      "dlg_01_04": {
+        "id": "dlg_01_04",
+        "actor": "Lendro",
+        "text": "（白酒喝到半杯。暖和过来了。开始说话——不是倾诉，是让对话别落地。Stage 1 独角戏模式：他不等回应，自己能撑满。）\nLendro：这地方以前没见过。新开的？"
+      },
+      "dlg_01_05a": {
+        "id": "dlg_01_05a",
+        "actor": "老麦",
+        "text": "三年。\nLendro：三年？我在这片跑了二十年，没路过过。怪了。\n（老麦没解释。继续擦杯子。）\nLendro：（看他没展开。不追问。换方向。）\nLendro：你这吧台的木头比我办公桌好。局里的桌子——四条腿有三条垫着书。"
+      },
+      "dlg_01_05b": {
+        "id": "dlg_01_05b",
+        "actor": "老麦",
+        "text": "（擦杯子。停了一下。）\n老麦：算新的。也不算。\nLendro：怎么说？\n老麦：这地方开开关关的。换过人。上一个是个邮差。\nLendro：邮差开酒吧？\n老麦：嗯。\n（Lendro等了两秒。老麦在擦杯子。不展开了。）\nLendro：……行。那我换个问题——你以前干什么的。不是邮差吧。\n老麦：汽车零件。冲压车间。二十二年。\nLendro：（看他的手——不是吧台磨的。是机器磨的。）\nLendro：看出来了。"
+      },
+      "dlg_01_05c": {
+        "id": "dlg_01_05c",
+        "actor": "",
+        "text": "（老麦擦杯子。没说话。但也没避开视线。）\nLendro：（自己接上了——不需要答案的聊天。）\nLendro：你不说我也知道。开在没人路过的地方，还三年——你不是靠客人赚钱的。\n（喝了一口酒。）\nLendro：你是自己想开。\n（老麦看了他一眼。没承认。没否认。擦杯子。）\nLendro：没事。我不问。我今晚就是——路过。"
+      },
+      "dlg_01_06": {
+        "id": "dlg_01_06",
+        "actor": "",
+        "text": "（安静了两秒。雨声。Lendro 正准备发下一个球——）\n老麦：你是警察。\nLendro：（愣了一下。笑了——不是客套的笑，是真的觉得好玩。但眼睛还是不笑。）\nLendro：怎么看出来的。\n老麦：帽子放右手边。伸手能够到。不能挡视线。\n（擦杯子。）\n老麦：还有你进来的时候，先扫了一圈屋里。然后是窗。然后是门。\nLendro：（看着老麦。停了半秒。）\nLendro：……你自己以前也是警察？\n老麦：冲压车间。机器不会跑。但人会出错。\nLendro：出事的多吗。\n老麦：多。手指。胳膊。有时候更糟。\n（擦杯子。节奏没变。）\n老麦：所以看人。谁今天手抖了。谁昨天没睡好。线长不看这个。我看。\nLendro：（端起白酒。没喝。看着老麦。）\nLendro：你在这擦杯子，跟踩踏板差不多。\n老麦：（嘴角动了一下。最轻的笑。）\n老麦：没那么响。"
       },
       "dlg_01_07": {
         "id": "dlg_01_07",
         "actor": "Lendro",
-        "text": "我是个警察。或者说——曾经是。\n（喝一口酒）\nLendro：二十年了。码头区，禁酒令，走私……都是我的辖区。\nLendro：你见过码头凌晨三点的样子吗？"
+        "text": "（又喝了一口。酒过半杯。气氛对了——不是\"被倾听\"那种对，是\"旁边这个人和我一样见过破事\"那种对。）\nLendro：你刚才说看人——跟你说个事。\nLendro：上周逮了个私酒贩子。\n（老麦没接话。但擦杯子的节奏慢了一点——在听。）\nLendro：把酒藏在教堂的洗礼池里。我进去的时候，他站在池子边上，跟我说——他是来受洗的。\nLendro：我说你衣服怎么是干的。他说还没开始。\n（自己先笑了。讲笑话——眼睛不笑。他在填空间。）\nLendro：我说行。那这池子里是什么。他说是圣水。我说圣水怎么是棕色的。他说——新配方。\n（摇头。）\nLendro：我问他叫什么。他说\"我受了洗\"。我说这是名字？他说——对。我受了洗，然后卖威士忌。上帝不会怪我的。\nLendro：写报告的时候我手在抖。笑的。"
       },
       "dlg_01_08a": {
         "id": "dlg_01_08a",
-        "actor": "酒保",
-        "text": "没见过。"
+        "actor": "老麦",
+        "text": "（嘴角动了一下。最轻的笑。）\n老麦：你们这行比我那行麻烦。\nLendro：（得到了确认——他在听，他觉得好笑。deflection -5。）\nLendro：你那边呢？车间里总有什么吧。\n老麦：有个哥们。每天带一样的饭盒。一样的三明治。一样的苹果。吃了十四年。\nLendro：十四年？\n老麦：嗯。后来发现他不是爱吃。是他老婆只做这一种。\n（擦杯子。）\n老麦：他没说。十四年没说。\nLendro：（顿了一下。没笑。笑不出来了——不是不好笑，是听懂了。）\nLendro：……行。十四年的三明治。\n（端起杯子。没喝，但手指放松了。）"
       },
       "dlg_01_08b": {
         "id": "dlg_01_08b",
-        "actor": "酒保",
-        "text": "三点怎么了？"
+        "actor": "",
+        "text": "（老麦擦杯子。没笑。但杯子往Lendro那边推了半寸。）\nLendro：（注意到了。不需要他说出来。）\nLendro：你知道吗，抓他的时候他在唱圣歌。真的。被铐上还在唱。\nLendro：我说你唱什么。他说——赞美上帝。上帝让我多卖了几瓶。\n（摇头。笑出声。但眼睛——还是没跟上。）\nLendro：这人要是当警察，比我强。心理素质。"
       },
       "dlg_01_08c": {
         "id": "dlg_01_08c",
         "actor": "",
-        "text": "（安静等他说）"
+        "text": "（老麦停下擦杯子。拿起自己的杯子——他给自己倒了一杯。举了一下。没碰，只是举了一下。）\nLendro：（看着老麦自己喝了一口。他认识这个动作——不是敬酒，是\"我听到了\"。）\nLendro：……行。你也听够了。不讲了。\n（把杯子里的酒喝完。比平时慢。）"
       },
-      "dlg_01_warehouse": {
-        "id": "dlg_01_warehouse",
+      "dlg_01_09": {
+        "id": "dlg_01_09",
         "actor": "Lendro",
-        "text": "（酒已经见底，但没有要续的意思）\nLendro：有个搭档。叫 Eilas。\n（停顿很长，像是在决定要不要说出这个名字）\nLendro：比我年轻五岁。刚从学院出来的时候，是我带的他。\n（握杯的手指关节发白）\nLendro：码头第十七号仓库。线人说那批货当晚到。\nLendro：我们两个人进去的。\n（停顿两秒）\nLendro：……出来的只有我一个。"
-      },
-      "dlg_01_eilas_a": {
-        "id": "dlg_01_eilas_a",
-        "actor": "酒保",
-        "text": "发生了什么？\nLendro：（看了你一眼，像是在判断你是不是审讯室里的人）\nLendro：……你真想听？\n（不等回答）\nLendro：仓库里不是走私酒。是——\n（突然停住，喉结动了一下）\nLendro：……我不记得了。\n（声音变硬）\nLendro：不。我记得。我只是——\n（停顿）\nLendro：……还没准备好说。\n（防御姿态，肩线重新绷紧）"
-      },
-      "dlg_01_eilas_b": {
-        "id": "dlg_01_eilas_b",
-        "actor": "酒保",
-        "text": "你不用说了。\nLendro：（明显松了一口气，但嘴角没有上扬）\nLendro：……谢了。\n（把空杯推过来，手指在杯口停了一瞬）\nLendro：下次吧。\n（退回安全距离）"
-      },
-      "dlg_01_eilas_c": {
-        "id": "dlg_01_eilas_c",
-        "actor": "",
-        "text": "（酒保给他倒酒，不说话）\nLendro：（看着新倒的酒，没立刻端起来）\nLendro：……\nLendro：（低声）你倒酒的时候不问问题。\n（端起来，小口喝）\nLendro：……这样挺好。\n（放松程度最高）"
-      },
-      "dlg_01_exit": {
-        "id": "dlg_01_exit",
-        "actor": "Lendro",
-        "text": "（不管之前选了什么，最终都会起身）\nLendro：……该走了。\n（风衣扣子扣上，戴上帽子，帽檐压得很低）\nLendro：这地方——\n（停顿）\nLendro：……还开着吧？"
+        "text": "（喝完最后一口。看杯底——确认喝完了。Stage 1 的仪式：翻到最后一页，看一眼，合上。）\nLendro：该走了。\n（顿了一下。差点说\"还不错\"。改了口。）\nLendro：这地方——\n（看了老麦一眼。老麦在擦杯子。没催。没问。）\nLendro：还开着吧。"
       },
       "dlg_01_farewell_a": {
         "id": "dlg_01_farewell_a",
-        "actor": "酒保",
-        "text": "一直开着。\nLendro：（点头，推门离开）"
+        "actor": "老麦",
+        "text": "（点头。擦杯子。）\n老麦：下雨就开着。\nLendro：（帽子压低。）\nLendro：……行。\n（推门出去。没回头。）"
       },
       "dlg_01_farewell_b": {
         "id": "dlg_01_farewell_b",
-        "actor": "酒保",
-        "text": "你随时来。\nLendro：（顿了一下，没回头，推门离开）"
+        "actor": "老麦",
+        "text": "（看了他一眼。）\n老麦：嗯。你随时来。\nLendro：（顿了一下。手指在门框上敲了一下——和吧台上敲三下同一个节奏。）\nLendro：……下次下雨。\n（推门出去。）"
       },
       "dlg_01_farewell_c": {
         "id": "dlg_01_farewell_c",
         "actor": "",
-        "text": "（酒保点头）\nLendro：（推门离开）"
+        "text": "（老麦点头。把空杯往自己这边挪了半寸——收走了。）\nLendro：（看了这个动作。没说什么。）\n（推门出去。）"
       }
     },
     "dialogueOrder": [
@@ -427,293 +802,267 @@
       "dlg_01_02b",
       "dlg_01_02c",
       "dlg_01_03",
-      "dlg_01_04a",
-      "dlg_01_04b",
-      "dlg_01_04c",
       "dlg_01_drink_correct",
       "dlg_01_drink_wrong_whisky",
       "dlg_01_drink_wrong_beer",
       "dlg_01_drink_wrong_lemon",
-      "dlg_01_05",
-      "dlg_01_06a",
-      "dlg_01_06b",
-      "dlg_01_06c",
+      "dlg_01_04",
+      "dlg_01_05a",
+      "dlg_01_05b",
+      "dlg_01_05c",
+      "dlg_01_06",
       "dlg_01_07",
       "dlg_01_08a",
       "dlg_01_08b",
       "dlg_01_08c",
-      "dlg_01_warehouse",
-      "dlg_01_eilas_a",
-      "dlg_01_eilas_b",
-      "dlg_01_eilas_c",
-      "dlg_01_exit",
+      "dlg_01_09",
       "dlg_01_farewell_a",
       "dlg_01_farewell_b",
       "dlg_01_farewell_c"
     ],
     "narratives": {
-      "narr_whatever_01": {
-        "id": "narr_whatever_01",
-        "actor": "旁白",
-        "text": "（无论选什么，Lendro 都接以下台词。停顿长度不同：A正常 / B更紧 / C最长）\n\nLendro：雾。从水面升起来，把整个码头吞进去。\nLendro：仓库的灯一盏一盏灭掉，像是有什么东西在吹蜡烛。\n（手指无意识地摸了一下风衣内侧——枪套的位置）\nLendro：……那天也是这样的雾。"
-      },
       "narr_01_01": {
         "id": "narr_01_01",
         "actor": "旁白",
-        "text": "吧台上留着一个空杯。\n杯底有一圈水渍——分不清是酒，还是雨水。"
+        "text": "吧台上留着一圈水渍——分不清是酒，还是雨。\r\n老麦拿起杯子。擦了一下。放回架子。看钟。\r\n10:43。还早。\r\n继续擦下一个杯子。"
       }
     },
     "commands": [
       {
-        "id": "cmd_0001",
         "type": "BG",
-        "params": {
-          "assetId": "tavern_night_rain",
-          "transition": "none"
-        },
-        "raw": "[BG tavern_night_rain none]"
+        "params": "tavern_night_rain",
+        "raw": "[BG tavern_night_rain]"
       },
       {
-        "id": "cmd_0002",
         "type": "BGM",
-        "params": {
-          "assetId": "jazz_piano_low",
-          "action": "play"
-        },
-        "raw": "[BGM jazz_piano_low play]"
+        "params": "jazz_piano_low",
+        "raw": "[BGM jazz_piano_low]"
       },
       {
-        "id": "cmd_0003",
         "type": "LIGHT",
-        "params": {
-          "color": "#ffeedd",
-          "intensity": 0.8,
-          "description": "暖黄偏暗，吧台灯亮，角落阴影重"
-        },
-        "raw": "[LIGHT #ffeedd 0.8 暖黄偏暗，吧台灯亮，角落阴影重]"
+        "params": "暖黄偏暗，吧台灯亮，角落阴影重",
+        "raw": "[LIGHT 暖黄偏暗，吧台灯亮，角落阴影重]"
       },
       {
-        "id": "cmd_0004",
         "type": "PROP",
-        "params": {
-          "propId": "bar",
-          "action": "show",
-          "state": "吧台干净，酒架半满，窗台空"
-        },
-        "raw": "[PROP bar show 吧台干净，酒架半满，窗台空]"
+        "params": "吧台干净，酒架半满，窗台空",
+        "raw": "[PROP 吧台干净，酒架半满，窗台空]"
       },
       {
-        "id": "cmd_0005",
         "type": "SE",
-        "params": {
-          "assetId": "door_open_wind_chime",
-          "loop": false
-        },
+        "params": "door_open_wind_chime",
         "raw": "[SE door_open_wind_chime]"
       },
       {
-        "id": "cmd_0006",
         "type": "SE",
-        "params": {
-          "assetId": "footsteps_heavy",
-          "loop": false
-        },
-        "raw": "[SE footsteps_heavy]"
+        "params": "footsteps_heavy 3步 停顿 2步",
+        "raw": "[SE footsteps_heavy 3步 停顿 2步]"
       },
       {
-        "id": "cmd_0007",
         "type": "ENTER",
-        "params": {
-          "characterId": "Lendro",
-          "poseId": "Lendro_coat_wet",
-          "position": "center"
-        },
-        "raw": "[ENTER Lendro Lendro_coat_wet center]"
+        "params": "Lendro_coat_wet",
+        "raw": "[ENTER Lendro_coat_wet]"
       },
       {
-        "id": "cmd_0008",
         "type": "PAUSE",
-        "params": {
-          "durationMs": 1500
-        },
-        "raw": "[PAUSE 1500]"
+        "params": "1.5s",
+        "raw": "[PAUSE 1.5s]"
       },
       {
-        "id": "cmd_0009",
         "type": "GOTO",
-        "params": {
-          "targetNodeId": "dlg_01_01"
-        },
+        "params": "dlg_01_01",
         "raw": "[GOTO dlg_01_01]"
       },
       {
-        "id": "cmd_0010",
         "type": "CHOICE",
-        "params": {
-          "choiceId": "ch_01_01"
-        },
-        "raw": "[CHOICE ch_01_01]"
+        "params": "ch_01_01",
+        "raw": "[CHOICE ch_01_01]",
+        "choices": {
+          "A": "dlg_01_02a",
+          "B": "dlg_01_02b",
+          "C": "dlg_01_02c"
+        }
       },
       {
-        "id": "cmd_0011",
         "type": "GOTO",
-        "params": {
-          "targetNodeId": "dlg_01_03"
-        },
+        "params": "dlg_01_03",
         "raw": "[GOTO dlg_01_03]"
       },
       {
-        "id": "cmd_0012",
         "type": "CHOICE",
-        "params": {
-          "choiceId": "ch_01_02"
-        },
-        "raw": "[CHOICE ch_01_02]"
+        "params": "drink_01_01",
+        "raw": "[CHOICE drink_01_01]",
+        "choices": {
+          "白酒": "dlg_01_drink_correct",
+          "威士忌": "dlg_01_drink_wrong_whisky",
+          "啤酒": "dlg_01_drink_wrong_beer",
+          "柠檬水": "dlg_01_drink_wrong_lemon"
+        }
       },
       {
-        "id": "cmd_0013",
-        "type": "CHOICE",
-        "params": {
-          "choiceId": "drink_01_01"
-        },
-        "raw": "[CHOICE drink_01_01]"
-      },
-      {
-        "id": "cmd_0014",
         "type": "GOTO",
-        "params": {
-          "targetNodeId": "dlg_01_05"
-        },
-        "raw": "[GOTO dlg_01_05]"
+        "params": "dlg_01_04",
+        "raw": "[GOTO dlg_01_04]"
       },
       {
-        "id": "cmd_0015",
         "type": "CHOICE",
-        "params": {
-          "choiceId": "ch_01_03"
-        },
-        "raw": "[CHOICE ch_01_03]"
+        "params": "ch_01_02",
+        "raw": "[CHOICE ch_01_02]",
+        "choices": {
+          "A": "dlg_01_05a",
+          "B": "dlg_01_05b",
+          "C": "dlg_01_05c"
+        }
       },
       {
-        "id": "cmd_0016",
         "type": "GOTO",
-        "params": {
-          "targetNodeId": "dlg_01_07"
-        },
+        "params": "dlg_01_06",
+        "raw": "[GOTO dlg_01_06]"
+      },
+      {
+        "type": "GOTO",
+        "params": "dlg_01_07",
         "raw": "[GOTO dlg_01_07]"
       },
       {
-        "id": "cmd_0017",
         "type": "CHOICE",
-        "params": {
-          "choiceId": "ch_01_04"
-        },
-        "raw": "[CHOICE ch_01_04]"
+        "params": "ch_01_03",
+        "raw": "[CHOICE ch_01_03]",
+        "choices": {
+          "A": "dlg_01_08a",
+          "B": "dlg_01_08b",
+          "C": "dlg_01_08c"
+        }
       },
       {
-        "id": "cmd_0018",
         "type": "GOTO",
-        "params": {
-          "targetNodeId": "dlg_01_warehouse"
-        },
-        "raw": "[GOTO dlg_01_warehouse]"
+        "params": "dlg_01_09",
+        "raw": "[GOTO dlg_01_09]"
       },
       {
-        "id": "cmd_0019",
         "type": "CHOICE",
-        "params": {
-          "choiceId": "ch_01_05"
-        },
-        "raw": "[CHOICE ch_01_05]"
+        "params": "ch_01_04",
+        "raw": "[CHOICE ch_01_04]",
+        "choices": {
+          "A": "dlg_01_farewell_a",
+          "B": "dlg_01_farewell_b",
+          "C": "dlg_01_farewell_c"
+        }
       },
       {
-        "id": "cmd_0020",
-        "type": "GOTO",
-        "params": {
-          "targetNodeId": "dlg_01_exit"
-        },
-        "raw": "[GOTO dlg_01_exit]"
-      },
-      {
-        "id": "cmd_0021",
-        "type": "CHOICE",
-        "params": {
-          "choiceId": "ch_01_06"
-        },
-        "raw": "[CHOICE ch_01_06]"
-      },
-      {
-        "id": "cmd_0022",
         "type": "EXIT",
-        "params": {
-          "characterId": "Lendro"
-        },
+        "params": "Lendro",
         "raw": "[EXIT Lendro]"
       },
       {
-        "id": "cmd_0023",
         "type": "SE",
-        "params": {
-          "assetId": "door_close_wind_chime",
-          "loop": false
-        },
+        "params": "door_close_wind_chime",
         "raw": "[SE door_close_wind_chime]"
       },
       {
-        "id": "cmd_0024",
         "type": "SE",
-        "params": {
-          "assetId": "rain_louder_then_fade",
-          "loop": false
-        },
+        "params": "rain_louder_then_fade",
         "raw": "[SE rain_louder_then_fade]"
       },
       {
-        "id": "cmd_0025",
         "type": "BG",
-        "params": {
-          "assetId": "tavern_night_rain_empty",
-          "transition": "none"
-        },
+        "params": "tavern_night_rain_empty",
         "raw": "[BG tavern_night_rain_empty]"
       },
       {
-        "id": "cmd_0026",
         "type": "BGM",
-        "params": {
-          "assetId": "jazz_piano_low",
-          "action": "fade_out",
-          "duration": 3000
-        },
-        "raw": "[BGM jazz_piano_low fade_out 3000]"
+        "params": "fade_out 3s",
+        "raw": "[BGM fade_out 3s]"
       },
       {
-        "id": "cmd_0027",
         "type": "PAUSE",
-        "params": {
-          "durationMs": 3000
-        },
-        "raw": "[PAUSE 3000]"
+        "params": "2s",
+        "raw": "[PAUSE 2s]"
       },
       {
-        "id": "cmd_0028",
         "type": "GOTO",
-        "params": {
-          "targetNodeId": "narr_01_01"
-        },
+        "params": "narr_01_01",
         "raw": "[GOTO narr_01_01]"
       },
       {
-        "id": "cmd_0029",
+        "type": "PAUSE",
+        "params": "1.5s",
+        "raw": "[PAUSE 1.5s]"
+      },
+      {
+        "type": "SE",
+        "params": "door_creak_slow",
+        "raw": "[SE door_creak_slow]"
+      },
+      {
         "type": "END",
-        "params": {},
+        "params": "",
         "raw": "[END]"
       }
     ],
     "links": {
       "next_visit": "Day03_警探_第2次",
-      "related": []
+      "related": [
+        {
+          "conditions": [
+            {
+              "if": "ch_01_01_C",
+              "then": "更早开口，寒暄缩短——被注意过一次，这次不用重复确认"
+            },
+            {
+              "if": "drink_01_01_correct",
+              "then": "老麦直接倒威士忌，不用问——记得"
+            },
+            {
+              "if": "ch_01_03_A",
+              "then": "Lendro主动提起上次你说的车间——十四年的三明治他没忘"
+            }
+          ],
+          "day": 3,
+          "character": "Lendro",
+          "visit": 2
+        },
+        {
+          "day": 8,
+          "character": "Zombie",
+          "event": "警探拔枪。与Day01老麦的观察形成呼应。"
+        },
+        {
+          "day": 9,
+          "character": [
+            "Lendro",
+            "Zombie"
+          ],
+          "event": "镜像场景——老麦给的沉默，Lendro给了僵尸。"
+        }
+      ]
     },
-    "metaphor": []
+    "metaphor": [
+      {
+        "anchor": "dlg_01_03",
+        "surface": "手指在吧台上敲三下——确认这张吧台是实的",
+        "deep": "PTSD——需要反复确认现在是真的。Stage 1 的仪式。"
+      },
+      {
+        "anchor": "dlg_01_06",
+        "surface": "老麦看人——谁今天手抖了。谁昨天没睡好",
+        "deep": "两个在不同世界看了几十年的中年人，用同一种方式活下来：观察。不加判断。"
+      },
+      {
+        "anchor": "dlg_01_08a",
+        "surface": "十四年的三明治。十四年没说",
+        "deep": "Lendro听懂了——有些东西你咽下去了，不说。和他自己咽下去的码头仓库是同一种沉默。"
+      },
+      {
+        "anchor": "dlg_01_farewell_a",
+        "surface": "下雨就开着",
+        "deep": "老麦版本的随时来。加了条件，加了分寸。Lendro不需要承诺——他需要一个不会变的地方。"
+      },
+      {
+        "anchor": "narr_01_01",
+        "surface": "杯底水渍分不清酒和雨。老麦擦杯子。看钟。10:43。",
+        "deep": "Stage 1 的收尾：老麦在干活。看钟是确认钟还在走。和 Stage 3 看钟形成递进。"
+      }
+    ]
   }
 }

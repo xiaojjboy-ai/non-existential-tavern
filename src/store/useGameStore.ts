@@ -158,7 +158,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
 
       if (command.type === 'END') {
-        set({ currentCommandIndex: i, currentChoiceId: null, runtime });
+        const nextPlotId = plot.meta?.next as string | undefined;
+        if (nextPlotId && allPlots[nextPlotId]) {
+          const nextPlot = allPlots[nextPlotId];
+          set({
+            currentPlotId: nextPlotId,
+            currentNodeId: findFirstNodeId(nextPlot),
+            currentCommandIndex: findFirstPlayableCommandIndex(nextPlot),
+            currentChoiceId: null,
+            currentDay: String(nextPlot?.meta?.day ?? ''),
+            runtime: getInitialRuntime(nextPlot),
+          });
+        } else {
+          set({ currentCommandIndex: i, currentChoiceId: null, runtime });
+        }
         return;
       }
     }

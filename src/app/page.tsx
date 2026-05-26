@@ -1,11 +1,11 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { GameCanvas } from '@/components/GameCanvas';
 import { Typewriter } from '@/components/Typewriter';
 import { MixingStation } from '@/components/MixingStation';
 import { useGameStore } from '@/store/useGameStore';
-import type { ChoiceBranch, DialogueNode, PlotData } from '@/types/game';
+import type { ChoiceBranch, PlotData } from '@/types/game';
 
 function removeActorPrefix(line: string, actor: string) {
   if (!actor) return line;
@@ -13,7 +13,7 @@ function removeActorPrefix(line: string, actor: string) {
   return line.replace(new RegExp(`^${escapedActor}[：:]\\s*`), '');
 }
 
-function formatNodeText(node: DialogueNode | null) {
+function formatNodeText(node: { text: string; actor: string } | null) {
   if (!node) return '';
   return node.text
     .split(/\r?\n/)
@@ -49,12 +49,14 @@ export default function Home() {
     handleDrinkMix,
     nextStep,
     runtime,
+    setPlot,
   } = useGameStore();
   const [completedNodeId, setCompletedNodeId] = useState<string | null>(null);
   const [debugExpanded, setDebugExpanded] = useState(false);
   const [debugHovered, setDebugHovered] = useState(false);
   const [hoveredChoiceKey, setHoveredChoiceKey] = useState<string | null>(null);
   const [isMixingActive, setIsMixingActive] = useState(false);
+
 
   const plot = getCurrentPlot();
   const node = getCurrentNode();
@@ -88,6 +90,13 @@ export default function Home() {
 
     nextStep();
   }, [activeChoices, currentNodeId, isTypingComplete, nextStep, node]);
+
+  // Debug: expose store for console access
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      (window as unknown as { __debugNextStep: typeof nextStep }).__debugNextStep = nextStep;
+    }
+  }, [nextStep]);
 
   if (!node) {
     return (
@@ -126,7 +135,7 @@ export default function Home() {
       <main className="fixed inset-0 z-20 flex flex-col justify-between p-6 md:p-12 pointer-events-none select-none crt-scanlines crt-screen crt-aberration">
         {/* 顶部 VCR/HUD 沉浸式状态栏 */}
         <div className="w-full max-w-5xl self-center pointer-events-auto">
-          <div 
+          <div
             className="flex w-full items-center justify-between border-b-2 px-4 py-2"
             style={{ borderColor: 'var(--color-terminal-amber)', borderBottomStyle: 'dashed' }}
           >
@@ -137,8 +146,21 @@ export default function Home() {
             <div className="font-mono text-sm tracking-widest text-[var(--color-terminal-amber)] crt-text-glow uppercase">
               DAY_{String(plot?.meta.day).padStart(2, '0')} : {Array.isArray(plot?.meta.character) ? plot.meta.character.join(', ') : plot?.meta.character}
             </div>
-            <div className="font-mono text-sm text-[var(--color-terminal-amber)] crt-text-glow opacity-70">
-              SYS_OK
+            <div className="flex items-center gap-3">
+              <select
+                value={currentPlotId}
+                onChange={(e) => setPlot(e.target.value)}
+                className="rounded border border-[var(--color-terminal-amber)] bg-black/60 px-2 py-1 text-[10px] text-[var(--color-terminal-amber)] cursor-pointer hover:border-[var(--color-phosphor-crimson)] focus:outline-none font-mono"
+              >
+                {Object.keys(getAllPlots()).map((id) => (
+                  <option key={id} value={id} className="bg-zinc-900 text-zinc-200">
+                    {id.replace(/_/g, ' ')}
+                  </option>
+                ))}
+              </select>
+              <div className="font-mono text-sm text-[var(--color-terminal-amber)] crt-text-glow opacity-70">
+                SYS_OK
+              </div>
             </div>
           </div>
         </div>
@@ -181,9 +203,8 @@ export default function Home() {
               {actorLabel}
             </div>
           )}
-
-          <div 
-            className="mb-8 min-h-[90px] w-full text-base leading-relaxed" 
+          <div
+            className="mb-8 min-h-[90px] w-full text-base leading-relaxed"
             data-testid="dialogue-text"
             style={{
               fontFamily: 'var(--font-noto)',
