@@ -3,7 +3,6 @@
     "meta": {
       "day": 2,
       "character": "安尼尔（En neer）",
-      "stage": 1,
       "visit": 1,
       "requires": [
         {
@@ -444,14 +443,8 @@
     ],
     "links": {
       "next_visit": "Day0x_安尼尔_第2次",
-      "stage_progress": {
-        "current": "stage_1",
-        "next_trigger": "visits >= 2 且 mike_resistance <= 50 → Stage 2（老麦从抗拒转为还行）"
-      },
       "related": [
         {
-          "visit": 2,
-          "character": "Enneer",
           "conditions": [
             {
               "if": "ch_02_01_C",
@@ -469,22 +462,24 @@
               "if": "ch_02_03_B",
               "then": "老麦说了下次来——第二次安尼尔进门时脚步更轻"
             }
-          ]
+          ],
+          "character": "Enneer",
+          "visit": 2
         },
         {
-          "visit": 3,
           "character": [
             "Enneer",
             "Sylvena"
           ],
+          "visit": 3,
           "event": "猫女少女苏醒后第3天——安尼尔见到学院袍子和天才少女，触发完整回忆"
         },
         {
-          "visit": 4,
           "character": [
             "Enneer",
             "Sylvena"
           ],
+          "visit": 4,
           "event": "结局分支——破土 / 永眠的花 / 苗"
         },
         {
@@ -549,7 +544,6 @@
     "meta": {
       "day": 1,
       "character": "Lendro",
-      "stage": 1,
       "visit": 1,
       "requires": null,
       "unlocks": [
@@ -1008,15 +1002,8 @@
     ],
     "links": {
       "next_visit": "Day03_警探_第2次",
-      "stage_progress": {
-        "current": "stage_1",
-        "next_trigger": "visits >= 2 且 trust >= 15 → Stage 2"
-      },
       "related": [
         {
-          "day": 3,
-          "character": "Lendro",
-          "visit": 2,
           "conditions": [
             {
               "if": "ch_01_01_C",
@@ -1030,7 +1017,10 @@
               "if": "ch_01_03_A",
               "then": "Lendro主动提起上次你说的车间——十四年的三明治他没忘"
             }
-          ]
+          ],
+          "day": 3,
+          "character": "Lendro",
+          "visit": 2
         },
         {
           "day": 8,

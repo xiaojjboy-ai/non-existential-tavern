@@ -1,10 +1,10 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { GameCanvas } from '@/components/GameCanvas';
 import { Typewriter } from '@/components/Typewriter';
 import { useGameStore } from '@/store/useGameStore';
-import type { ChoiceBranch, DialogueNode, PlotData } from '@/types/game';
+import type { ChoiceBranch, PlotData } from '@/types/game';
 
 function removeActorPrefix(line: string, actor: string) {
   if (!actor) return line;
@@ -95,9 +95,11 @@ export default function Home() {
   }, [activeChoices, currentNodeId, isTypingComplete, nextStep, node]);
 
   // Debug: expose store for console access
-  if (typeof window !== 'undefined') {
-    (window as any).__debugNextStep = nextStep;
-  }
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      (window as unknown as { __debugNextStep: typeof nextStep }).__debugNextStep = nextStep;
+    }
+  }, [nextStep]);
 
   if (!node) {
     return (

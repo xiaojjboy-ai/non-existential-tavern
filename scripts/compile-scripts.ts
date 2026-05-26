@@ -584,8 +584,15 @@ function asLinks(
         if (item.day !== undefined && typeof item.day !== 'number' && typeof item.day !== 'string') {
           addConversionIssue(issues, file, `${itemPath}.day`, 'number | string', item.day);
         }
-        if (item.character !== undefined && typeof item.character !== 'string') {
-          addConversionIssue(issues, file, `${itemPath}.character`, 'string', item.character);
+        if (item.character !== undefined) {
+          if (typeof item.character !== 'string' && !Array.isArray(item.character)) {
+            addConversionIssue(issues, file, `${itemPath}.character`, 'string | string[]', item.character);
+          } else if (Array.isArray(item.character)) {
+            const stringItems = item.character.filter((x): x is string => typeof x === 'string');
+            if (stringItems.length !== item.character.length) {
+              addConversionIssue(issues, file, `${itemPath}.character`, 'string[]（仅字符串）', item.character);
+            }
+          }
         }
         if (item.visit !== undefined && typeof item.visit !== 'number' && typeof item.visit !== 'string') {
           addConversionIssue(issues, file, `${itemPath}.visit`, 'number | string', item.visit);

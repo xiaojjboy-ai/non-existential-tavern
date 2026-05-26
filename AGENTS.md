@@ -57,3 +57,20 @@ cmd /c npm run build      # compile + build 完整打包构建
 - 存储路径：`harness/records/<role>/<task-id>.md`
 - **接任务时**：创建该文件，填写修改意图。
 - **交付前**：补全完成项、验证结果和证据，无记录不准收工。
+
+---
+
+## 7. 静态资源（透明立绘）作图与去底指南
+如果任务涉及生成透明背景图层（例如角色立绘、猫咪立绘或道具图层），由于大多数图片生成模型仅能直接输出不带 Alpha 通道的 `JPEG/RGB` 格式且纯白抠图容易误伤主体白色，所有 Agent 必须遵守以下作图与去底工作流：
+1. **原图生成**：
+   在 Prompt 中明确包含 `isolated on a solid chroma key green background`。必须使用绿幕作为对比背景，以防在抠图时伤及角色主体本身的白色区域（如眼睛高光、眼白等）。
+2. **执行绿幕去底与溢色滤除**：
+   在根目录下运行以下项目级命令，使用带羽化和 De-spill（抑制绿边溢色）的算法对原画进行抠图去底处理：
+   ```powershell
+   python tools/image_processing/remove_green_background.py <输入绿底原画.png> <输出透明立绘.png>
+   ```
+3. **真实性通道校验**：
+   处理完成后，必须运行校验脚本对生成的 PNG 文件的 Alpha 通道和透明像素占比进行实测校验，必须满足 `PASS` 状态方可导入 `public/assets/` 中：
+   ```powershell
+   python tools/image_processing/check_png_alpha.py <输出透明立绘.png>
+   ```
