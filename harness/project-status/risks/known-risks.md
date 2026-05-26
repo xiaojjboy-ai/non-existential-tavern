@@ -2,22 +2,28 @@
 
 ## R1: 旧目录仍保留
 
-旧目录 `H:\AI\非存在主义酒馆\非存在主义酒馆` 暂未删除。后续清理前必须确认新工作区完整可用。
+旧目录 `H:\AI\非存在主义酒馆\非存在主义酒馆` 仍保留。后续清理前必须确认当前工作区完整可用。
 
-## R2: Web 仓库有外部改动
+## R2: 生成物不要手改
 
-当前仓库中存在其他 agent 产生的未提交改动。不要混入 harness 提交。
+`src/data/plot-data.json` 是 `cmd /c npm run compile` 的输出。修改剧情时应改 `脚本/*.md`，再重新编译。
 
-## R3: Harness 尚未接自动触发
+## R3: 文档索引容易过期
 
-当前 guard 需要手动运行。尚未接 git hook、CI、Claude/opencode/Codex 工具级 hook。
+剧情路径、角色清单和 harness 结构变化后，必须同步更新：
 
-## R4: 分支确认事故
+- `README.md`
+- `AGENTS.md`
+- `harness/project-status/`
 
-曾发生本地 `master` 推送到远端 `main` 的流程事故。虽然内容已进入正确远端分支，但操作口径不合格。
+## R4: GitHub CLI 未登录
 
-新的铁律：
+当前环境已安装 GitHub CLI `2.92.0`，但尚未登录。需要 GitHub 操作时先执行 `gh auth login`。
 
-- 上传前必须确认当前分支、上游分支、远端默认分支和准备推送目标。
+## R5: 分支确认事故
+
+曾发生本地 `master` 推送到远端 `main` 的流程事故。新的铁律：
+
+- 上传前确认当前分支、上游分支、远端默认分支和准备推送目标。
 - 本地分支、上游分支、目标远端没对齐，不准 push。
-- `guard.ps1 -Stage ci` 必须先执行分支门禁。
+- 推送前优先看 `git status --short --branch`。

@@ -1,6 +1,6 @@
 {
-  "id": "harness-trim-down",
-  "title": "把 harness 砍成角色+边界+简单留档",
+  "id": "refresh-index",
+  "title": "刷新项目索引单与状态清单",
   "role": "admin",
   "extra_allowed": [],
   "extra_forbidden": []
