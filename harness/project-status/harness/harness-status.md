@@ -2,49 +2,30 @@
 
 ## 当前能力
 
-- 任务票据：`harness/current-task.json`
-- 文件边界：`harness/claims.json`
-- 强门禁：`harness/policy/guard.ps1`
-- 证据目录：`harness/evidence/`
-- 工作记录：`harness/work-records/`
-- 计划目录：`harness/plans/`
-- 项目状态：`harness/project-status/`
+- 角色认领：`.\h <role>`，角色为 `admin` / `developer` / `planner`。
+- 角色边界：`harness/roles.json`。
+- 当前任务：`harness/current-task.json`。
+- 自检门禁：`harness/policy/guard.ps1`。
+- Git hook 模板：`harness/hooks/pre-commit`、`harness/hooks/pre-commit.ps1`。
+- Hook 文档：`harness/hook-guide.md`。
+- 工作留档：`harness/records/<role>/<task-id>.md`。
+- 留档模板：`harness/records/_template.md`。
+- 项目状态：`harness/project-status/`。
 
-## Drill 铁律
+## 当前流程
 
-1. 你没有通过检查，就没有资格说完成。
-2. 没有 evidence，就没有完成。
-3. guard 不绿，不准交付。
+- 开工前按用户指定身份执行 `.\h <role>`。
+- 首次克隆或 hook 丢失时执行 `.\h install-hooks`。
+- 交付前运行：
 
-## 尚未完成
+```powershell
+powershell -ExecutionPolicy Bypass -File .\harness\policy\guard.ps1 -Stage inspect
+```
 
-- 自动安装 git hook。
-- 自动安装工具级 hook。
-- CI 工作流。
-- required_checks 逐条执行记录校验。
+- 任务结束前必须写入 `harness/records/<role>/` 留档。
 
-## 已新增分支门禁
+## 当前状态
 
-`guard.ps1 -Stage ci` 会先检查：
-
-- 当前分支必须是 `main`。
-- upstream 必须是 `origin/main`。
-
-分支不对齐，不准 push。
-
-## Hook 初始化规范
-
-Hook 不是自动偷偷安装的。每个 agent 或人类成员必须在自己的工具里主动接入。
-
-标准命令：
-
-- 开工前：`powershell -ExecutionPolicy Bypass -File .\harness\policy\guard.ps1 -Stage inspect`
-- 停止/交付前：`powershell -ExecutionPolicy Bypass -File .\harness\policy\guard.ps1 -Stage pre-stop`
-- 提交前：`powershell -ExecutionPolicy Bypass -File .\harness\policy\guard.ps1 -Stage pre-commit`
-- 推送/CI 前：`powershell -ExecutionPolicy Bypass -File .\harness\policy\guard.ps1 -Stage ci`
-
-当前状态：
-
-- 规范已写入。
-- 自动安装器未实现。
-- 是否已接入具体工具，由执行者在工作记录中说明。
+- Harness 已从旧的 claims/evidence/work-records 结构精简为角色边界 + Git hook + records 留档。
+- 旧文档中提到的 `harness/claims.json`、`harness/evidence/`、`harness/work-records/` 已过时。
+- 是否接入具体工具级 hook，由执行者在工作记录中说明。
