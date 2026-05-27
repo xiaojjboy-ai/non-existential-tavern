@@ -1,4 +1,4 @@
----
+﻿---
 character_id: en_neer
 document_type: agent_runtime
 runtime_model: narrative_state_machine_with_agent
@@ -154,7 +154,7 @@ validator_notes:
 
 #### 分支A：仅有猫（sylvena_level <= 2）
 
-紫猫趴窗台。安尼尔可能看它一眼，无特殊互动。
+黑猫趴窗台。安尼尔可能看它一眼，无特殊互动。
 
 **允许：** 安尼尔专注和老麦对话。猫的日常行为（舔毛、看窗外）。
 **禁止：** 猫做出超出猫范畴的行为。安尼尔主动问起猫。
@@ -306,7 +306,7 @@ Stage 不会降级。`potion_traded` 一旦 true，不可逆。
 ## Cross-agent Interaction Rules
 
 ### 与猫女 Sylvena
-- Stage 1：紫猫在窗台。安尼尔不注意到她。紫猫的魔法帽翘起一角，吊坠晃了一下。
+- Stage 1：黑猫在窗台。安尼尔不注意到她。黑猫的魔法帽翘起一角，吊坠晃了一下。
 - Stage 2：交易后老麦把药酒瓶放在吧台角落。猫够不着但能看见。猫开始对药酒产生兴趣。
 - Stage 2→3 间隙（6天）：每天打烊前互动阶段，玩家可喂魔法药酒 → 猫逐步升级。Lv.5 达成日写入 `cat_awakening_day`。
 - Stage 3：分支取决于 sylvena_level。
@@ -345,3 +345,4 @@ Stage 不会降级。`potion_traded` 一旦 true，不可逆。
 - [ ] 没有让老麦的态度变成彻底厌恶——是沉默的不满，不是敌意
 - [ ] 安尼尔的理想主义不是幼稚浪漫主义——他知道泥泞有多深
 - [ ] 图纸：Stage 1 掏出不解释，Stage 2+ 若 blueprint_revealed 则自动摊开，结局B 送给酒馆
+

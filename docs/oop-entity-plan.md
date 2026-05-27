@@ -1,4 +1,4 @@
-# 面向对象实体架构 (OOP Entity System) 实施与工作流落地计划
+﻿# 面向对象实体架构 (OOP Entity System) 实施与工作流落地计划
 
 为了支持复杂的剧情系统（如：动态演变的状态机），我们将构建一套基于“数据黑板（Zustand） + 外部实体管理器（EntityManager）”的类对象架构。同时，严格按照项目《AGENTS.md》规定的工作流和记录规范进行推进。
 
@@ -25,7 +25,7 @@
 
 ### 第三步：编写核心架构代码
 - `src/game/entities/BaseEntity.ts`：实现数据代理读写。
-- `src/game/entities/CompanionEntity.ts`：实现紫猫等特定伴生角色的判定。
+- `src/game/entities/CompanionEntity.ts`：实现黑猫等特定伴生角色的判定。
 - `src/game/EntityManager.ts`：实现实体对象池调度。
 - `src/store/useGameStore.ts`：桥接底层数据与外部实体管理器。
 - `src/types/game.ts`：补充相关类型的 TS 接口。
@@ -48,4 +48,5 @@
 - 通过上述的所有 NPM 构建脚本和 `guard.ps1` 脚本的输出绿灯。
 
 ### 手动功能验证
-- 在 `useGameStore.ts` 中触发一次模拟的紫猫好感度增加，通过 Log 确认 `EntityManager` 正确拦截、调用了 `checkTriggers()`，并将紫猫的阶段（Stage）推向下一级，最终安全地写回到 Zustand 内存中。
+- 在 `useGameStore.ts` 中触发一次模拟的黑猫好感度增加，通过 Log 确认 `EntityManager` 正确拦截、调用了 `checkTriggers()`，并将黑猫的阶段（Stage）推向下一级，最终安全地写回到 Zustand 内存中。
+
