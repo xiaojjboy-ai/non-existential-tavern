@@ -829,6 +829,9 @@ function asDrinkRule(
       addConversionIssue(issues, file, 'drink.correct_effect', 'object', value.correct_effect);
     } else {
       const ce = value.correct_effect;
+      if (ce.dialogue !== undefined && typeof ce.dialogue !== 'string') {
+        addConversionIssue(issues, file, 'drink.correct_effect.dialogue', 'string', ce.dialogue);
+      }
       if (ce.affinity !== undefined && typeof ce.affinity !== 'string') {
         addConversionIssue(issues, file, 'drink.correct_effect.affinity', 'string', ce.affinity);
       }
@@ -836,6 +839,7 @@ function asDrinkRule(
         addConversionIssue(issues, file, 'drink.correct_effect.emotion', 'string', ce.emotion);
       }
       correctEffect = {
+        dialogue: typeof ce.dialogue === 'string' ? ce.dialogue : undefined,
         affinity: typeof ce.affinity === 'string' ? ce.affinity : undefined,
         emotion: typeof ce.emotion === 'string' ? ce.emotion : undefined,
       };
