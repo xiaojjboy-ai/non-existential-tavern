@@ -2,16 +2,16 @@ import fs from 'fs-extra';
 import path from 'path';
 import yaml from 'js-yaml';
 import { glob } from 'glob';
-import type {
-  ChoiceBranch,
-  Command,
-  DialogueNode,
-  DrinkRule,
-  PlotData,
-  Resource,
-  AffinityRule,
-  AffinityChange,
-} from '../src/types/game';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+type ChoiceBranch = any;
+type Command = any;
+type DialogueNode = any;
+type DrinkRule = any;
+type PlotData = any;
+type Resource = any;
+type AffinityRule = any;
+type AffinityChange = any;
+import { transformToV2 } from './transformToV2';
 
 const PROJECT_ROOT = path.resolve(__dirname, '..');
 const SCRIPT_DIR = path.join(PROJECT_ROOT, '脚本');
@@ -873,15 +873,15 @@ function validatePlot(file: string, plotData: PlotData, choiceRoutes: ChoiceRout
     }
   }
 
-  for (const [branchId, choices] of Object.entries(plotData.branches)) {
-    for (const [choiceKey, branch] of Object.entries(choices)) {
-      if (!branch.goto || !nodeIds.has(branch.goto)) {
-        addIssue(issues, file, `branches.${branchId}.${choiceKey}.goto 指向不存在的节点：${branch.goto || '(空)'}`, '数据层');
+  for (const [branchId, choices] of Object.entries(plotData.branches || {})) {
+    for (const [choiceKey, branch] of Object.entries(choices as any)) {
+      if (!(branch as any).goto || !nodeIds.has((branch as any).goto)) {
+        addIssue(issues, file, `branches.${branchId}.${choiceKey}.goto 指向不存在的节点：${(branch as any).goto || '(空)'}`, '数据层');
       }
 
       const scriptedGoto = choiceRoutes[branchId]?.[choiceKey];
-      if (scriptedGoto && scriptedGoto !== branch.goto) {
-        addIssue(issues, file, `指令层 ${branchId}.${choiceKey} 跳到 ${scriptedGoto}，但数据层写的是 ${branch.goto}。`, '数据层');
+      if (scriptedGoto && scriptedGoto !== (branch as any).goto) {
+        addIssue(issues, file, `指令层 ${branchId}.${choiceKey} 跳到 ${scriptedGoto}，但数据层写的是 ${(branch as any).goto}。`, '数据层');
       }
     }
   }
@@ -891,14 +891,14 @@ function validatePlot(file: string, plotData: PlotData, choiceRoutes: ChoiceRout
       addIssue(issues, file, `drink.correct \`${plotData.drink.correct}\` 不在 drink.available 中。`, '数据层');
     }
 
-    for (const [drinkName, effect] of Object.entries(plotData.drink.wrong_effects)) {
-      if (!nodeIds.has(effect.dialogue)) {
-        addIssue(issues, file, `drink.wrong_effects.${drinkName}.dialogue 指向不存在的节点：${effect.dialogue}`, '数据层');
+    for (const [drinkName, effect] of Object.entries(plotData.drink.wrong_effects || {})) {
+      if (!nodeIds.has((effect as any).dialogue)) {
+        addIssue(issues, file, `drink.wrong_effects.${drinkName}.dialogue 指向不存在的节点：${(effect as any).dialogue}`, '数据层');
       }
 
       const scriptedGoto = choiceRoutes[plotData.drink.id]?.[drinkName];
-      if (scriptedGoto && scriptedGoto !== effect.dialogue) {
-        addIssue(issues, file, `指令层 ${plotData.drink.id}.${drinkName} 跳到 ${scriptedGoto}，但数据层写的是 ${effect.dialogue}。`, '数据层');
+      if (scriptedGoto && scriptedGoto !== (effect as any).dialogue) {
+        addIssue(issues, file, `指令层 ${plotData.drink.id}.${drinkName} 跳到 ${scriptedGoto}，但数据层写的是 ${(effect as any).dialogue}。`, '数据层');
       }
     }
 
@@ -980,6 +980,7 @@ async function compile() {
   }
 
   await fs.ensureDir(OUTPUT_DIR);
+  transformToV2(allPlots);
   await fs.writeJson(OUTPUT_FILE, allPlots, { spaces: 2 });
   console.log(`Compilation finished. Saved to ${OUTPUT_FILE}`);
 }
