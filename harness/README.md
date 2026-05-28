@@ -109,7 +109,7 @@ Stage 参数：
 
 | 命令 | 作用 |
 |------|------|
-| `.\h <role>` | 写身份 + 跑 inspect |
+| `.\h <role>` | 认领角色；若与当前角色相同则复用，不重复领取；仅角色变化时写身份并跑 inspect |
 | `.\h install-hooks` | 安装 Git pre-commit hook |
 | `.\h doctor` | 自检 role/roles.json/guard/hook 是否就绪 |
 | `.\h` | 显示用法和当前 role |

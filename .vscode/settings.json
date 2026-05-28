@@ -1,0 +1,8 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^git status --short --branch; git pull --ff-only$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}

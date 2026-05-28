@@ -52,6 +52,16 @@ echo ERROR: unknown role "%arg1%". Valid: admin, developer, planner
 goto end
 
 :setrole
+set "currentRole="
+if exist "harness\.current-role" (
+    set /p currentRole=<"harness\.current-role"
+)
+
+if /I "%currentRole%"=="%arg1%" (
+    echo role unchanged: %arg1%
+    goto end
+)
+
 echo %arg1%> "harness\.current-role"
 echo role set: %arg1%
 powershell -ExecutionPolicy Bypass -File "harness\policy\guard.ps1" -Stage inspect

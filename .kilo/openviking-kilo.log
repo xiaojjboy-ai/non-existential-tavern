@@ -1,0 +1,13 @@
+{"ts":"2026-05-28T12:29:59.488Z","level":"INFO","message":"plugin_loaded","data":{"version":"2026-05-11-transform-injection","endpoint":"http://127.0.0.1:1934","recall":true,"commit":true}}
+{"ts":"2026-05-28T13:16:37.013Z","level":"INFO","message":"plugin_loaded","data":{"version":"2026-05-11-transform-injection","endpoint":"http://127.0.0.1:1934","recall":true,"commit":true}}
+{"ts":"2026-05-28T14:58:23.205Z","level":"INFO","message":"session_idle","data":{"session":"ses_190e8c376ffeeDcIMUHMgKy6LW"}}
+{"ts":"2026-05-28T15:03:28.257Z","level":"INFO","message":"session_idle","data":{"session":"ses_190e8c376ffeeDcIMUHMgKy6LW"}}
+{"ts":"2026-05-28T15:11:47.912Z","level":"INFO","message":"session_idle","data":{"session":"ses_190e8c376ffeeDcIMUHMgKy6LW"}}
+{"ts":"2026-05-28T15:14:02.101Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_190da421affefI3P0kMeDVMm9J","fingerprint":"[CONTEXT]: tavern-web 项目的 plot-data.json","totalCount":3}}
+{"ts":"2026-05-28T15:15:00.611Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_190da421affefI3P0kMeDVMm9J","fingerprint":"[CONTEXT]: tavern-web 项目的 plot-data.json","totalCount":2}}
+{"ts":"2026-05-28T15:15:08.713Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_190da020affe5jieY5qS70rlat","fingerprint":"[CONTEXT]: tavern-web 项目的 h.bat 文件新增了角色幂","totalCount":3}}
+{"ts":"2026-05-28T15:15:32.244Z","level":"INFO","message":"session_idle","data":{"session":"ses_190da421affefI3P0kMeDVMm9J"}}
+{"ts":"2026-05-28T15:16:10.609Z","level":"INFO","message":"session_idle","data":{"session":"ses_190da020affe5jieY5qS70rlat"}}
+{"ts":"2026-05-28T15:18:20.084Z","level":"INFO","message":"session_idle","data":{"session":"ses_190da806bffeJ2CePa9DmQp7Hs"}}
+{"ts":"2026-05-28T15:18:22.436Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_190e8c376ffeeDcIMUHMgKy6LW","fingerprint":"未提交的变更  记得让子代理一起看看 多发几个","totalCount":3}}
+{"ts":"2026-05-28T15:19:06.669Z","level":"INFO","message":"session_idle","data":{"session":"ses_190e8c376ffeeDcIMUHMgKy6LW"}}

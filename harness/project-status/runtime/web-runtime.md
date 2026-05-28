@@ -6,8 +6,12 @@
 - 当前 git 仓库位于当前仓库根目录。
 - 页面入口：`src/app/page.tsx`。
 - 状态管理：`src/store/useGameStore.ts`。
-- Pixi 画面：`src/components/GameCanvas.tsx`，要求全屏 `fixed inset-0` 并使用 `resizeTo={containerRef}`。
-- 调酒交互：`src/components/MixingStation.tsx`。
+- 架构文档：`docs/web-architecture-v2.md` (已弃用 OOP 架构)。
+- 表现组件：`src/components/GameCanvas.tsx`，要求全屏 `fixed inset-0` 并使用 `resizeTo={containerRef}`。
+- 对话交互：`src/components/DialogueBox.tsx` 独立管理对话与点击推进。
+- 分支控制：`src/components/ChoiceMenu.tsx`。
+- 调酒交互：`src/components/DrinkPrompt.tsx` 与 `src/components/MixingStation.tsx`。
+- 上帝调试：`src/components/DebugPanel.tsx`。
 - 调酒评价：`src/engine/DrinkEvaluator.ts`。
 - 酒水库存：`src/data/bar-inventory.ts`。
 
