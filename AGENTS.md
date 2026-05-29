@@ -8,9 +8,13 @@
 - 当前状态：`harness/project-status/README.md`
 - Harness 用法：`harness/README.md`
 - Hook 细节：`harness/hook-guide.md`
+- Demo 总纲：`docs/00_Demo_总纲.md`（项目最高指示，必须优先阅读）
+- 剧情大纲：`docs/01_Demo_剧情大纲.md`
+- 角色速查：`docs/02_Demo_角色速查表.md`
+- 技术节点：`docs/03_Demo_技术节点大纲.md`
 - 剧情格式：`docs/script-format.md`
 - 数据契约：`docs/data-contract-v2.md`
-- 角色设定：`docs/characters/`
+- 角色设定细则：`docs/characters/`
 - 剧情源文件：`脚本/`
 
 ## 开工规则

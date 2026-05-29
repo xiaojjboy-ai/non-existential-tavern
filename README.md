@@ -42,19 +42,21 @@ cmd /c npm run lint
 cmd /c npm run build
 ```
 
-## 当前剧情索引
+## 核心设定文档 (当前唯一轨道：11 天 Demo 版)
 
-- `脚本/Day01_警探_第1次.md`：Lendro 第一次来访，当前 QA 主路径为 `ch_01_01=C → ch_01_02=C → drink_01_01=白酒 → ch_01_03=B → ch_01_04=A`。
+开发剧情前，请务必优先阅读以下 Demo 专属基石文档（它们会覆盖任何旧版的 30 天设定）：
+1. `docs/00_Demo_总纲.md`：极简、疏离的存在主义世界观定义。
+2. `docs/01_Demo_剧情大纲.md`：11天连贯大纲及多结局触发逻辑。
+3. `docs/02_Demo_角色速查表.md`：Demo 登场人物核心弧光与多结局清单。
+4. `docs/03_Demo_技术节点大纲.md`：详细的 YAML 对话节点拆解。
+
+## 剧情与角色微观索引
+
+- `脚本/Day01_警探_第1次.md`：Lendro 第一次来访。
 - `脚本/Day02_维修师_第1次.md`：维修师第一次来访。
+- `脚本/Day03_女牛仔_第1次.md`：牛仔第一次来访。
+- `docs/characters/<role>/`：包含各自角色的微观 prompt 与语气参考。
 - `src/data/plot-data.json` 是编译生成物，不要手改。
-
-## 当前角色索引
-
-- `docs/characters/lendro/`：警探 Lendro。
-- `docs/characters/old_mike/`：酒保 Old Mike。
-- `docs/characters/en_neer/`：安尼尔。
-- `docs/characters/sylvena/`：猫女 Sylvena。
-- `docs/characters/00_角色设定模板.md`：角色设定模板。
 
 ## 当前系统状态
 
