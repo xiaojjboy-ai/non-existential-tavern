@@ -130,9 +130,9 @@ export function DialogueBox({ children }: { children?: React.ReactNode }) {
   const effectClasses = mapInlineCommandsToClasses(node.inlineCommands);
   const showAdvanceLayer = !currentChoiceId && !activeInteraction;
 
-  // 面板贴底锚定、向上自然增高（max-h + 内部滚动）；面板本身 pointer-events-none，
-  // 正文区点击穿透至全屏推进层，交互元素（选项/调酒）各自重新启用 pointer-events。
-  const containerClasses = `absolute bottom-0 inset-x-0 flex flex-col pointer-events-none transition-all duration-300 z-30 max-h-[72vh] overflow-y-auto ${effectClasses}`;
+  // 悬浮卡片式对话框：居中、脱离整条底栏视觉；面板本身仍不接管点击，
+  // 正文点击继续命中 portal 推进层，交互元素（选项/调酒）各自重新启用 pointer-events。
+  const containerClasses = `absolute left-1/2 bottom-5 z-30 flex max-h-[72vh] w-[min(92vw,1040px)] -translate-x-1/2 flex-col overflow-y-auto rounded-2xl border pointer-events-none transition-all duration-300 ${effectClasses}`;
 
   return (
     <>
@@ -148,15 +148,15 @@ export function DialogueBox({ children }: { children?: React.ReactNode }) {
         document.body,
       )}
 
-      <div
-        className={containerClasses}
-        style={{
-          backgroundColor: 'rgba(10, 10, 10, 0.82)',
-          borderTop: '2px solid var(--color-terminal-amber)',
-          boxShadow: '0 -8px 28px rgba(0, 0, 0, 0.55)',
-          backdropFilter: 'blur(2px)',
-        }}
-      >
+        <div
+          className={containerClasses}
+          style={{
+            backgroundColor: 'rgba(10, 10, 10, 0.82)',
+            borderColor: 'rgba(229, 169, 59, 0.75)',
+            boxShadow: '0 18px 48px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(229, 169, 59, 0.18) inset',
+            backdropFilter: 'blur(6px)',
+          }}
+        >
         <div
           className="flex w-full items-center px-4 py-1"
           style={{ backgroundColor: 'var(--color-terminal-amber)' }}
@@ -174,8 +174,8 @@ export function DialogueBox({ children }: { children?: React.ReactNode }) {
               color: 'var(--color-terminal-amber)',
               borderBottom: '2px solid var(--color-terminal-amber)',
               paddingBottom: '4px',
-              marginLeft: '10vw',
-              marginRight: '10vw',
+              marginLeft: 'clamp(1rem, 3vw, 2rem)',
+              marginRight: 'clamp(1rem, 3vw, 2rem)',
             }}
           >
             {actorLabel}
@@ -185,16 +185,16 @@ export function DialogueBox({ children }: { children?: React.ReactNode }) {
         <div
           className="mb-4 min-h-[72px] text-base leading-relaxed whitespace-pre-wrap"
           data-testid="dialogue-text"
-          style={{
-            fontFamily: 'var(--font-noto)',
-            lineHeight: '1.85',
-            fontSize: '1.15rem',
-            color: 'var(--color-foreground)',
-            textShadow: '0 0 2px var(--color-text-dim)',
-            paddingLeft: '10vw',
-            paddingRight: '10vw',
-          }}
-        >
+            style={{
+              fontFamily: 'var(--font-noto)',
+              lineHeight: '1.85',
+              fontSize: '1.15rem',
+              color: 'var(--color-foreground)',
+              textShadow: '0 0 2px var(--color-text-dim)',
+              paddingLeft: 'clamp(1rem, 3vw, 2rem)',
+              paddingRight: 'clamp(1rem, 3vw, 2rem)',
+            }}
+          >
           {isMultiLine ? (
             <>
               {lines.slice(0, currentLineIndex).map((line, idx) => (
@@ -240,7 +240,7 @@ export function DialogueBox({ children }: { children?: React.ReactNode }) {
         </div>
 
         {/* children(ChoiceMenu / DrinkPrompt) 与正文同列对齐；自身已含 pointer-events-auto */}
-        <div style={{ paddingLeft: '10vw', paddingRight: '10vw', paddingBottom: '1.5rem' }}>
+        <div style={{ paddingLeft: 'clamp(1rem, 3vw, 2rem)', paddingRight: 'clamp(1rem, 3vw, 2rem)', paddingBottom: '1.5rem' }}>
           {children}
         </div>
       </div>

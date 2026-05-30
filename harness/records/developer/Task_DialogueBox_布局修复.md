@@ -4,20 +4,22 @@
 **角色**：developer
 **Agent 工具**：Kilo
 **接任务**：2026-05-30 — 修复对话框/选项菜单独立成块、点击无反应、播放流程与脚本文本对齐
-**完成**：2026-05-30 — 对话框重构为贴底独立块，选项恒在视口内可点，端到端流程验证通过
+**完成**：2026-05-30 — 对话框重构为居中悬浮卡片，点击链路保留可用，端到端流程验证通过
 
 ## 改了什么
 
 - `src/components/DialogueBox.tsx`：
-  - 容器由 `absolute inset-0`（被钉死在 33vh 吧台内、选项溢出视口外不可点）改为 `absolute bottom-0 inset-x-0 max-h-[72vh] overflow-y-auto`，贴底锚定、向上自然增高，选项恒在视口底部可见可点。
-  - 加半透明深色块背景（`rgba(10,10,10,0.82)`）+ 顶部琥珀边框 + 阴影 + 轻微背景模糊，使对话框成为独立模块。
-  - 收窄角色名/正文边距（mt-6→mt-4、mb-8→mb-4、min-h 90→72px）。
-  - children(ChoiceMenu/DrinkPrompt) 包一层 10vw 横向 padding + 1.5rem 底部留白，与正文同列对齐。
+  - 容器由 `absolute inset-0`（被钉死在 33vh 吧台内、选项溢出视口外不可点）先改为贴底块，随后按用户截图反馈进一步修正为 **居中悬浮卡片**：`absolute left-1/2 bottom-5 w-[min(92vw,1040px)] -translate-x-1/2 rounded-2xl border ...`。
+  - 去掉“整条底栏”视觉，改为半透明深色悬浮框（`rgba(10,10,10,0.82)`）+ 琥珀描边 + 双层阴影 + `backdrop-filter: blur(6px)`，与计划中的浮起式对话框一致。
+  - 角色名/正文/选项区左右内边距改为 `clamp(1rem, 3vw, 2rem)`，不再依赖全屏 10vw 缩进，避免悬浮框内文本过度收窄。
+  - children(ChoiceMenu/DrinkPrompt) 与正文同列对齐，底部保留 1.5rem 留白。
+  - 保留 `createPortal` 推进层点击修复链路，不把点击能力重新绑死在透明底栏上。
 - 仅本回合改动此一文件；其余工作区改动来自先前会话。
 
 ## 怎么验证
 
 - `npx tsc --noEmit --pretty false`：EXITCODE=0，无类型错误。
+- 悬浮框布局实测：视口 1264x625 下，卡片位置为 `left=104 top=310 right=1144 bottom=510 width=1040 height=200`，已明显脱离全宽底栏，成为居中悬浮块。
 - agent-browser headless（视口 1264x625）端到端：
   - 第一选项（3 项）实测 bounding box top/bottom 全部 ≤625、`elementFromPoint` 命中按钮自身（此前在 y=693~741 视口外，命中 null）。
   - `find testid choice-button-A click` 真实坐标点击 → 选项消费、推进到 dlg_01_03a。
@@ -37,6 +39,14 @@
 - 特效逐节点核对：narr_01_cultist_confront 触发 `effect-shake`；narr_01_cultist_vanish 触发 `effect-glitch + effect-flash`。
 - 终点停在 dlg_01_09（"老麦转过身…一个喝酒的地方。你的杯子空了。"），无残留选项、无继续推进 = END 正常。
 - **结论**：三项验收标准（①对话框独立成块且样式一致 ②点击修复 ③流程与脚本文本逐节点对上）全部端到端通过。
+
+## 2026-05-30 补充：按用户截图反馈修正为“悬浮框”
+
+用户指出当前 UI 仍表现为“贴底整条栏”，与计划中的悬浮框不符。已据此做最小视觉修复，仅调整 `DialogueBox.tsx`：
+
+- 视觉形态从 **底部全宽条** 改为 **底部上浮的居中卡片**，不动 store / 分支 / 点击状态机。
+- 悬浮框位置与尺寸已通过浏览器探针确认，宽度不再铺满屏幕。
+- 真实点击验证仍通过：在悬浮框正文区域连续点击两次，可从序幕推进到下一句、再下一句，说明样式修正未破坏点击。
 
 ## 遗留（待用户决断，与本回合修复无关）
 
