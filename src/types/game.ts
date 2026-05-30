@@ -86,6 +86,48 @@ declare global {
 }
 
 // ==========================================
+// ====== V3 行内指令与交互层类型 ======
+// ==========================================
+
+/** 行内特效指令枚举 */
+export type InlineCommandType = 'SHAKE' | 'GLITCH' | 'SPRITE' | 'FLASH' | 'FREEZE';
+
+/** 行内指令结构 */
+export interface InlineCommand {
+  type: InlineCommandType;
+  args?: string;
+}
+
+/** 交互类型枚举 */
+export type InteractionKind = 'drag_and_drop' | 'pour' | 'shake_device' | 'click_sequence';
+
+/** 交互规则定义 */
+export interface InteractionRule {
+  id: string;
+  kind: InteractionKind;
+  label: string;
+  /** 拖拽物件列表（drag_and_drop 类型使用） */
+  items?: Array<{
+    id: string;
+    label: string;
+    targetZoneId: string;
+  }>;
+  /** 目标区域（drag_and_drop 类型使用） */
+  zones?: Array<{
+    id: string;
+    label: string;
+  }>;
+  /** 完成交互后跳转的节点 ID */
+  successGotoNodeId: string;
+  /** 交互失败跳转的节点 ID（可选） */
+  failGotoNodeId?: string;
+  /** 交互成功时好感度效果 */
+  successAffinityEffect?: AffinityEffect;
+  /** 交互时长限制（毫秒，0 表示无限制） */
+  timeLimitMs?: number;
+}
+
+// ==========================================
 // ====== 核心强类型与数据结构规范 (已升级为V2标准) ======
 // ==========================================
 
@@ -101,6 +143,7 @@ export type CommandType =
   | 'PAUSE'   // 等待停顿
   | 'GOTO'    // 跳转到指定节点
   | 'CHOICE'  // 触发选项面板
+  | 'INTERACT' // 触发交互小游戏
   | 'END';    // 关卡/剧情结束
 
 export interface CommandParamMap {
@@ -115,6 +158,7 @@ export interface CommandParamMap {
   PAUSE: { durationMs: number };
   GOTO: { targetNodeId: string };
   CHOICE: { choiceId: string };
+  INTERACT: { interactionId: string };
   END: Record<string, never>;
 }
 
@@ -207,6 +251,8 @@ export interface DialogueNode {
     soundEffectId?: string;          // 说话时的音效ID（如叹气、冷笑）
     voiceId?: string;                // 对白配音文件ID
   };
+  /** V3: 行内指令列表，编译时从文本中提取 */
+  inlineCommands?: InlineCommand[];
 }
 
 // 单个完整关卡剧情数据
@@ -221,6 +267,8 @@ export interface PlotData {
   commands: Command[];
   links?: unknown;
   metaphor?: unknown;
+  /** V3: 交互层规则字典，key 为 interaction ID */
+  interactions?: Record<string, InteractionRule>;
 }
 
 // 统一的全局存档快照格式

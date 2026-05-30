@@ -11,3 +11,171 @@
 {"ts":"2026-05-28T15:18:20.084Z","level":"INFO","message":"session_idle","data":{"session":"ses_190da806bffeJ2CePa9DmQp7Hs"}}
 {"ts":"2026-05-28T15:18:22.436Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_190e8c376ffeeDcIMUHMgKy6LW","fingerprint":"未提交的变更  记得让子代理一起看看 多发几个","totalCount":3}}
 {"ts":"2026-05-28T15:19:06.669Z","level":"INFO","message":"session_idle","data":{"session":"ses_190e8c376ffeeDcIMUHMgKy6LW"}}
+{"ts":"2026-05-29T14:10:46.592Z","level":"INFO","message":"plugin_loaded","data":{"version":"2026-05-11-transform-injection","endpoint":"http://127.0.0.1:1934","recall":true,"commit":true}}
+{"ts":"2026-05-29T14:32:44.624Z","level":"INFO","message":"plugin_loaded","data":{"version":"2026-05-11-transform-injection","endpoint":"http://127.0.0.1:1934","recall":true,"commit":true}}
+{"ts":"2026-05-29T14:55:22.620Z","level":"WARN","message":"transform_circuit_breaker","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x","count":4}}
+{"ts":"2026-05-29T14:55:41.330Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x","fingerprint":"看看现在的项目怎么样","totalCount":4}}
+{"ts":"2026-05-29T15:01:49.341Z","level":"INFO","message":"session_idle","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x"}}
+{"ts":"2026-05-29T15:01:50.258Z","level":"INFO","message":"session_idle","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x"}}
+{"ts":"2026-05-29T15:03:31.569Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x","fingerprint":"继续","totalCount":2}}
+{"ts":"2026-05-29T15:07:54.697Z","level":"INFO","message":"session_idle","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x"}}
+{"ts":"2026-05-29T15:13:04.468Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x","fingerprint":"看看 我应该有个计划还没有执行 我想执行那个计划","totalCount":2}}
+{"ts":"2026-05-29T15:15:27.997Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x","fingerprint":"看看 我应该有个计划还没有执行 我想执行那个计划","totalCount":3}}
+{"ts":"2026-05-29T15:16:29.816Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x","fingerprint":"看看 我应该有个计划还没有执行 我想执行那个计划","totalCount":1}}
+{"ts":"2026-05-29T15:16:55.900Z","level":"INFO","message":"session_idle","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x"}}
+{"ts":"2026-05-29T15:16:56.669Z","level":"INFO","message":"session_idle","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x"}}
+{"ts":"2026-05-29T15:18:25.962Z","level":"INFO","message":"session_idle","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x"}}
+{"ts":"2026-05-29T15:18:26.743Z","level":"INFO","message":"session_idle","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x"}}
+{"ts":"2026-05-29T15:19:26.310Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x","fingerprint":"好了 我切了个模式","totalCount":3}}
+{"ts":"2026-05-29T15:21:04.809Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x","fingerprint":"好了 我切了个模式","totalCount":1}}
+{"ts":"2026-05-29T15:22:37.057Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x","fingerprint":"好了 我切了个模式","totalCount":2}}
+{"ts":"2026-05-29T15:25:08.293Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x","fingerprint":"好了 我切了个模式","totalCount":3}}
+{"ts":"2026-05-29T15:26:15.566Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x","fingerprint":"好了 我切了个模式","totalCount":3}}
+{"ts":"2026-05-29T15:28:32.331Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x","fingerprint":"好了 我切了个模式","totalCount":2}}
+{"ts":"2026-05-29T15:29:46.098Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x","fingerprint":"好了 我切了个模式","totalCount":2}}
+{"ts":"2026-05-29T15:31:53.442Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x","fingerprint":"好了 我切了个模式","totalCount":1}}
+{"ts":"2026-05-29T15:33:06.415Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x","fingerprint":"好了 我切了个模式","totalCount":1}}
+{"ts":"2026-05-29T15:34:09.266Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x","fingerprint":"好了 我切了个模式","totalCount":2}}
+{"ts":"2026-05-29T15:35:02.328Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x","fingerprint":"好了 我切了个模式","totalCount":2}}
+{"ts":"2026-05-29T15:36:17.712Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x","fingerprint":"好了 我切了个模式","totalCount":2}}
+{"ts":"2026-05-29T15:37:34.526Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x","fingerprint":"好了 我切了个模式","totalCount":1}}
+{"ts":"2026-05-29T15:38:30.022Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x","fingerprint":"好了 我切了个模式","totalCount":3}}
+{"ts":"2026-05-29T15:39:46.560Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x","fingerprint":"好了 我切了个模式","totalCount":2}}
+{"ts":"2026-05-29T15:40:31.418Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x","fingerprint":"好了 我切了个模式","totalCount":3}}
+{"ts":"2026-05-29T15:42:19.539Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x","fingerprint":"好了 我切了个模式","totalCount":3}}
+{"ts":"2026-05-29T15:42:37.850Z","level":"INFO","message":"session_idle","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x"}}
+{"ts":"2026-05-29T15:48:54.642Z","level":"INFO","message":"session_idle","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x"}}
+{"ts":"2026-05-29T15:49:18.859Z","level":"WARN","message":"transform_circuit_breaker","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x","count":4}}
+{"ts":"2026-05-29T15:49:28.082Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x","fingerprint":"You are Kilo Code, an expert code review","totalCount":4}}
+{"ts":"2026-05-29T15:50:21.061Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x","fingerprint":"You are Kilo Code, an expert code review","totalCount":2}}
+{"ts":"2026-05-29T15:51:56.762Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x","fingerprint":"You are Kilo Code, an expert code review","totalCount":1}}
+{"ts":"2026-05-29T15:53:37.004Z","level":"INFO","message":"session_idle","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x"}}
+{"ts":"2026-05-29T15:53:39.252Z","level":"INFO","message":"session_idle","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x"}}
+{"ts":"2026-05-29T15:53:40.037Z","level":"INFO","message":"session_idle","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x"}}
+{"ts":"2026-05-29T15:54:22.122Z","level":"INFO","message":"session_idle","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x"}}
+{"ts":"2026-05-29T15:54:22.925Z","level":"INFO","message":"session_idle","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x"}}
+{"ts":"2026-05-29T15:55:05.764Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x","fingerprint":"继续吧","totalCount":1}}
+{"ts":"2026-05-29T15:55:06.704Z","level":"INFO","message":"session_idle","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x"}}
+{"ts":"2026-05-29T15:55:07.496Z","level":"INFO","message":"session_idle","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x"}}
+{"ts":"2026-05-29T15:55:58.177Z","level":"INFO","message":"session_idle","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x"}}
+{"ts":"2026-05-29T15:58:09.656Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x","fingerprint":"继续吧","totalCount":1}}
+{"ts":"2026-05-29T15:59:13.649Z","level":"WARN","message":"transform_circuit_breaker","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x","count":4}}
+{"ts":"2026-05-29T15:59:30.397Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x","fingerprint":"Continue if you have next steps, or stop","totalCount":4}}
+{"ts":"2026-05-29T16:00:14.847Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x","fingerprint":"Continue if you have next steps, or stop","totalCount":2}}
+{"ts":"2026-05-29T16:00:45.331Z","level":"WARN","message":"transform_circuit_breaker","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x","count":4}}
+{"ts":"2026-05-29T16:00:55.774Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x","fingerprint":"Continue if you have next steps, or stop","totalCount":4}}
+{"ts":"2026-05-29T16:01:21.699Z","level":"WARN","message":"transform_circuit_breaker","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x","count":4}}
+{"ts":"2026-05-29T16:01:29.722Z","level":"WARN","message":"transform_circuit_breaker","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x","count":5}}
+{"ts":"2026-05-29T16:01:35.678Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x","fingerprint":"Continue if you have next steps, or stop","totalCount":5}}
+{"ts":"2026-05-29T16:02:10.223Z","level":"WARN","message":"transform_circuit_breaker","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x","count":4}}
+{"ts":"2026-05-29T16:02:34.620Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x","fingerprint":"Continue if you have next steps, or stop","totalCount":4}}
+{"ts":"2026-05-29T16:03:05.070Z","level":"WARN","message":"transform_circuit_breaker","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x","count":4}}
+{"ts":"2026-05-29T16:03:11.665Z","level":"WARN","message":"transform_circuit_breaker","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x","count":5}}
+{"ts":"2026-05-29T16:03:18.525Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x","fingerprint":"Continue if you have next steps, or stop","totalCount":5}}
+{"ts":"2026-05-29T16:03:44.789Z","level":"WARN","message":"transform_circuit_breaker","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x","count":4}}
+{"ts":"2026-05-29T16:03:52.171Z","level":"WARN","message":"transform_circuit_breaker","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x","count":5}}
+{"ts":"2026-05-29T16:03:59.194Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x","fingerprint":"Continue if you have next steps, or stop","totalCount":5}}
+{"ts":"2026-05-29T16:04:35.613Z","level":"WARN","message":"transform_circuit_breaker","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x","count":4}}
+{"ts":"2026-05-29T16:04:51.633Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x","fingerprint":"Continue if you have next steps, or stop","totalCount":4}}
+{"ts":"2026-05-29T16:05:10.564Z","level":"INFO","message":"session_idle","data":{"session":"ses_18bc4de5bffehXSCXRxR8UpM2x"}}
+{"ts":"2026-05-29T16:46:29.813Z","level":"INFO","message":"plugin_loaded","data":{"version":"2026-05-11-transform-injection","endpoint":"http://127.0.0.1:1934","recall":true,"commit":true}}
+{"ts":"2026-05-29T16:47:07.603Z","level":"INFO","message":"session_idle","data":{"session":"ses_18b5e222cffeQ5uk9KNUA6fjQk"}}
+{"ts":"2026-05-29T16:47:08.315Z","level":"INFO","message":"session_idle","data":{"session":"ses_18b5e222cffeQ5uk9KNUA6fjQk"}}
+{"ts":"2026-05-29T16:47:58.224Z","level":"INFO","message":"session_idle","data":{"session":"ses_18b5e222cffeQ5uk9KNUA6fjQk"}}
+{"ts":"2026-05-29T16:47:58.898Z","level":"INFO","message":"session_idle","data":{"session":"ses_18b5e222cffeQ5uk9KNUA6fjQk"}}
+{"ts":"2026-05-29T17:02:59.973Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18b5e222cffeQ5uk9KNUA6fjQk","fingerprint":"我对文本框架做了修改你看看有没有什么说法","totalCount":3}}
+{"ts":"2026-05-29T17:04:07.830Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18b5e222cffeQ5uk9KNUA6fjQk","fingerprint":"我对文本框架做了修改你看看有没有什么说法","totalCount":1}}
+{"ts":"2026-05-29T17:05:08.527Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18b5e222cffeQ5uk9KNUA6fjQk","fingerprint":"我对文本框架做了修改你看看有没有什么说法","totalCount":1}}
+{"ts":"2026-05-29T17:06:30.701Z","level":"INFO","message":"session_idle","data":{"session":"ses_18b5e222cffeQ5uk9KNUA6fjQk"}}
+{"ts":"2026-05-29T17:08:34.870Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18b5e222cffeQ5uk9KNUA6fjQk","fingerprint":"# agent-browser\r\n\r\nFast browser automati","totalCount":2}}
+{"ts":"2026-05-29T17:13:44.702Z","level":"INFO","message":"session_idle","data":{"session":"ses_18b5e222cffeQ5uk9KNUA6fjQk"}}
+{"ts":"2026-05-29T17:13:45.928Z","level":"INFO","message":"session_idle","data":{"session":"ses_18b5e222cffeQ5uk9KNUA6fjQk"}}
+{"ts":"2026-05-29T17:14:46.311Z","level":"INFO","message":"session_idle","data":{"session":"ses_18b5e222cffeQ5uk9KNUA6fjQk"}}
+{"ts":"2026-05-29T17:15:52.266Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18b5e222cffeQ5uk9KNUA6fjQk","fingerprint":"开始对话之后疯狂直接全部覆盖没了 然后吧台设计也是一坨","totalCount":1}}
+{"ts":"2026-05-29T17:15:58.226Z","level":"INFO","message":"session_idle","data":{"session":"ses_18b5e222cffeQ5uk9KNUA6fjQk"}}
+{"ts":"2026-05-29T17:15:59.128Z","level":"INFO","message":"session_idle","data":{"session":"ses_18b5e222cffeQ5uk9KNUA6fjQk"}}
+{"ts":"2026-05-29T17:16:15.135Z","level":"INFO","message":"session_idle","data":{"session":"ses_18b5e222cffeQ5uk9KNUA6fjQk"}}
+{"ts":"2026-05-29T17:16:16.056Z","level":"INFO","message":"session_idle","data":{"session":"ses_18b5e222cffeQ5uk9KNUA6fjQk"}}
+{"ts":"2026-05-29T17:16:56.580Z","level":"INFO","message":"plugin_loaded","data":{"version":"2026-05-11-transform-injection","endpoint":"http://127.0.0.1:1934","recall":true,"commit":true}}
+{"ts":"2026-05-29T17:17:10.359Z","level":"INFO","message":"session_idle","data":{"session":"ses_18b5e222cffeQ5uk9KNUA6fjQk"}}
+{"ts":"2026-05-29T17:17:11.116Z","level":"INFO","message":"session_idle","data":{"session":"ses_18b5e222cffeQ5uk9KNUA6fjQk"}}
+{"ts":"2026-05-29T17:18:09.232Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18b5e222cffeQ5uk9KNUA6fjQk","fingerprint":"继续","totalCount":1}}
+{"ts":"2026-05-29T17:18:16.558Z","level":"INFO","message":"session_idle","data":{"session":"ses_18b5e222cffeQ5uk9KNUA6fjQk"}}
+{"ts":"2026-05-29T17:18:17.402Z","level":"INFO","message":"session_idle","data":{"session":"ses_18b5e222cffeQ5uk9KNUA6fjQk"}}
+{"ts":"2026-05-29T17:18:57.667Z","level":"INFO","message":"session_idle","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8"}}
+{"ts":"2026-05-29T17:19:57.229Z","level":"INFO","message":"session_idle","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8"}}
+{"ts":"2026-05-29T17:20:29.078Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","fingerprint":"现在的设计语言是 CRT 复古终端美学（磷光红 + 终端琥珀 + 扫描线 + 色","totalCount":3}}
+{"ts":"2026-05-29T17:20:59.011Z","level":"WARN","message":"transform_circuit_breaker","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","count":4}}
+{"ts":"2026-05-29T17:21:04.878Z","level":"WARN","message":"transform_circuit_breaker","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","count":5}}
+{"ts":"2026-05-29T17:21:49.105Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","fingerprint":"现在的设计语言是 CRT 复古终端美学（磷光红 + 终端琥珀 + 扫描线 + 色","totalCount":5}}
+{"ts":"2026-05-29T17:22:31.441Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","fingerprint":"现在的设计语言是 CRT 复古终端美学（磷光红 + 终端琥珀 + 扫描线 + 色","totalCount":3}}
+{"ts":"2026-05-29T17:23:25.126Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","fingerprint":"现在的设计语言是 CRT 复古终端美学（磷光红 + 终端琥珀 + 扫描线 + 色","totalCount":3}}
+{"ts":"2026-05-29T17:24:50.783Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","fingerprint":"现在的设计语言是 CRT 复古终端美学（磷光红 + 终端琥珀 + 扫描线 + 色","totalCount":1}}
+{"ts":"2026-05-29T17:26:51.988Z","level":"INFO","message":"session_idle","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8"}}
+{"ts":"2026-05-29T17:26:53.302Z","level":"INFO","message":"session_idle","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8"}}
+{"ts":"2026-05-29T17:27:36.370Z","level":"INFO","message":"session_idle","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8"}}
+{"ts":"2026-05-29T17:27:37.889Z","level":"INFO","message":"session_idle","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8"}}
+{"ts":"2026-05-29T17:28:33.056Z","level":"INFO","message":"session_idle","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8"}}
+{"ts":"2026-05-29T17:28:34.239Z","level":"INFO","message":"session_idle","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8"}}
+{"ts":"2026-05-29T17:29:23.819Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","fingerprint":"加载不进去","totalCount":2}}
+{"ts":"2026-05-29T17:30:28.848Z","level":"INFO","message":"session_idle","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8"}}
+{"ts":"2026-05-29T17:32:05.606Z","level":"INFO","message":"session_idle","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8"}}
+{"ts":"2026-05-29T17:32:07.119Z","level":"INFO","message":"session_idle","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8"}}
+{"ts":"2026-05-29T17:33:06.119Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","fingerprint":"又有新问题","totalCount":2}}
+{"ts":"2026-05-29T17:35:12.457Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","fingerprint":"又有新问题","totalCount":1}}
+{"ts":"2026-05-29T17:36:14.477Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","fingerprint":"又有新问题","totalCount":1}}
+{"ts":"2026-05-29T17:37:11.342Z","level":"INFO","message":"session_idle","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8"}}
+{"ts":"2026-05-29T17:40:35.620Z","level":"INFO","message":"session_idle","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8"}}
+{"ts":"2026-05-29T17:40:36.503Z","level":"INFO","message":"session_idle","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8"}}
+{"ts":"2026-05-29T17:41:46.811Z","level":"INFO","message":"session_idle","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8"}}
+{"ts":"2026-05-29T17:43:14.880Z","level":"INFO","message":"session_idle","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8"}}
+{"ts":"2026-05-29T17:43:19.424Z","level":"INFO","message":"session_idle","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8"}}
+{"ts":"2026-05-29T17:43:20.455Z","level":"INFO","message":"session_idle","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8"}}
+{"ts":"2026-05-29T17:46:01.164Z","level":"INFO","message":"session_idle","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8"}}
+{"ts":"2026-05-29T17:46:01.968Z","level":"INFO","message":"session_idle","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8"}}
+{"ts":"2026-05-29T17:46:26.152Z","level":"WARN","message":"transform_circuit_breaker","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","count":4}}
+{"ts":"2026-05-29T17:46:48.331Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","fingerprint":"# agent-browser\r\n\r\nFast browser automati","totalCount":4}}
+{"ts":"2026-05-29T17:48:07.953Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","fingerprint":"# agent-browser\r\n\r\nFast browser automati","totalCount":3}}
+{"ts":"2026-05-29T17:52:22.431Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","fingerprint":"# agent-browser\r\n\r\nFast browser automati","totalCount":1}}
+{"ts":"2026-05-29T17:53:58.990Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","fingerprint":"Continue if you have next steps, or stop","totalCount":2}}
+{"ts":"2026-05-29T17:56:30.991Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","fingerprint":"Continue if you have next steps, or stop","totalCount":1}}
+{"ts":"2026-05-29T17:57:52.718Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","fingerprint":"Continue if you have next steps, or stop","totalCount":1}}
+{"ts":"2026-05-29T17:58:27.269Z","level":"WARN","message":"transform_circuit_breaker","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","count":4}}
+{"ts":"2026-05-29T17:58:37.906Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","fingerprint":"Continue if you have next steps, or stop","totalCount":4}}
+{"ts":"2026-05-29T17:59:36.740Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","fingerprint":"Continue if you have next steps, or stop","totalCount":3}}
+{"ts":"2026-05-29T18:00:30.548Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","fingerprint":"Continue if you have next steps, or stop","totalCount":2}}
+{"ts":"2026-05-29T18:01:38.730Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","fingerprint":"Continue if you have next steps, or stop","totalCount":2}}
+{"ts":"2026-05-29T18:02:25.331Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","fingerprint":"Continue if you have next steps, or stop","totalCount":1}}
+{"ts":"2026-05-29T18:03:28.435Z","level":"WARN","message":"transform_circuit_breaker","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","count":4}}
+{"ts":"2026-05-29T18:03:41.197Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","fingerprint":"Continue if you have next steps, or stop","totalCount":4}}
+{"ts":"2026-05-29T18:05:11.929Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","fingerprint":"Continue if you have next steps, or stop","totalCount":2}}
+{"ts":"2026-05-29T18:07:06.608Z","level":"WARN","message":"transform_circuit_breaker","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","count":4}}
+{"ts":"2026-05-29T18:07:13.240Z","level":"WARN","message":"transform_circuit_breaker","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","count":5}}
+{"ts":"2026-05-29T18:07:46.613Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","fingerprint":"Continue if you have next steps, or stop","totalCount":5}}
+{"ts":"2026-05-29T18:09:09.035Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","fingerprint":"Continue if you have next steps, or stop","totalCount":2}}
+{"ts":"2026-05-29T18:09:33.087Z","level":"WARN","message":"transform_circuit_breaker","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","count":4}}
+{"ts":"2026-05-29T18:09:44.697Z","level":"WARN","message":"transform_circuit_breaker","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","count":5}}
+{"ts":"2026-05-29T18:09:57.756Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","fingerprint":"Continue if you have next steps, or stop","totalCount":5}}
+{"ts":"2026-05-29T18:10:55.899Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","fingerprint":"Continue if you have next steps, or stop","totalCount":3}}
+{"ts":"2026-05-29T18:11:49.871Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","fingerprint":"Continue if you have next steps, or stop","totalCount":3}}
+{"ts":"2026-05-29T18:12:21.065Z","level":"WARN","message":"transform_circuit_breaker","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","count":4}}
+{"ts":"2026-05-29T18:12:57.981Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","fingerprint":"Continue if you have next steps, or stop","totalCount":4}}
+{"ts":"2026-05-29T18:13:45.182Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","fingerprint":"Continue if you have next steps, or stop","totalCount":2}}
+{"ts":"2026-05-29T18:14:35.103Z","level":"WARN","message":"transform_circuit_breaker","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","count":4}}
+{"ts":"2026-05-29T18:14:55.971Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","fingerprint":"Continue if you have next steps, or stop","totalCount":4}}
+{"ts":"2026-05-29T18:15:49.446Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","fingerprint":"Continue if you have next steps, or stop","totalCount":2}}
+{"ts":"2026-05-29T18:16:10.800Z","level":"INFO","message":"session_idle","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8"}}
+{"ts":"2026-05-29T18:30:21.181Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","fingerprint":"# agent-browser\r\n\r\nFast browser automati","totalCount":1}}
+{"ts":"2026-05-29T18:31:37.951Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","fingerprint":"# agent-browser\r\n\r\nFast browser automati","totalCount":1}}
+{"ts":"2026-05-29T18:33:00.109Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","fingerprint":"# agent-browser\r\n\r\nFast browser automati","totalCount":1}}
+{"ts":"2026-05-29T18:33:46.946Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","fingerprint":"# agent-browser\r\n\r\nFast browser automati","totalCount":2}}
+{"ts":"2026-05-29T18:34:45.186Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","fingerprint":"# agent-browser\r\n\r\nFast browser automati","totalCount":1}}
+{"ts":"2026-05-29T18:35:27.520Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","fingerprint":"# agent-browser\r\n\r\nFast browser automati","totalCount":2}}
+{"ts":"2026-05-29T18:36:12.469Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","fingerprint":"# agent-browser\r\n\r\nFast browser automati","totalCount":2}}
+{"ts":"2026-05-29T18:38:08.778Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","fingerprint":"# agent-browser\r\n\r\nFast browser automati","totalCount":1}}
+{"ts":"2026-05-29T18:40:34.653Z","level":"WARN","message":"transform_circuit_breaker","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","count":4}}
+{"ts":"2026-05-29T18:41:05.150Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","fingerprint":"Continue if you have next steps, or stop","totalCount":4}}
+{"ts":"2026-05-29T18:42:16.392Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","fingerprint":"Continue if you have next steps, or stop","totalCount":3}}
+{"ts":"2026-05-29T18:43:12.419Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","fingerprint":"Continue if you have next steps, or stop","totalCount":2}}
+{"ts":"2026-05-29T18:44:14.175Z","level":"WARN","message":"transform_circuit_breaker_ttl_expired","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8","fingerprint":"Continue if you have next steps, or stop","totalCount":3}}
+{"ts":"2026-05-29T18:44:49.697Z","level":"INFO","message":"session_idle","data":{"session":"ses_18b413cb2ffeTXwsRcHE7oEOW8"}}

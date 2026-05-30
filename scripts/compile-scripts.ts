@@ -11,6 +11,7 @@ type PlotData = any;
 type Resource = any;
 type AffinityRule = any;
 type AffinityChange = any;
+type InteractionRule = any;
 import { transformToV2 } from './transformToV2';
 
 const PROJECT_ROOT = path.resolve(__dirname, '..');
@@ -18,7 +19,8 @@ const SCRIPT_DIR = path.join(PROJECT_ROOT, '脚本');
 const OUTPUT_DIR = path.join(PROJECT_ROOT, 'src/data');
 const OUTPUT_FILE = path.join(OUTPUT_DIR, 'plot-data.json');
 
-const LAYER_NAMES = ['指令层', '对话层', '数据层'] as const;
+/** V3: 四层结构，新增交互层 */
+const LAYER_NAMES = ['指令层', '对话层', '数据层', '交互层'] as const;
 const COMMAND_TYPES = [
   'BG',
   'BGM',
@@ -31,6 +33,7 @@ const COMMAND_TYPES = [
   'PAUSE',
   'GOTO',
   'CHOICE',
+  'INTERACT',
   'END',
 ] as const;
 
@@ -99,7 +102,7 @@ function addConversionIssue(
 }
 
 function parseLayers(file: string, content: string, issues: CompileIssue[]): ParsedMarkdown | null {
-  const headerMatches = [...content.matchAll(/^##\s*(指令层|对话层|数据层)\s*$/gm)];
+  const headerMatches = [...content.matchAll(/^##\s*(指令层|对话层|数据层|交互层)\s*$/gm)];
   const layerBodies: Partial<Record<LayerName, string>> = {};
 
   if (headerMatches.length === 0) {
@@ -110,6 +113,8 @@ function parseLayers(file: string, content: string, issues: CompileIssue[]): Par
   for (const layerName of LAYER_NAMES) {
     const match = headerMatches.find((candidate) => candidate[1] === layerName);
     if (!match) {
+      // V3: 交互层是可选的，其余三层必须存在
+      if (layerName === '交互层') continue;
       addIssue(issues, file, `缺少 \`## ${layerName}\`。`, layerName);
       continue;
     }
@@ -123,12 +128,21 @@ function parseLayers(file: string, content: string, issues: CompileIssue[]): Par
   const ordered = headerMatches.map((match) => match[1]).filter((name): name is LayerName => {
     return LAYER_NAMES.includes(name as LayerName);
   });
-  const firstSeen = LAYER_NAMES.map((name) => ordered.indexOf(name));
-  if (firstSeen.some((index) => index === -1) || firstSeen.some((index, i) => i > 0 && index < firstSeen[i - 1])) {
-    addIssue(issues, file, '三层顺序必须是：指令层 -> 对话层 -> 数据层。');
+  // V3: 验证前三层顺序必须固定，交互层在数据层之后
+  const requiredOrder = ['指令层', '对话层', '数据层'] as const;
+  const requiredIndices = requiredOrder.map((name) => ordered.indexOf(name));
+  if (requiredIndices.some((index) => index === -1)) {
+    // 缺少必要层，已在上面报错
+  } else if (requiredIndices.some((index, i) => i > 0 && index < requiredIndices[i - 1])) {
+    addIssue(issues, file, '前三层顺序必须是：指令层 -> 对话层 -> 数据层。');
+  }
+  // 交互层如果存在，必须在数据层之后
+  const interactionIndex = ordered.indexOf('交互层');
+  if (interactionIndex !== -1 && interactionIndex < requiredIndices[2]) {
+    addIssue(issues, file, '交互层必须在数据层之后。', '交互层');
   }
 
-  if (!LAYER_NAMES.every((name) => layerBodies[name] !== undefined)) {
+  if (!requiredOrder.every((name) => layerBodies[name] !== undefined)) {
     return null;
   }
 
@@ -216,6 +230,23 @@ function splitActorAndText(rawText: string) {
   };
 }
 
+/** V3: 从对话文本中提取行内指令，并返回剥离指令后的纯文本 */
+function extractInlineCommands(rawText: string): { cleanText: string; inlineCommands: Array<{ type: string; args?: string }> } {
+  const inlineCommandRegex = /\[([A-Z_]+)\s*(.*?)\]/g;
+  const inlineCommands: Array<{ type: string; args?: string }> = [];
+  const validTypes = new Set(['SHAKE', 'GLITCH', 'SPRITE', 'FLASH', 'FREEZE']);
+
+  const cleanText = rawText.replace(inlineCommandRegex, (_match, type: string, args: string) => {
+    if (validTypes.has(type)) {
+      inlineCommands.push({ type, args: args.trim() || undefined });
+      return ''; // 剥离行内指令
+    }
+    return _match; // 保留非行内指令的方括号内容
+  }).replace(/  +/g, ' ').trim();
+
+  return { cleanText, inlineCommands };
+}
+
 function parseDialogues(file: string, section: string, issues: CompileIssue[]) {
   const cleaned = section.replace(/```(?:\w+)?/g, '');
   const nodeMatches = [...cleaned.matchAll(/^\[(dlg_[A-Za-z0-9_]+|narr_[A-Za-z0-9_]+)\]\s*$/gm)];
@@ -238,12 +269,23 @@ function parseDialogues(file: string, section: string, issues: CompileIssue[]) {
       addIssue(issues, file, `节点 \`${id}\` 没有正文。`, '对话层');
     }
 
+    // V3: 提取行内指令并剥离
+    const { cleanText, inlineCommands } = extractInlineCommands(rawText);
+
     if (id.startsWith('dlg_')) {
-      const { actor, text } = splitActorAndText(rawText);
+      const { actor, text } = splitActorAndText(cleanText);
       dialogueOrder.push(id);
-      dialogues[id] = { id, actor, text };
+      const node: DialogueNode = { id, actor, text };
+      if (inlineCommands.length > 0) {
+        (node as any).inlineCommands = inlineCommands;
+      }
+      dialogues[id] = node;
     } else {
-      narratives[id] = { id, actor: '旁白', text: rawText };
+      const node: DialogueNode = { id, actor: '旁白', text: cleanText };
+      if (inlineCommands.length > 0) {
+        (node as any).inlineCommands = inlineCommands;
+      }
+      narratives[id] = node;
     }
   }
 
@@ -926,6 +968,7 @@ function buildPlotData(
   yamlData: YamlRecord,
   commands: Command[],
   dialoguesResult: ReturnType<typeof parseDialogues>,
+  interactions: Record<string, InteractionRule> | undefined,
   file: string,
   issues: CompileIssue[],
 ): PlotData {
@@ -940,6 +983,7 @@ function buildPlotData(
     commands,
     links: asLinks(yamlData.links, file, issues),
     metaphor: asMetaphor(yamlData.metaphor, file, issues),
+    ...(interactions && Object.keys(interactions).length > 0 ? { interactions } : {}),
   };
 }
 
@@ -968,7 +1012,12 @@ async function compile() {
     const { commands, choiceRoutes } = parseCommands(file, parsed.layers['指令层'], issues);
     const dialoguesResult = parseDialogues(file, parsed.layers['对话层'], issues);
     const yamlData = parseYamlLayer(file, parsed.layers['数据层'], issues);
-    const plotData = buildPlotData(yamlData, commands, dialoguesResult, file, issues);
+    
+    // V3: 解析交互层（可选）
+    const interactionLayer = parsed.layers['交互层'];
+    const interactions = interactionLayer ? parseInteractionLayer(file, interactionLayer, issues) : undefined;
+    
+    const plotData = buildPlotData(yamlData, commands, dialoguesResult, interactions, file, issues);
 
     validatePlot(file, plotData, choiceRoutes, issues);
     allPlots[plotId] = plotData;
@@ -987,6 +1036,47 @@ async function compile() {
   transformToV2(allPlots);
   await fs.writeJson(OUTPUT_FILE, allPlots, { spaces: 2 });
   console.log(`Compilation finished. Saved to ${OUTPUT_FILE}`);
+}
+
+/** V3: 解析交互层 YAML */
+function parseInteractionLayer(file: string, section: string, issues: CompileIssue[]): Record<string, InteractionRule> | undefined {
+  const yamlMatch = section.match(/```yaml\s*([\s\S]*?)```/) ?? section.match(/```\s*([\s\S]*?)```/);
+  if (!yamlMatch) {
+    // 交互层可选，没有 YAML 块不算错误
+    return undefined;
+  }
+
+  try {
+    const loaded = yaml.load(yamlMatch[1]);
+    if (!isRecord(loaded)) {
+      addIssue(issues, file, '交互层 YAML 顶层必须是对象。', '交互层');
+      return undefined;
+    }
+    
+    // 验证交互规则结构
+    const interactions: Record<string, InteractionRule> = {};
+    for (const [id, rule] of Object.entries(loaded)) {
+      if (!isRecord(rule)) {
+        addIssue(issues, file, `交互规则 \`${id}\` 必须是对象。`, '交互层');
+        continue;
+      }
+      if (typeof rule.kind !== 'string') {
+        addIssue(issues, file, `交互规则 \`${id}.kind\` 必须是字符串。`, '交互层');
+        continue;
+      }
+      if (typeof rule.successGotoNodeId !== 'string') {
+        addIssue(issues, file, `交互规则 \`${id}.successGotoNodeId\` 必须是字符串。`, '交互层');
+        continue;
+      }
+      interactions[id] = { ...rule, id } as InteractionRule;
+    }
+    
+    return Object.keys(interactions).length > 0 ? interactions : undefined;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    addIssue(issues, file, `交互层 YAML 解析失败：${message}`, '交互层');
+    return undefined;
+  }
 }
 
 async function writeIssueLog(issues: CompileIssue[]) {

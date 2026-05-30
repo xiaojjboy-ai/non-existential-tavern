@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { Command, DialogueNode, GameState, PlotData, RuntimeDebugState, AffinityEffect, MixingRecipe } from '../types/game';
+import type { Command, DialogueNode, GameState, PlotData, RuntimeDebugState, AffinityEffect, MixingRecipe, InlineCommand, InteractionRule } from '../types/game';
 import { evaluateDrink } from '../engine/DrinkEvaluator';
 import allPlotsRaw from '../data/plot-data.json';
 
@@ -65,7 +65,45 @@ function getInitialRuntime(plot: PlotData | undefined) {
   return replayNonBlockingCommands(plot, 0, firstPlayableIndex - 1);
 }
 
+// ==========================================
+// ====== V3 行内指令执行映射 ======
+// ==========================================
+
+/** 行内指令产生的对话效果状态 */
+export interface DialogueEffectState {
+  /** 当前激活的特效类名列表（如 'shake', 'glitch'） */
+  activeEffects: string[];
+  /** SPRITE 指令的目标立绘 ID */
+  spriteOverride: string | null;
+  /** 特效是否正在播放 */
+  isPlaying: boolean;
+}
+
+function createEmptyDialogueEffect(): DialogueEffectState {
+  return {
+    activeEffects: [],
+    spriteOverride: null,
+    isPlaying: false,
+  };
+}
+
+/** 将行内指令类型映射为 CSS 动画类名 */
+function mapInlineCommandToEffect(cmd: InlineCommand): string {
+  switch (cmd.type) {
+    case 'SHAKE': return 'shake';
+    case 'GLITCH': return 'glitch';
+    case 'FLASH': return 'flash';
+    case 'FREEZE': return 'freeze';
+    case 'SPRITE': return 'sprite-switch';
+    default: return '';
+  }
+}
+
 interface GameStore extends GameState {
+  // V3: 行内指令与交互状态
+  dialogueEffect: DialogueEffectState;
+  activeInteraction: InteractionRule | null;
+
   setPlot: (plotId: string) => void;
   setNode: (nodeId: string) => void;
   updateAffinity: (character: string, field: string, value: number) => void;
@@ -76,6 +114,12 @@ interface GameStore extends GameState {
   getCurrentPlot: () => PlotData | undefined;
   getCurrentNode: () => DialogueNode | null;
   getAllPlots: () => Record<string, PlotData>;
+
+  // V3: 行内指令执行与交互管理
+  executeInlineCommands: (commands: InlineCommand[]) => void;
+  clearDialogueEffect: () => void;
+  startInteraction: (interactionId: string) => void;
+  completeInteraction: (success: boolean) => void;
 }
 
 const defaultPlot = allPlots[defaultPlotId];
@@ -92,6 +136,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
   flags: {},
   runtime: getInitialRuntime(defaultPlot),
 
+  // V3: 初始状态
+  dialogueEffect: createEmptyDialogueEffect(),
+  activeInteraction: null,
+
   setPlot: (plotId) => {
     const plot = allPlots[plotId];
     set({
@@ -101,11 +149,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       currentChoiceId: null,
       currentDay: String(plot?.meta?.day ?? '01'),
       runtime: getInitialRuntime(plot),
+      dialogueEffect: createEmptyDialogueEffect(),
+      activeInteraction: null,
     });
   },
 
   setNode: (nodeId) => {
-    set({ currentNodeId: nodeId, currentChoiceId: null });
+    set({ currentNodeId: nodeId, currentChoiceId: null, dialogueEffect: createEmptyDialogueEffect() });
   },
 
   updateAffinity: (character, field, value) => set((state) => ({
@@ -138,6 +188,70 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   getAllPlots: () => allPlots,
 
+  // ==========================================
+  // ====== V3: 行内指令执行 ======
+  // ==========================================
+
+  executeInlineCommands: (commands: InlineCommand[]) => {
+    if (!commands || commands.length === 0) return;
+
+    const activeEffects: string[] = [];
+    let spriteOverride: string | null = null;
+
+    for (const cmd of commands) {
+      if (cmd.type === 'SPRITE' && cmd.args) {
+        spriteOverride = cmd.args;
+      } else {
+        const effect = mapInlineCommandToEffect(cmd);
+        if (effect) activeEffects.push(effect);
+      }
+    }
+
+    set({
+      dialogueEffect: {
+        activeEffects,
+        spriteOverride,
+        isPlaying: activeEffects.length > 0 || spriteOverride !== null,
+      },
+    });
+  },
+
+  clearDialogueEffect: () => {
+    set({ dialogueEffect: createEmptyDialogueEffect() });
+  },
+
+  // ==========================================
+  // ====== V3: 交互管理 ======
+  // ==========================================
+
+  startInteraction: (interactionId: string) => {
+    const plot = get().getCurrentPlot();
+    if (!plot?.interactions?.[interactionId]) return;
+
+    set({
+      activeInteraction: plot.interactions[interactionId],
+    });
+  },
+
+  completeInteraction: (success: boolean) => {
+    const state = get();
+    const interaction = state.activeInteraction;
+    if (!interaction) return;
+
+    const gotoNodeId = success ? interaction.successGotoNodeId : (interaction.failGotoNodeId ?? interaction.successGotoNodeId);
+
+    if (success && interaction.successAffinityEffect) {
+      state.applyEffect([interaction.successAffinityEffect]);
+    }
+
+    set((currentState) => ({
+      currentNodeId: gotoNodeId,
+      currentChoiceId: null,
+      activeInteraction: null,
+      history: [...currentState.history, `interact:${interaction.id}:${success ? 'success' : 'fail'}`],
+    }));
+  },
+
   nextStep: () => {
     const state = get();
     const plot = state.getCurrentPlot();
@@ -148,12 +262,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const runtime = replayNonBlockingCommands(plot, state.currentCommandIndex + 1, i);
 
       if (command.type === 'GOTO') {
-        set({ currentNodeId: command.params.targetNodeId, currentCommandIndex: i, currentChoiceId: null, runtime });
+        set({ currentNodeId: command.params.targetNodeId, currentCommandIndex: i, currentChoiceId: null, runtime, dialogueEffect: createEmptyDialogueEffect() });
         return;
       }
 
       if (command.type === 'CHOICE') {
         set({ currentCommandIndex: i, currentChoiceId: command.params.choiceId, runtime });
+        return;
+      }
+
+      if (command.type === 'INTERACT') {
+        set({ currentCommandIndex: i, runtime });
+        get().startInteraction(command.params.interactionId);
         return;
       }
 
@@ -168,6 +288,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
             currentChoiceId: null,
             currentDay: String(nextPlot?.meta?.day ?? ''),
             runtime: getInitialRuntime(nextPlot),
+            dialogueEffect: createEmptyDialogueEffect(),
+            activeInteraction: null,
           });
         } else {
           set({ currentCommandIndex: i, currentChoiceId: null, runtime });
@@ -189,6 +311,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         currentNodeId: branch.gotoNodeId,
         currentChoiceId: null,
         history: [...currentState.history, `${branchId}:${choiceKey}`],
+        dialogueEffect: createEmptyDialogueEffect(),
       }));
       return;
     }
@@ -203,6 +326,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           currentNodeId: rule.gotoNodeId,
           currentChoiceId: null,
           history: [...currentState.history, `drink:${rule.id}`],
+          dialogueEffect: createEmptyDialogueEffect(),
         }));
       }
     }
@@ -224,6 +348,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       currentNodeId: evalRule.gotoNodeId,
       currentChoiceId: null,
       history: [...currentState.history, `drink:${evalRule.id}`],
+      dialogueEffect: createEmptyDialogueEffect(),
     }));
   }
 }));

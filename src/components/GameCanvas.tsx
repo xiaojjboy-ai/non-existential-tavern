@@ -46,7 +46,7 @@ const drawBottle = (
 };
 
 export const GameCanvas = () => {
-  const { runtime } = useGameStore();
+  const { runtime, dialogueEffect } = useGameStore();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
   const [time, setTime] = useState(0);
@@ -165,7 +165,9 @@ export const GameCanvas = () => {
     return new BlurFilter(4);
   }, []);
 
-  const showLendro = !!(runtime.activeSpriteId && runtime.activeSpriteId.includes('Lendro'));
+  // [SPRITE] 行内指令覆盖优先于 runtime.activeSpriteId
+  const effectiveSpriteId = dialogueEffect.spriteOverride ?? runtime.activeSpriteId;
+  const showLendro = !!(effectiveSpriteId && effectiveSpriteId.includes('Lendro'));
   const showLendroRef = useRef(showLendro);
   const dimensionsRef = useRef(dimensions);
 

@@ -32,6 +32,7 @@ export function transformToV2(allPlots: any) {
           case 'PAUSE': params = { durationMs: parseInt(rawParams)||1000 }; break;
           case 'GOTO': params = { targetNodeId: rawParams }; break;
           case 'CHOICE': params = { choiceId: rawParams }; break;
+          case 'INTERACT': params = { interactionId: rawParams }; break;
           case 'END': params = {}; break;
         }
       }

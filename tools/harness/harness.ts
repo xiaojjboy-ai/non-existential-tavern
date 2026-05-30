@@ -190,20 +190,10 @@ function getRecord(value: unknown): Record<string, unknown> | null {
 }
 
 function validateFilenameMeta(file: string, data: Record<string, unknown>, issues: HarnessIssue[]) {
-  if (file.startsWith('DayPost_')) return;
-  const dayMatch = file.match(/^Day(\d{2})_/);
-  if (!dayMatch) {
-    addIssue(issues, { severity: 'error', file, message: '正式脚本文件名必须以 DayXX_ 开头，或使用 DayPost_。' });
-    return;
-  }
   const meta = getRecord(data.meta);
   if (!meta) {
     addIssue(issues, { severity: 'error', file, layer: '数据层', message: '缺少 meta。' });
     return;
-  }
-  const metaDay = String(meta.day ?? '').padStart(2, '0');
-  if (metaDay !== dayMatch[1]) {
-    addIssue(issues, { severity: 'error', file, layer: '数据层', message: `meta.day=${String(meta.day)} 与文件名 Day${dayMatch[1]} 不一致。` });
   }
   for (const key of ['character', 'visit', 'requires', 'unlocks', 'next', 'resources']) {
     if (!(key in meta)) {
@@ -258,7 +248,7 @@ async function validateScripts(issues: HarnessIssue[]) {
   const scriptFiles = files.filter((file) => !file.startsWith('模板_'));
 
   if (scriptFiles.length === 0) {
-    addIssue(issues, { severity: 'error', file: '脚本/', message: '没有正式 DayXX 脚本文件。' });
+    addIssue(issues, { severity: 'error', file: '脚本/', message: '没有正式脚本文件。' });
   }
 
   for (const file of scriptFiles) {

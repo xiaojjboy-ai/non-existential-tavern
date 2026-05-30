@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { GameCanvas } from '@/components/GameCanvas';
 import { MixingStation } from '@/components/MixingStation';
+import { InteractionLayer } from '@/components/InteractionLayer';
 import { useGameStore } from '@/store/useGameStore';
 import { ChoiceMenu } from '@/components/ChoiceMenu';
 import { DebugPanel } from '@/components/DebugPanel';
@@ -13,6 +14,7 @@ export default function Home() {
   const {
     currentPlotId,
     currentNodeId,
+    activeInteraction,
     getAllPlots,
     getCurrentNode,
     getCurrentPlot,
@@ -53,7 +55,8 @@ export default function Home() {
       {/* 独立的演出表现模块：立绘、背景切换 */}
       <GameCanvas />
       
-      <main className="fixed inset-0 z-20 flex flex-col justify-between p-6 md:p-12 pointer-events-none select-none crt-scanlines crt-screen crt-aberration">
+      {/* V3: 重构后的全屏 Layout — 顶部 HUD + 吧台物理桌面层 */}
+      <main className="fixed inset-0 z-20 flex flex-col pointer-events-none select-none crt-scanlines crt-screen crt-aberration" style={{ height: '100vh' }}>
         {/* 顶部 VCR/HUD 沉浸式状态栏 (纯展示层) */}
         <div className="w-full max-w-5xl self-center pointer-events-auto">
           <div
@@ -86,22 +89,34 @@ export default function Home() {
           </div>
         </div>
 
-        {/* 独立的对话框模块，内部嵌套了分支选项与调酒触发器 */}
-        <DialogueBox>
-          <ChoiceMenu />
-          {!isMixingActive && <DrinkPrompt onActivate={() => setIsMixingActive(true)} />}
-        </DialogueBox>
+        {/* 中间留白区域 — Pixi Canvas 在 z-0 层独立渲染 */}
 
-        {/* 独立的调酒台交互模块 */}
-        {isMixingActive && (
-          <MixingStation 
-            onCancel={() => setIsMixingActive(false)} 
-            onServe={(recipe) => {
-              setIsMixingActive(false);
-              handleDrinkMix(recipe);
-            }} 
-          />
-        )}
+        {/* V3: 底部 30% 吧台物理桌面层 */}
+        <div className="mt-auto">
+          <div className="bar-counter relative" style={{ height: '33vh' }}>
+            {/* 独立的对话框模块，悬浮于吧台之上 */}
+            <DialogueBox>
+              <ChoiceMenu />
+              {!isMixingActive && <DrinkPrompt onActivate={() => setIsMixingActive(true)} />}
+            </DialogueBox>
+
+            {/* V3: 交互层组件 — 拖拽小游戏等 */}
+            {activeInteraction && (
+              <InteractionLayer />
+            )}
+
+            {/* 独立的调酒台交互模块 */}
+            {isMixingActive && (
+              <MixingStation 
+                onCancel={() => setIsMixingActive(false)} 
+                onServe={(recipe) => {
+                  setIsMixingActive(false);
+                  handleDrinkMix(recipe);
+                }} 
+              />
+            )}
+          </div>
+        </div>
 
         {/* 独立的调试面板模块 (可以随时拿掉) */}
         <DebugPanel />

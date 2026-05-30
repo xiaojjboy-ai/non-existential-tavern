@@ -99,3 +99,120 @@ html {
 .crt-text-glow-crimson {
   text-shadow: 0 0 8px var(--color-phosphor-crimson), 0 0 1px var(--color-phosphor-crimson);
 }
+
+/* ==========================================
+   V3 行内特效动画
+   ========================================== */
+
+@keyframes v3Shake {
+  0%, 100% { transform: translate(0, 0); }
+  10% { transform: translate(-4px, 2px); }
+  20% { transform: translate(4px, -2px); }
+  30% { transform: translate(-3px, -3px); }
+  40% { transform: translate(3px, 3px); }
+  50% { transform: translate(-2px, 1px); }
+  60% { transform: translate(2px, -1px); }
+  70% { transform: translate(-1px, 2px); }
+  80% { transform: translate(1px, -2px); }
+  90% { transform: translate(-1px, 0); }
+}
+
+@keyframes v3Glitch {
+  0% { transform: translate(0); filter: none; }
+  20% { transform: translate(-3px, 2px); filter: hue-rotate(90deg); }
+  40% { transform: translate(3px, -1px); filter: hue-rotate(-90deg) saturate(2); }
+  60% { transform: translate(-2px, -2px); filter: hue-rotate(45deg); }
+  80% { transform: translate(2px, 1px); filter: none; }
+  100% { transform: translate(0); filter: none; }
+}
+
+@keyframes v3Flash {
+  0% { opacity: 1; }
+  10% { opacity: 0; background: white; }
+  20% { opacity: 1; background: transparent; }
+  30% { opacity: 0.8; background: white; }
+  40% { opacity: 1; background: transparent; }
+  100% { opacity: 1; background: transparent; }
+}
+
+@keyframes v3Freeze {
+  0% { filter: brightness(1) saturate(1); }
+  50% { filter: brightness(0.3) saturate(0) contrast(2); }
+  100% { filter: brightness(0.3) saturate(0) contrast(2); }
+}
+
+/* V3 特效类名 */
+.effect-shake {
+  animation: v3Shake 0.5s ease-in-out;
+}
+
+.effect-glitch {
+  animation: v3Glitch 0.4s ease-in-out;
+}
+
+.effect-flash {
+  animation: v3Flash 0.6s ease-out;
+}
+
+.effect-freeze {
+  animation: v3Freeze 0.3s forwards;
+}
+
+.effect-sprite-switch {
+  transition: opacity 0.3s ease-in-out;
+}
+
+/* V3 吧台物理桌面 */
+.bar-counter {
+  background: linear-gradient(
+    to bottom,
+    oklch(0.15 0.03 30 / 0.95),
+    oklch(0.10 0.02 30 / 0.98)
+  );
+  border-top: 2px solid var(--color-terminal-amber);
+  box-shadow:
+    inset 0 0 60px rgba(0, 0, 0, 0.9),
+    inset 0 20px 20px -20px var(--color-terminal-amber),
+    0 -15px 50px rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(8px);
+}
+
+/* V3 拖拽交互样式 */
+.drag-item {
+  cursor: grab;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  user-select: none;
+}
+
+.drag-item:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px var(--color-terminal-amber);
+}
+
+.drag-item:active {
+  cursor: grabbing;
+  transform: scale(1.08);
+}
+
+.drag-item.dragging {
+  opacity: 0.7;
+  transform: scale(1.1);
+  box-shadow: 0 0 30px var(--color-terminal-amber);
+}
+
+.drop-zone {
+  border: 2px dashed var(--color-terminal-amber);
+  transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
+}
+
+.drop-zone.drag-over {
+  border-color: var(--color-phosphor-crimson);
+  background-color: oklch(0.2 0.05 20 / 0.3);
+  box-shadow: 0 0 25px var(--color-phosphor-crimson) inset;
+}
+
+.drop-zone.matched {
+  border-color: oklch(0.7 0.2 140);
+  background-color: oklch(0.2 0.05 140 / 0.2);
+  box-shadow: 0 0 15px oklch(0.7 0.2 140) inset;
+}
