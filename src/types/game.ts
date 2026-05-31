@@ -90,7 +90,7 @@ declare global {
 // ==========================================
 
 /** 行内特效指令枚举 */
-export type InlineCommandType = 'SHAKE' | 'GLITCH' | 'SPRITE' | 'FLASH' | 'FREEZE';
+export type InlineCommandType = 'SHAKE' | 'GLITCH' | 'SPRITE' | 'FLASH' | 'FREEZE' | 'GUNSHOT';
 
 /** 行内指令结构 */
 export interface InlineCommand {

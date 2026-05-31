@@ -234,7 +234,7 @@ function splitActorAndText(rawText: string) {
 function extractInlineCommands(rawText: string): { cleanText: string; inlineCommands: Array<{ type: string; args?: string }> } {
   const inlineCommandRegex = /\[([A-Z_]+)\s*(.*?)\]/g;
   const inlineCommands: Array<{ type: string; args?: string }> = [];
-  const validTypes = new Set(['SHAKE', 'GLITCH', 'SPRITE', 'FLASH', 'FREEZE']);
+  const validTypes = new Set(['SHAKE', 'GLITCH', 'SPRITE', 'FLASH', 'FREEZE', 'GUNSHOT']);
 
   const cleanText = rawText.replace(inlineCommandRegex, (_match, type: string, args: string) => {
     if (validTypes.has(type)) {

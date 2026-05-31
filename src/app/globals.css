@@ -141,6 +141,29 @@ html {
   100% { filter: brightness(0.3) saturate(0) contrast(2); }
 }
 
+@keyframes gunshotFlashLayer {
+  0% { opacity: 0; transform: scale(0.98); }
+  1% {
+    opacity: 0.96;
+    background:
+      linear-gradient(90deg, rgba(255, 214, 52, 0.38), transparent 11% 89%, rgba(255, 214, 52, 0.36)),
+      radial-gradient(ellipse at 50% 48%, rgba(255, 238, 162, 0.68) 0%, rgba(255, 145, 28, 0.28) 27%, rgba(20, 0, 0, 0.26) 58%, transparent 76%),
+      repeating-linear-gradient(to bottom, rgba(255, 230, 80, 0.2) 0 1px, transparent 1px 4px);
+    filter: brightness(2.5) contrast(2);
+    transform: scale(1.02);
+  }
+  8% {
+    opacity: 0.58;
+    background:
+      radial-gradient(ellipse at 50% 48%, rgba(255, 204, 76, 0.46) 0%, rgba(255, 92, 22, 0.22) 32%, transparent 68%),
+      repeating-linear-gradient(to bottom, rgba(255, 216, 64, 0.18) 0 1px, transparent 1px 3px);
+    transform: scale(1.08);
+    filter: brightness(1.5) contrast(1.45);
+  }
+  24% { opacity: 0.24; transform: scale(1.18); filter: brightness(1.15); }
+  100% { opacity: 0; transform: scale(1.32); }
+}
+
 /* V3 特效类名 */
 .effect-shake {
   animation: v3Shake 0.5s ease-in-out;
@@ -156,6 +179,135 @@ html {
 
 .effect-freeze {
   animation: v3Freeze 0.3s forwards;
+}
+
+.animate-gunshot-flash {
+  /* 闪光同步，自然消散 */
+  animation: gunshotFlashLayer 0.8s ease-out forwards;
+}
+
+@keyframes v3GunshotHard {
+  0% {
+    transform: perspective(800px) translate3d(0, 0, 0) scaleX(1) scaleY(1) skewX(0deg) rotateZ(0deg);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    filter: none;
+  }
+  2% {
+    transform: perspective(800px) translate3d(-1px, 1px, 0) scaleX(1.006) scaleY(0.84) skewX(-2deg) rotateZ(0.22deg);
+    clip-path: polygon(0 18%, 8% 0, 18% 10%, 30% 0, 43% 12%, 58% 0, 72% 9%, 86% 0, 100% 14%, 97% 90%, 84% 100%, 68% 87%, 51% 100%, 34% 89%, 17% 100%, 0 85%);
+    filter: brightness(3.45) sepia(0.72) hue-rotate(-16deg) saturate(5.2) contrast(2.45);
+    box-shadow: 150px 0 64px -84px rgba(255, 229, 60, 0.94) inset, -150px 0 64px -84px rgba(255, 229, 60, 0.9) inset, 0 0 84px rgba(255, 175, 28, 0.5) !important;
+  }
+  7% {
+    transform: perspective(800px) rotateY(-1.5deg) translate3d(-3px, 8px, 0) scaleX(1.032) scaleY(0.42) skewX(-7deg) rotateZ(-0.34deg);
+    clip-path: polygon(0 37%, 6% 0, 18% 23%, 31% 4%, 47% 19%, 63% 4%, 78% 23%, 100% 0, 96% 77%, 85% 100%, 66% 76%, 49% 95%, 31% 77%, 13% 100%, 0 81%);
+    filter: brightness(4.95) sepia(1) hue-rotate(-18deg) saturate(7) contrast(2.9);
+    box-shadow: 190px 0 82px -92px rgba(255, 235, 64, 0.98) inset, -185px 0 82px -92px rgba(255, 235, 64, 0.95) inset, 0 0 104px rgba(255, 101, 22, 0.52) !important;
+  }
+  12% {
+    transform: perspective(800px) rotateY(1.2deg) translate3d(3px, -6px, 0) scaleX(1.022) scaleY(0.5) skewX(6deg) rotateZ(0.42deg);
+    clip-path: polygon(0 12%, 10% 2%, 24% 19%, 39% 3%, 55% 18%, 73% 4%, 100% 16%, 95% 100%, 78% 83%, 59% 100%, 40% 81%, 21% 100%, 0 83%);
+    filter: brightness(3.85) sepia(0.95) hue-rotate(-14deg) saturate(6.2) contrast(2.4);
+    box-shadow: 0 0 112px 26px rgba(255, 142, 20, 0.7) inset !important;
+  }
+  17% {
+    transform: perspective(800px) translate3d(-2px, 5px, 0) scaleX(1.012) scaleY(0.66) skewX(-4deg) rotateZ(-0.26deg);
+    clip-path: polygon(0 11%, 100% 3%, 96% 93%, 82% 100%, 62% 88%, 42% 100%, 19% 90%, 0 98%);
+    filter: brightness(2.45) sepia(0.54) saturate(3.8) contrast(1.82);
+  }
+  23% {
+    transform: perspective(800px) translate3d(1px, -2px, 0) scaleX(1) scaleY(0.82) skewX(2.5deg) rotateZ(0.16deg);
+    clip-path: polygon(0 5%, 18% 0, 100% 6%, 98% 96%, 76% 100%, 56% 95%, 36% 100%, 0 92%);
+    filter: brightness(1.65) sepia(0.28) saturate(2.6) contrast(1.42);
+  }
+  29% {
+    transform: perspective(800px) translate3d(0, 0, 0) scaleX(1) scaleY(0.96) skewX(0deg) rotateZ(0deg);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    filter: brightness(1.18) contrast(1.2);
+  }
+  33% {
+    transform: translate3d(-5px, 1px, 0) scaleY(0.96) skewX(-2.8deg) rotateZ(0.2deg);
+    filter: brightness(1.28) contrast(1.22);
+  }
+  36% { transform: translate3d(4px, -1px, 0) scaleY(0.98) skewX(2.4deg) rotateZ(-0.18deg); filter: brightness(1.18) contrast(1.16); }
+  39% { transform: translate3d(-4px, 1px, 0) scaleY(0.965) skewX(-2.2deg) rotateZ(0.16deg); }
+  43% { transform: translate3d(3px, 0, 0) scaleY(0.99) skewX(1.8deg) rotateZ(-0.14deg); }
+  47% { transform: translate3d(-3px, -1px, 0) scaleY(0.975) skewX(-1.6deg) rotateZ(0.12deg); }
+  51% { transform: translate3d(2.5px, 1px, 0) skewX(1.35deg); }
+  55% { transform: translate3d(-2.5px, 0, 0) skewX(-1.2deg); }
+  60% { transform: translate3d(2px, -1px, 0) skewX(1deg); }
+  65% { transform: translate3d(-2px, 1px, 0) skewX(-0.85deg); }
+  70% { transform: translate3d(1.5px, 0, 0) skewX(0.68deg); }
+  76% { transform: translate3d(-1.2px, 0, 0) skewX(-0.5deg); }
+  82% { transform: translate3d(0.9px, 0, 0) skewX(0.35deg); }
+  89% { transform: translate3d(-0.6px, 0, 0) skewX(-0.22deg); }
+  95% { transform: translate3d(0.3px, 0, 0) skewX(0.1deg); }
+  100% {
+    transform: perspective(800px) translate3d(0, 0, 0) scaleX(1) scaleY(1) skewX(0deg) rotateZ(0deg);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    filter: none;
+  }
+}
+
+@keyframes gunshotCrackLayer {
+  0% { opacity: 0; transform: translate3d(-2px, 0, 0) scaleY(1); }
+  1% { opacity: 1; transform: translate3d(2px, -1px, 0) scaleY(0.84); }
+  5% { opacity: 1; transform: translate3d(-1px, 1px, 0) scaleY(0.92); }
+  12% { opacity: 0.86; transform: translate3d(1px, 0, 0) scaleY(1); }
+  28% { opacity: 0.46; transform: translate3d(-1px, 0, 0); }
+  52% { opacity: 0.18; transform: translate3d(1px, 0, 0); }
+  100% { opacity: 0; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes gunshotAfterimageLayer {
+  0% { opacity: 0; transform: translate3d(0, 0, 0); }
+  1% { opacity: 0.92; transform: translate3d(-2px, 0, 0); }
+  4% { opacity: 0.74; transform: translate3d(2px, 0, 0); }
+  10% { opacity: 0.42; transform: translate3d(-1px, 0, 0); }
+  24% { opacity: 0.2; transform: translate3d(1px, 0, 0); }
+  100% { opacity: 0; transform: translate3d(0, 0, 0); }
+}
+
+.effect-gunshot {
+  position: relative;
+  overflow: hidden !important;
+  isolation: isolate;
+  transform-origin: 50% 50%;
+  backface-visibility: hidden;
+  transition: none !important;
+  animation: v3GunshotHard 1.08s steps(1, end) !important;
+}
+
+.effect-gunshot::before,
+.effect-gunshot::after {
+  content: "";
+  position: absolute;
+  inset: -18% -6%;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.effect-gunshot::before {
+  background:
+    linear-gradient(90deg, rgba(255, 231, 71, 0.9) 0 2%, rgba(255, 172, 30, 0.36) 2% 7%, transparent 12% 88%, rgba(255, 172, 30, 0.36) 93% 98%, rgba(255, 231, 71, 0.88) 98% 100%),
+    linear-gradient(24deg, transparent 0 30%, rgba(255, 255, 228, 0.82) 31%, transparent 33%),
+    linear-gradient(151deg, transparent 0 41%, rgba(255, 255, 218, 0.7) 42%, transparent 44%),
+    linear-gradient(78deg, transparent 0 55%, rgba(255, 226, 88, 0.66) 56%, transparent 58%),
+    linear-gradient(118deg, transparent 0 62%, rgba(255, 255, 210, 0.52) 63%, transparent 65%),
+    repeating-linear-gradient(to bottom, rgba(255, 89, 47, 0.36) 0 1px, rgba(255, 226, 93, 0.28) 1px 2px, transparent 2px 4px);
+  clip-path: polygon(0 18%, 7% 3%, 18% 13%, 29% 0, 43% 12%, 56% 3%, 70% 15%, 86% 0, 100% 17%, 98% 86%, 83% 100%, 68% 86%, 51% 100%, 35% 88%, 18% 100%, 0 84%);
+  mix-blend-mode: screen;
+  animation: gunshotCrackLayer 0.58s steps(9, end) forwards;
+}
+
+.effect-gunshot::after {
+  background:
+    radial-gradient(ellipse at 50% 46%, rgba(255, 242, 177, 0.5) 0%, rgba(255, 181, 38, 0.2) 28%, transparent 58%),
+    linear-gradient(90deg, rgba(255, 214, 55, 0.42), transparent 8% 92%, rgba(255, 214, 55, 0.38)),
+    repeating-linear-gradient(to bottom, rgba(255, 223, 83, 0.25) 0 1px, transparent 1px 3px);
+  mix-blend-mode: color-dodge;
+  opacity: 0;
+  animation: gunshotAfterimageLayer 0.72s steps(10, end) forwards;
 }
 
 .effect-sprite-switch {

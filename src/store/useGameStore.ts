@@ -95,6 +95,7 @@ function mapInlineCommandToEffect(cmd: InlineCommand): string {
     case 'FLASH': return 'flash';
     case 'FREEZE': return 'freeze';
     case 'SPRITE': return 'sprite-switch';
+    case 'GUNSHOT': return 'gunshot';
     default: return '';
   }
 }

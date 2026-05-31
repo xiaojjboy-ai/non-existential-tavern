@@ -70,6 +70,7 @@ Lendro：[SHAKE] 你说什么？！
 | `[SPRITE]` | 立绘切换 | `[SPRITE lendro_angry]` |
 | `[FLASH]` | 闪光效果 | `[FLASH] 轰！` |
 | `[FREEZE]` | 画面冻结 | `[FREEZE] 时间停止了` |
+| `[GUNSHOT]` | 枪击冲击形变 | `[GUNSHOT] 枪口顶住了他的下颌骨` |
 
 带参数的指令格式：`[指令名 参数]`，如 `[SPRITE lendro_angry]`。
 
