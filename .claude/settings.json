@@ -1,4 +1,8 @@
 {
+  "autoCompactEnabled": true,
+  "permissions": {
+    "defaultMode": "auto"
+  },
   "hooks": {
     "PostCompact": [
       {

@@ -7,8 +7,10 @@ import { InteractionLayer } from '@/components/InteractionLayer';
 import { useGameStore } from '@/store/useGameStore';
 import { ChoiceMenu } from '@/components/ChoiceMenu';
 import { DebugPanel } from '@/components/DebugPanel';
-import { DialogueBox } from '@/components/DialogueBox';
+import dynamic from 'next/dynamic';
 import { DrinkPrompt } from '@/components/DrinkPrompt';
+
+const DialogueBox = dynamic(() => import('@/components/DialogueBox').then(m => ({ default: m.DialogueBox })), { ssr: false });
 
 export default function Home() {
   const {
